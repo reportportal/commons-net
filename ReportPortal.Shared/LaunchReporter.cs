@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using ReportPortal.Client;
@@ -19,6 +18,18 @@ namespace ReportPortal.Shared
             TestNodes = new ConcurrentBag<TestReporter>();
         }
 
+        public LaunchReporter(Service service, string launchId, DateTime startTime)
+        {
+            _service = service;
+
+            LaunchId = launchId;
+            StartTime = startTime;
+
+            TestNodes = new ConcurrentBag<TestReporter>();
+
+            StartTask = Task.FromResult(0);
+        }
+
         public string LaunchId;
 
         public Task StartTask;
@@ -34,18 +45,19 @@ namespace ReportPortal.Shared
         }
 
         public Task FinishTask;
+
         public void Finish(FinishLaunchRequest request, bool force = false)
         {
-            var dependentTasks = TestNodes.Select(tn => tn.FinishTask).ToList();
-            dependentTasks.Add(StartTask);
+            Finish(request, force, true);
+        }
 
-            FinishTask = Task.Factory.ContinueWhenAll(dependentTasks.ToArray(), async (a) =>
+        public void Finish(FinishLaunchRequest request, bool force, bool finishLaunch)
+        {
+            var dependentTasks = TestNodes.Select(tn => tn.FinishTask).Concat(new[] { StartTask }).ToArray();
+
+            FinishTask = Task.Factory.ContinueWhenAll(dependentTasks, async _ =>
             {
-                if (force)
-                {
-                    await _service.FinishLaunchAsync(LaunchId, request, force);
-                }
-                else
+                if (!force)
                 {
                     try
                     {
@@ -60,7 +72,10 @@ namespace ReportPortal.Shared
                     {
                         request.EndTime = StartTime;
                     }
+                }
 
+                if (finishLaunch)
+                {
                     await _service.FinishLaunchAsync(LaunchId, request, force);
                 }
 
