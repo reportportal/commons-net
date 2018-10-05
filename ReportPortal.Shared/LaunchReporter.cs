@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ReportPortal.Client;
@@ -46,15 +45,19 @@ namespace ReportPortal.Shared
         }
 
         public Task FinishTask;
+
         public void Finish(FinishLaunchRequest request, bool force = false)
         {
-            FinishTask = Task.Factory.ContinueWhenAll(this.DependentTasks.ToArray(), async (a) =>
+            Finish(request, force, true);
+        }
+
+        public void Finish(FinishLaunchRequest request, bool force, bool finishLaunch)
+        {
+            var dependentTasks = TestNodes.Select(tn => tn.FinishTask).Concat(new[] { StartTask }).ToArray();
+
+            FinishTask = Task.Factory.ContinueWhenAll(dependentTasks, async _ =>
             {
-                if (force)
-                {
-                    await _service.FinishLaunchAsync(LaunchId, request, force);
-                }
-                else
+                if (!force)
                 {
                     try
                     {
@@ -69,19 +72,14 @@ namespace ReportPortal.Shared
                     {
                         request.EndTime = StartTime;
                     }
+                }
 
+                if (finishLaunch)
+                {
                     await _service.FinishLaunchAsync(LaunchId, request, force);
                 }
 
             }).Unwrap();
-        }
-
-        public List<Task> DependentTasks
-        {
-            get
-            {
-                return TestNodes.Select(tn => tn.FinishTask).Concat(new [] { StartTask }).ToList();
-            }
         }
 
         public ConcurrentBag<TestReporter> TestNodes { get; set; }
