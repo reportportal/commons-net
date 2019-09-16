@@ -1,4 +1,5 @@
-﻿using ReportPortal.Shared.Reporter;
+﻿using Moq;
+using ReportPortal.Shared.Reporter;
 using ReportPortal.Shared.Tests.Helpers;
 using System;
 using System.Collections.Generic;
@@ -82,31 +83,36 @@ namespace ReportPortal.Shared.Tests.Faked
         [Fact]
         public void StartLaunchScheduling()
         {
-            var totalNumber = 1000;
+            var service = new Mock<Client.Service>(new Uri("http://abc.com"), It.IsAny<string>(), It.IsAny<string>());
+            service.Setup(s => s.StartLaunchAsync(It.IsAny<Client.Requests.StartLaunchRequest>())).Returns(Task.FromResult(new Client.Models.Launch()));
 
-            var fakeService = new FakeService(new Uri("https://rp.epam.com/api/v1/"), "ci-agents-checks", "b79e81a5-8448-49b5-857d-945ff5fd5ed2");
+            var launchReporters = new List<Mock<LaunchReporter>>();
 
-            var launchReporters = new List<LaunchReporter>();
-
-            for (int i = 0; i < totalNumber; i++)
+            for (int i = 0; i < 1000; i++)
             {
-                var launchReporter = new LaunchReporter(fakeService);
+                var launchReporter = new Mock<LaunchReporter>(service.Object);
 
-                launchReporters.Add(launchReporter);
-
-                var launchDateTime = DateTime.UtcNow;
-
-                launchReporter.Start(new Client.Requests.StartLaunchRequest
+                launchReporter.Object.Start(new Client.Requests.StartLaunchRequest
                 {
                     Name = $"ReportPortal Shared {i}",
-                    StartTime = launchDateTime
+                    StartTime = DateTime.UtcNow
                 });
+
+                launchReporters.Add(launchReporter);
             }
 
-            Task.WaitAll(launchReporters.Select(l => l.StartTask).ToArray());
+            for (int i = 0; i < 1000; i++)
+            {
+                var launchReporter = launchReporters[i];
 
-            Assert.Equal(totalNumber, launchReporters.Select(l => l.LaunchInfo.Name).Distinct().Count());
-            Assert.Equal(totalNumber, launchReporters.Select(l => l.LaunchInfo.Id).Distinct().Count());
+                Assert.NotNull(launchReporter.Object.StartTask);
+
+                launchReporter.Object.Sync();
+
+                Assert.Equal($"ReportPortal Shared {i}", launchReporter.Object.LaunchInfo.Name);
+            }
+
+            service.Verify(s => s.StartLaunchAsync(It.IsAny<Client.Requests.StartLaunchRequest>()), Times.Exactly(1000));
         }
     }
 }

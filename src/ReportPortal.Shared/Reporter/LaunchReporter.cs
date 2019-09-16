@@ -140,5 +140,12 @@ namespace ReportPortal.Shared.Reporter
         }
 
         public TestReporter LastTestNode { get; set; }
+
+        public void Sync()
+        {
+            StartTask?.GetAwaiter().GetResult();
+
+            FinishTask?.GetAwaiter().GetResult();
+        }
     }
 }
