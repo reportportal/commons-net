@@ -18,10 +18,7 @@ namespace ReportPortal.Shared.Tests.Faked
         [InlineData(5, 10000, 10)]
         public void SuccessReporting(int suitesPerLaunch, int testsPerSuite, int logsPerTest)
         {
-            var service = new Mock<Client.Service>(new Uri("http://abc.com"), It.IsAny<string>(), It.IsAny<string>());
-            service.Setup(s => s.StartLaunchAsync(It.IsAny<Client.Requests.StartLaunchRequest>())).Returns(Task.FromResult(new Client.Models.Launch()));
-            service.Setup(s => s.StartTestItemAsync(It.IsAny<Client.Requests.StartTestItemRequest>())).Returns(Task.FromResult(new Client.Models.TestItem()));
-            service.Setup(s => s.StartTestItemAsync(null, It.IsAny<Client.Requests.StartTestItemRequest>())).Returns(Task.FromResult(new Client.Models.TestItem()));
+            var service = new MockServiceBuilder().Build();
 
             var launchScheduler = new LaunchScheduler(service.Object);
             var launchReporter = launchScheduler.Build(suitesPerLaunch, testsPerSuite, logsPerTest);
@@ -38,11 +35,8 @@ namespace ReportPortal.Shared.Tests.Faked
         [InlineData(10, 10, 10)]
         public void FailedLogsShouldNotAffectFinishingLaunch(int suitesPerLaunch, int testsPerSuite, int logsPerTest)
         {
-            var service = new Mock<Client.Service>(new Uri("http://abc.com"), It.IsAny<string>(), It.IsAny<string>());
-            service.Setup(s => s.StartLaunchAsync(It.IsAny<Client.Requests.StartLaunchRequest>())).Returns(Task.FromResult(new Client.Models.Launch()));
-            service.Setup(s => s.StartTestItemAsync(It.IsAny<Client.Requests.StartTestItemRequest>())).Returns(Task.FromResult(new Client.Models.TestItem()));
-            service.Setup(s => s.StartTestItemAsync(null, It.IsAny<Client.Requests.StartTestItemRequest>())).Returns(Task.FromResult(new Client.Models.TestItem()));
-            service.Setup(s => s.AddLogItemAsync(It.IsAny<Client.Requests.AddLogItemRequest>())).Throws(new Exception());
+            var service = new MockServiceBuilder().Build();
+            service.Setup(s => s.AddLogItemAsync(It.IsAny<Client.Requests.AddLogItemRequest>())).Throws<Exception>();
 
             var launchScheduler = new LaunchScheduler(service.Object);
             var launchReporter = launchScheduler.Build(suitesPerLaunch, testsPerSuite, logsPerTest);
@@ -60,10 +54,7 @@ namespace ReportPortal.Shared.Tests.Faked
         [InlineData(5, 5, 0)]
         public void FailedFinishTestItemShouldRaiseExceptionAtFinishLaunch(int suitesPerLaunch, int testsPerSuite, int logsPerTest)
         {
-            var service = new Mock<Client.Service>(new Uri("http://abc.com"), It.IsAny<string>(), It.IsAny<string>());
-            service.Setup(s => s.StartLaunchAsync(It.IsAny<Client.Requests.StartLaunchRequest>())).Returns(Task.FromResult(new Client.Models.Launch()));
-            service.Setup(s => s.StartTestItemAsync(It.IsAny<Client.Requests.StartTestItemRequest>())).Returns(Task.FromResult(new Client.Models.TestItem()));
-            service.Setup(s => s.StartTestItemAsync(null, It.IsAny<Client.Requests.StartTestItemRequest>())).Returns(Task.FromResult(new Client.Models.TestItem()));
+            var service = new MockServiceBuilder().Build();
             service.Setup(s => s.FinishTestItemAsync(null, It.IsAny<Client.Requests.FinishTestItemRequest>())).Throws(new Exception());
 
             var launchScheduler = new LaunchScheduler(service.Object);
@@ -83,8 +74,7 @@ namespace ReportPortal.Shared.Tests.Faked
         [InlineData(100, 100, 1)]
         public void FailedStartSuiteItemShouldRaiseExceptionAtFinishLaunch(int suitesPerLaunch, int testsPerSuite, int logsPerTest)
         {
-            var service = new Mock<Client.Service>(new Uri("http://abc.com"), It.IsAny<string>(), It.IsAny<string>());
-            service.Setup(s => s.StartLaunchAsync(It.IsAny<Client.Requests.StartLaunchRequest>())).Returns(Task.FromResult(new Client.Models.Launch()));
+            var service = new MockServiceBuilder().Build();
             service.Setup(s => s.StartTestItemAsync(It.IsAny<Client.Requests.StartTestItemRequest>())).Throws<Exception>();
 
             var launchScheduler = new LaunchScheduler(service.Object);
@@ -101,8 +91,7 @@ namespace ReportPortal.Shared.Tests.Faked
         [Fact]
         public void StartLaunchScheduling()
         {
-            var service = new Mock<Client.Service>(new Uri("http://abc.com"), It.IsAny<string>(), It.IsAny<string>());
-            service.Setup(s => s.StartLaunchAsync(It.IsAny<Client.Requests.StartLaunchRequest>())).Returns(Task.FromResult(new Client.Models.Launch()));
+            var service = new MockServiceBuilder().Build();
 
             var launchReporters = new List<Mock<LaunchReporter>>();
 
