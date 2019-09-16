@@ -18,16 +18,19 @@ namespace ReportPortal.Shared.Tests.Faked
         [InlineData(5, 10000, 10)]
         public void SuccessReporting(int suitesPerLaunch, int testsPerSuite, int logsPerTest)
         {
-            var fakeService = new FakeService(new Uri("https://rp.epam.com/api/v1/"), "ci-agents-checks", "b79e81a5-8448-49b5-857d-945ff5fd5ed2");
+            var service = new Mock<Client.Service>(new Uri("http://abc.com"), It.IsAny<string>(), It.IsAny<string>());
+            service.Setup(s => s.StartLaunchAsync(It.IsAny<Client.Requests.StartLaunchRequest>())).Returns(Task.FromResult(new Client.Models.Launch()));
+            service.Setup(s => s.StartTestItemAsync(It.IsAny<Client.Requests.StartTestItemRequest>())).Returns(Task.FromResult(new Client.Models.TestItem()));
+            service.Setup(s => s.StartTestItemAsync(null, It.IsAny<Client.Requests.StartTestItemRequest>())).Returns(Task.FromResult(new Client.Models.TestItem()));
 
-            var launchScheduler = new LaunchScheduler(fakeService);
+            var launchScheduler = new LaunchScheduler(service.Object);
             var launchReporter = launchScheduler.Build(suitesPerLaunch, testsPerSuite, logsPerTest);
 
-            launchReporter.FinishTask.Wait();
+            launchReporter.Sync();
 
-            Assert.Equal(suitesPerLaunch * testsPerSuite + suitesPerLaunch, fakeService.StartTestItemCounter);
-
-            Assert.Equal(suitesPerLaunch * testsPerSuite * logsPerTest, fakeService.AddLogItemCounter);
+            service.Verify(s => s.StartTestItemAsync(It.IsAny<Client.Requests.StartTestItemRequest>()), Times.Exactly(suitesPerLaunch));
+            service.Verify(s => s.StartTestItemAsync(null, It.IsAny<Client.Requests.StartTestItemRequest>()), Times.Exactly(testsPerSuite * suitesPerLaunch));
+            service.Verify(s => s.AddLogItemAsync(It.IsAny<Client.Requests.AddLogItemRequest>()), Times.Exactly(suitesPerLaunch * testsPerSuite * logsPerTest));
         }
 
         [Theory]
@@ -35,49 +38,64 @@ namespace ReportPortal.Shared.Tests.Faked
         [InlineData(10, 10, 10)]
         public void FailedLogsShouldNotAffectFinishingLaunch(int suitesPerLaunch, int testsPerSuite, int logsPerTest)
         {
-            var fakeService = new FakeServiceWithFailedAddLogItemMethod(new Uri("https://rp.epam.com/api/v1/"), "ci-agents-checks", "b79e81a5-8448-49b5-857d-945ff5fd5ed2");
+            var service = new Mock<Client.Service>(new Uri("http://abc.com"), It.IsAny<string>(), It.IsAny<string>());
+            service.Setup(s => s.StartLaunchAsync(It.IsAny<Client.Requests.StartLaunchRequest>())).Returns(Task.FromResult(new Client.Models.Launch()));
+            service.Setup(s => s.StartTestItemAsync(It.IsAny<Client.Requests.StartTestItemRequest>())).Returns(Task.FromResult(new Client.Models.TestItem()));
+            service.Setup(s => s.StartTestItemAsync(null, It.IsAny<Client.Requests.StartTestItemRequest>())).Returns(Task.FromResult(new Client.Models.TestItem()));
+            service.Setup(s => s.AddLogItemAsync(It.IsAny<Client.Requests.AddLogItemRequest>())).Throws(new Exception());
 
-            var launchScheduler = new LaunchScheduler(fakeService);
+            var launchScheduler = new LaunchScheduler(service.Object);
             var launchReporter = launchScheduler.Build(suitesPerLaunch, testsPerSuite, logsPerTest);
 
-            launchReporter.FinishTask.Wait();
+            launchReporter.Sync();
 
-            Assert.Equal(suitesPerLaunch * testsPerSuite + suitesPerLaunch, fakeService.StartTestItemCounter);
-
-            Assert.Equal(suitesPerLaunch * testsPerSuite + suitesPerLaunch, fakeService.FinishTestItemCounter);
+            service.Verify(s => s.StartTestItemAsync(It.IsAny<Client.Requests.StartTestItemRequest>()), Times.Exactly(suitesPerLaunch));
+            service.Verify(s => s.StartTestItemAsync(null, It.IsAny<Client.Requests.StartTestItemRequest>()), Times.Exactly(testsPerSuite * suitesPerLaunch));
+            service.Verify(s => s.AddLogItemAsync(It.IsAny<Client.Requests.AddLogItemRequest>()), Times.Exactly(suitesPerLaunch * testsPerSuite * logsPerTest));
         }
 
         [Theory]
         [InlineData(1, 1, 1)]
         [InlineData(1, 1, 2)]
-        public void FailedFirstFinishTestItemShouldRaiseExceptionAtFinishLaunch(int suitesPerLaunch, int testsPerSuite, int logsPerTest)
+        [InlineData(5, 5, 0)]
+        public void FailedFinishTestItemShouldRaiseExceptionAtFinishLaunch(int suitesPerLaunch, int testsPerSuite, int logsPerTest)
         {
-            var fakeService = new FakeServiceWithFailedFirstFinishTestItemMethod(new Uri("https://rp.epam.com/api/v1/"), "ci-agents-checks", "b79e81a5-8448-49b5-857d-945ff5fd5ed2");
+            var service = new Mock<Client.Service>(new Uri("http://abc.com"), It.IsAny<string>(), It.IsAny<string>());
+            service.Setup(s => s.StartLaunchAsync(It.IsAny<Client.Requests.StartLaunchRequest>())).Returns(Task.FromResult(new Client.Models.Launch()));
+            service.Setup(s => s.StartTestItemAsync(It.IsAny<Client.Requests.StartTestItemRequest>())).Returns(Task.FromResult(new Client.Models.TestItem()));
+            service.Setup(s => s.StartTestItemAsync(null, It.IsAny<Client.Requests.StartTestItemRequest>())).Returns(Task.FromResult(new Client.Models.TestItem()));
+            service.Setup(s => s.FinishTestItemAsync(null, It.IsAny<Client.Requests.FinishTestItemRequest>())).Throws(new Exception());
 
-            var launchScheduler = new LaunchScheduler(fakeService);
+            var launchScheduler = new LaunchScheduler(service.Object);
             var launchReporter = launchScheduler.Build(suitesPerLaunch, testsPerSuite, logsPerTest);
 
-            var exp = Assert.ThrowsAny<Exception>(() => launchReporter.FinishTask.Wait());
+            var exp = Assert.ThrowsAny<Exception>(() => launchReporter.Sync());
+            Assert.Contains("Cannot finish launch", exp.Message);
 
-            Assert.Equal(suitesPerLaunch * testsPerSuite + suitesPerLaunch, fakeService.StartTestItemCounter);
-
-            Assert.Equal(suitesPerLaunch * testsPerSuite - 1, fakeService.FinishTestItemCounter);
+            service.Verify(s => s.StartTestItemAsync(It.IsAny<Client.Requests.StartTestItemRequest>()), Times.Exactly(suitesPerLaunch));
+            service.Verify(s => s.StartTestItemAsync(null, It.IsAny<Client.Requests.StartTestItemRequest>()), Times.Exactly(suitesPerLaunch * testsPerSuite));
+            service.Verify(s => s.FinishTestItemAsync(null, It.IsAny<Client.Requests.FinishTestItemRequest>()), Times.Exactly(suitesPerLaunch * testsPerSuite));
         }
 
         [Theory]
         [InlineData(100, 1, 1)]
         [InlineData(1, 100, 10000)]
         [InlineData(100, 100, 1)]
-        public void FailedFirstStartSuiteItemShouldRaiseExceptionAtFinishLaunch(int suitesPerLaunch, int testsPerSuite, int logsPerTest)
+        public void FailedStartSuiteItemShouldRaiseExceptionAtFinishLaunch(int suitesPerLaunch, int testsPerSuite, int logsPerTest)
         {
-            var fakeService = new FakeServiceWithFailedFirstStartTestItemMethod(new Uri("https://rp.epam.com/api/v1/"), "ci-agents-checks", "b79e81a5-8448-49b5-857d-945ff5fd5ed2");
+            var service = new Mock<Client.Service>(new Uri("http://abc.com"), It.IsAny<string>(), It.IsAny<string>());
+            service.Setup(s => s.StartLaunchAsync(It.IsAny<Client.Requests.StartLaunchRequest>())).Returns(Task.FromResult(new Client.Models.Launch()));
+            service.Setup(s => s.StartTestItemAsync(It.IsAny<Client.Requests.StartTestItemRequest>())).Throws<Exception>();
 
-            var launchScheduler = new LaunchScheduler(fakeService);
+            var launchScheduler = new LaunchScheduler(service.Object);
             var launchReporter = launchScheduler.Build(suitesPerLaunch, testsPerSuite, logsPerTest);
 
-            var exp = Assert.ThrowsAny<Exception>(() => launchReporter.FinishTask.Wait());
+            var exp = Assert.ThrowsAny<Exception>(() => launchReporter.Sync());
+            Assert.Contains("Cannot finish launch", exp.Message);
 
-            Assert.Equal((suitesPerLaunch - 1) * testsPerSuite + (suitesPerLaunch - 1), fakeService.StartTestItemCounter);
+            service.Verify(s => s.StartTestItemAsync(It.IsAny<Client.Requests.StartTestItemRequest>()), Times.Exactly(suitesPerLaunch));
+            service.Verify(s => s.StartTestItemAsync(null, It.IsAny<Client.Requests.StartTestItemRequest>()), Times.Never);
+            service.Verify(s => s.FinishTestItemAsync(null, It.IsAny<Client.Requests.FinishTestItemRequest>()), Times.Never);
         }
 
         [Fact]
