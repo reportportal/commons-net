@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -46,9 +47,9 @@ namespace ReportPortal.Shared
                         }
                     }
                 }
-                catch (ReflectionTypeLoadException)
+                catch (ReflectionTypeLoadException e)
                 {
-
+                    Tracer.Instance.TraceEvent(TraceEventType.Error, 1, $"Unable to handle logs: {e.Message}");
                 }
             }
 
