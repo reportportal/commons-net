@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
-namespace ReportPortal.Shared.Internal
+namespace ReportPortal.Shared.Internal.Logging
 {
-    public class TraceLogManager
+    public static class TraceLogManager
     {
         public static ITraceLogger GetLogger(Type type)
         {

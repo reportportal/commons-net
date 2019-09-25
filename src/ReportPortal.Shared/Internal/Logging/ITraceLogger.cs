@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ReportPortal.Shared.Internal
+namespace ReportPortal.Shared.Internal.Logging
 {
     public interface ITraceLogger
     {

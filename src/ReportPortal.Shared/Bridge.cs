@@ -12,7 +12,7 @@ namespace ReportPortal.Shared
 {
     public static class Bridge
     {
-        private static Internal.ITraceLogger TraceLogger { get; } = Internal.TraceLogManager.GetLogger(typeof(Bridge));
+        private static Internal.Logging.ITraceLogger TraceLogger { get; } = Internal.Logging.TraceLogManager.GetLogger(typeof(Bridge));
 
         static Bridge()
         {
@@ -20,6 +20,8 @@ namespace ReportPortal.Shared
             LogHandlerExtensions = new List<ILogHandler>();
 
             var currentDirectory = new DirectoryInfo(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
+
+            TraceLogger.Info($"Current assembly directory is '{currentDirectory}'");
 
             foreach (var file in currentDirectory.GetFiles("ReportPortal.*.dll"))
             {

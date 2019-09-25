@@ -1,7 +1,6 @@
-﻿using ReportPortal.Shared.Internal;
+﻿using ReportPortal.Shared.Internal.Logging;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -21,10 +20,10 @@ namespace ReportPortal.Shared.Tests.Internal
 
             var tasks = new List<Task>();
 
-            for (int i = 0; i < 200; i++)
+            for (int i = 0; i < 20; i++)
             {
                 var eventId = i;
-                tasks.Add(Task.Factory.StartNew(() => logger.Info("my message")));
+                tasks.Add(Task.Factory.StartNew(() => logger.Info($"my message #{eventId}")));
             }
 
             Task.WaitAll(tasks.ToArray());
