@@ -38,6 +38,11 @@ namespace ReportPortal.Shared.Tests.Internal
 
             Task.WaitAll(tasks.ToArray());
 
+            foreach (var file in Directory.GetFiles(Environment.CurrentDirectory))
+            {
+                _out.WriteLine(file);
+            }
+
             Assert.True(File.Exists(_defaultLogFilePath));
         }
 
