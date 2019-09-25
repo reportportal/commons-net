@@ -1,42 +1,68 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
 
 namespace ReportPortal.Shared.Internal.Logging
 {
     public static class TraceLogManager
     {
-        public static ITraceLogger GetLogger<T>()
+        static SourceLevels _traceLevel;
+
+        static TraceLogManager()
         {
-            return GetLogger(typeof(T));
+            var envTraceLevelValue = Environment.GetEnvironmentVariable("ReportPortal_TraceLevel");
+
+            if (!Enum.TryParse(envTraceLevelValue, out _traceLevel))
+            {
+                _traceLevel = SourceLevels.Error;
+            }
         }
+
+        readonly static object _lockObj = new object();
+
+        static Dictionary<Type, ITraceLogger> _traceLoggers;
 
         public static ITraceLogger GetLogger(Type type)
         {
-            var traceSource = new TraceSource(type.Name);
-
-            var envTraceLevelValue = Environment.GetEnvironmentVariable("ReportPortal_TraceLevel");
-
-            SourceLevels traceLevel;
-            if (!Enum.TryParse(envTraceLevelValue, out traceLevel))
+            if (_traceLoggers == null)
             {
-                traceLevel = SourceLevels.Error;
+                lock (_lockObj)
+                {
+                    if (_traceLoggers == null)
+                    {
+                        _traceLoggers = new Dictionary<Type, ITraceLogger>();
+                    }
+                }
             }
 
-            traceSource.Switch = new SourceSwitch("ReportPortal_TraceSwitch", traceLevel.ToString());
-
-            var logFileName = $"{type.Assembly.GetName().Name}.{Process.GetCurrentProcess().Id}.log";
-
-            var traceListener = new DefaultTraceListener
+            lock (_lockObj)
             {
-                Filter = new SourceFilter(traceSource.Name),
-                LogFileName = logFileName
-            };
+                if (!_traceLoggers.ContainsKey(type))
+                {
+                    var traceSource = new TraceSource(type.Name);
 
-            traceSource.Listeners.Add(traceListener);
+                    traceSource.Switch = new SourceSwitch("ReportPortal_TraceSwitch", _traceLevel.ToString());
 
-            return new TraceLogger(traceSource);
+                    var logFileName = $"{type.Assembly.GetName().Name}.{Process.GetCurrentProcess().Id}.log";
+
+                    var traceListener = new DefaultTraceListener
+                    {
+                        Filter = new SourceFilter(traceSource.Name),
+                        LogFileName = logFileName
+                    };
+
+                    traceSource.Listeners.Add(traceListener);
+
+                    _traceLoggers[type] = new TraceLogger(traceSource);
+                }
+            }
+
+            return _traceLoggers[type];
+        }
+
+        public static ITraceLogger GetLogger<T>()
+        {
+            return GetLogger(typeof(T));
         }
     }
 }
