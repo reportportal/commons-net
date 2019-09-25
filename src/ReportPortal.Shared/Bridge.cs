@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -13,6 +12,8 @@ namespace ReportPortal.Shared
 {
     public static class Bridge
     {
+        private static Internal.ITraceLogger TraceLogger { get; } = Internal.TraceLogManager.GetLogger(typeof(Bridge));
+
         static Bridge()
         {
             LogFormatterExtensions = new List<ILogFormatter>();
@@ -49,14 +50,13 @@ namespace ReportPortal.Shared
                 }
                 catch (ReflectionTypeLoadException e)
                 {
-                    Tracer.Instance.TraceEvent(TraceEventType.Error, 1, $"Unable to handle logs: {e.Message}");
+                    TraceLogger.Error(e.ToString());
                 }
             }
 
             LogFormatterExtensions = LogFormatterExtensions.OrderBy(ext => ext.Order).ToList();
             LogHandlerExtensions = LogHandlerExtensions.OrderBy(ext => ext.Order).ToList();
         }
-
 
         public static List<ILogFormatter> LogFormatterExtensions { get; }
 
