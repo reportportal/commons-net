@@ -7,13 +7,24 @@ namespace ReportPortal.Shared.Internal.Logging
 {
     public static class TraceLogManager
     {
+        public static ITraceLogger GetLogger<T>()
+        {
+            return GetLogger(typeof(T));
+        }
+
         public static ITraceLogger GetLogger(Type type)
         {
             var traceSource = new TraceSource(type.Name);
 
-            var envTraceLevel = Environment.GetEnvironmentVariable("ReportPortal_TraceLevel");
+            var envTraceLevelValue = Environment.GetEnvironmentVariable("ReportPortal_TraceLevel");
 
-            traceSource.Switch = new SourceSwitch("ReportPortal_TraceSwitch", envTraceLevel);
+            SourceLevels traceLevel;
+            if (!Enum.TryParse(envTraceLevelValue, out traceLevel))
+            {
+                traceLevel = SourceLevels.Error;
+            }
+
+            traceSource.Switch = new SourceSwitch("ReportPortal_TraceSwitch", traceLevel.ToString());
 
             var logFileName = $"{type.Assembly.GetName().Name}.{Process.GetCurrentProcess().Id}.log";
 

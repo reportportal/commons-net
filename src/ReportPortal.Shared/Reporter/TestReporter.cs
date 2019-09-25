@@ -14,6 +14,8 @@ namespace ReportPortal.Shared.Reporter
     {
         private readonly Service _service;
 
+        private static Internal.Logging.ITraceLogger TraceLogger { get; } = Internal.Logging.TraceLogManager.GetLogger<TestReporter>();
+
         public TestReporter(Service service, ILaunchReporter launchReporter, ITestReporter parentTestReporter)
         {
             _service = service;
@@ -33,6 +35,8 @@ namespace ReportPortal.Shared.Reporter
 
         public void Start(StartTestItemRequest request)
         {
+            TraceLogger.Verbose("Scheduling request to start new test item");
+
             if (StartTask != null)
             {
                 throw new InsufficientExecutionStackException("The test item is already scheduled for starting.");
@@ -82,8 +86,11 @@ namespace ReportPortal.Shared.Reporter
         }
 
         public Task FinishTask { get; private set; }
+
         public void Finish(FinishTestItemRequest request)
         {
+            TraceLogger.Verbose("Scheduling request to finish new test item");
+
             if (StartTask == null)
             {
                 throw new InsufficientExecutionStackException("The test item wasn't scheduled for starting to finish it properly.");

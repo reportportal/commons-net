@@ -15,7 +15,6 @@ build_script:
   - cmd: dotnet build
 
 test_script:
-  - cmd: set ReportPortal_TraceLevel=Verbose
   - cmd: dotnet test --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=OpenCover /p:CoverletOutput=./Coverage.xml
 
 after_test:
@@ -26,4 +25,3 @@ after_test:
 artifacts:
   - path: '**\*.nupkg'
   - path: '**\*.html'
-  - path: '**\ReportPortal*.log'

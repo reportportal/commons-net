@@ -19,6 +19,11 @@ namespace ReportPortal.Shared.Internal.Logging
             Message(TraceEventType.Information, message);
         }
 
+        public void Verbose(string message)
+        {
+            Message(TraceEventType.Verbose, message);
+        }
+
         public void Error(string message)
         {
             Message(TraceEventType.Error, message);

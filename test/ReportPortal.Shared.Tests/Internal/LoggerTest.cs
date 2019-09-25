@@ -10,13 +10,13 @@ namespace ReportPortal.Shared.Tests.Internal
     {
         public LoggerTest()
         {
-            Environment.SetEnvironmentVariable("ReportPortal_TraceLevel", "Verbose");
+            Environment.SetEnvironmentVariable("ReportPortal_TraceLevel", "Information");
         }
 
         [Fact]
         public void ConcurrentWriters()
         {
-            var logger = TraceLogManager.GetLogger(typeof(LoggerTest));
+            var logger = TraceLogManager.GetLogger<LoggerTest>();
 
             var tasks = new List<Task>();
 
