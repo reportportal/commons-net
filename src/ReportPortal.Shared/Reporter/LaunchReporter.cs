@@ -132,8 +132,8 @@ namespace ReportPortal.Shared.Reporter
 
         public ITestReporter StartChildTestReporter(StartTestItemRequest request)
         {
-            var newTestNode = new TestReporter(_service, this, null);
-            newTestNode.Start(request);
+            var newTestNode = new TestReporter(_service, this, null, request);
+
             if (ChildTestReporters == null)
             {
                 ChildTestReporters = new ConcurrentBag<ITestReporter>();
@@ -146,5 +146,12 @@ namespace ReportPortal.Shared.Reporter
         }
 
         public TestReporter LastTestNode { get; set; }
+
+        public void Sync()
+        {
+            StartTask?.GetAwaiter().GetResult();
+
+            FinishTask?.GetAwaiter().GetResult();
+        }
     }
 }

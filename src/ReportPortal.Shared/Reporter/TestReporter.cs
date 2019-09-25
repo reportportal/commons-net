@@ -16,26 +16,11 @@ namespace ReportPortal.Shared.Reporter
 
         private static Internal.Logging.ITraceLogger TraceLogger { get; } = Internal.Logging.TraceLogManager.GetLogger<TestReporter>();
 
-        public TestReporter(Service service, ILaunchReporter launchReporter, ITestReporter parentTestReporter)
+        public TestReporter(Service service, ILaunchReporter launchReporter, ITestReporter parentTestReporter, StartTestItemRequest startTestItemRequest)
         {
             _service = service;
             LaunchReporter = launchReporter;
             ParentTestReporter = parentTestReporter;
-
-            ThreadId = Thread.CurrentThread.ManagedThreadId;
-        }
-
-        public TestItem TestInfo { get; private set; }
-
-        public ILaunchReporter LaunchReporter { get; }
-
-        public ITestReporter ParentTestReporter { get; }
-
-        public Task StartTask { get; private set; }
-
-        public void Start(StartTestItemRequest request)
-        {
-            TraceLogger.Verbose("Scheduling request to start new test item");
 
             if (StartTask != null)
             {
@@ -51,15 +36,15 @@ namespace ReportPortal.Shared.Reporter
                     throw pt.Exception;
                 }
 
-                request.LaunchId = LaunchReporter.LaunchInfo.Id;
+                startTestItemRequest.LaunchId = LaunchReporter.LaunchInfo.Id;
                 if (ParentTestReporter == null)
                 {
-                    if (request.StartTime < LaunchReporter.LaunchInfo.StartTime)
+                    if (startTestItemRequest.StartTime < LaunchReporter.LaunchInfo.StartTime)
                     {
-                        request.StartTime = LaunchReporter.LaunchInfo.StartTime;
+                        startTestItemRequest.StartTime = LaunchReporter.LaunchInfo.StartTime;
                     }
 
-                    var id = (await _service.StartTestItemAsync(request)).Id;
+                    var id = (await _service.StartTestItemAsync(startTestItemRequest)).Id;
 
                     TestInfo = new TestItem
                     {
@@ -68,12 +53,12 @@ namespace ReportPortal.Shared.Reporter
                 }
                 else
                 {
-                    if (request.StartTime < ParentTestReporter.TestInfo.StartTime)
+                    if (startTestItemRequest.StartTime < ParentTestReporter.TestInfo.StartTime)
                     {
-                        request.StartTime = ParentTestReporter.TestInfo.StartTime;
+                        startTestItemRequest.StartTime = ParentTestReporter.TestInfo.StartTime;
                     }
 
-                    var id = (await _service.StartTestItemAsync(ParentTestReporter.TestInfo.Id, request)).Id;
+                    var id = (await _service.StartTestItemAsync(ParentTestReporter.TestInfo.Id, startTestItemRequest)).Id;
 
                     TestInfo = new TestItem
                     {
@@ -81,9 +66,19 @@ namespace ReportPortal.Shared.Reporter
                     };
                 }
 
-                TestInfo.StartTime = request.StartTime;
+                TestInfo.StartTime = startTestItemRequest.StartTime;
             }).Unwrap();
+
+            ThreadId = Thread.CurrentThread.ManagedThreadId;
         }
+
+        public TestItem TestInfo { get; private set; }
+
+        public ILaunchReporter LaunchReporter { get; }
+
+        public ITestReporter ParentTestReporter { get; }
+
+        public Task StartTask { get; private set; }
 
         public Task FinishTask { get; private set; }
 
@@ -157,8 +152,10 @@ namespace ReportPortal.Shared.Reporter
 
         public ITestReporter StartChildTestReporter(StartTestItemRequest request)
         {
-            var newTestNode = new TestReporter(_service, LaunchReporter, this);
-            newTestNode.Start(request);
+            TraceLogger.Verbose("Scheduling request to start new test item");
+
+            var newTestNode = new TestReporter(_service, LaunchReporter, this, request);
+
             if (ChildTestReporters == null)
             {
                 ChildTestReporters = new ConcurrentBag<ITestReporter>();
