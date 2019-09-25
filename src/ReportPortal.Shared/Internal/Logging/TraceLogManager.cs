@@ -32,6 +32,8 @@ namespace ReportPortal.Shared.Internal.Logging
         /// <returns><see cref="ITraceLogger"/> instance for logging internal messages</returns>
         public static ITraceLogger GetLogger(Type type)
         {
+            Trace.AutoFlush = true;
+
             if (_traceLoggers == null)
             {
                 lock (_lockObj)
