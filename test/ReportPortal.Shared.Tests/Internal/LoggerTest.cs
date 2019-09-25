@@ -36,6 +36,8 @@ namespace ReportPortal.Shared.Tests.Internal
                 }));
             }
 
+            System.Threading.Thread.Sleep(3000);
+
             Task.WaitAll(tasks.ToArray());
 
             foreach (var file in Directory.GetFiles(Environment.CurrentDirectory))
