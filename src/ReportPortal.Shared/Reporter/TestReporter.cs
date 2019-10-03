@@ -25,9 +25,9 @@ namespace ReportPortal.Shared.Reporter
 
             if (StartTask != null)
             {
-                var message = "The test item is already scheduled for starting.";
-                TraceLogger.Error(message);
-                throw new InsufficientExecutionStackException(message);
+                var exp = new InsufficientExecutionStackException("The test item is already scheduled for starting.");
+                TraceLogger.Error(exp.Message);
+                throw exp;
             }
 
             var parentStartTask = ParentTestReporter?.StartTask ?? LaunchReporter.StartTask;
@@ -36,6 +36,7 @@ namespace ReportPortal.Shared.Reporter
             {
                 if (pt.IsFaulted)
                 {
+                    TraceLogger.Error(pt.Exception?.Message);
                     throw pt.Exception;
                 }
 
@@ -91,16 +92,16 @@ namespace ReportPortal.Shared.Reporter
 
             if (StartTask == null)
             {
-                var message = "The test item wasn't scheduled for starting to finish it properly.";
-                TraceLogger.Error(message);
-                throw new InsufficientExecutionStackException(message);
+                var exp = new InsufficientExecutionStackException("The test item wasn't scheduled for starting to finish it properly.");
+                TraceLogger.Error(exp.Message);
+                throw exp;
             }
 
             if (FinishTask != null)
             {
-                var message = "The test item is already scheduled for finishing.";
-                TraceLogger.Error(message);
-                throw new InsufficientExecutionStackException(message);
+                var exp = new InsufficientExecutionStackException("The test item is already scheduled for finishing.");
+                TraceLogger.Error(exp.Message);
+                throw exp;
             }
 
             var dependentTasks = new List<Task>();
@@ -120,16 +121,16 @@ namespace ReportPortal.Shared.Reporter
                 {
                     if (StartTask.IsFaulted)
                     {
-                        var message = "Cannot finish test item due starting item failed.";
-                        TraceLogger.Error(message);
-                        throw new Exception(message, StartTask.Exception);
+                        var exp = new Exception("Cannot finish test item due starting item failed.");
+                        TraceLogger.Error(exp.Message);
+                        throw exp;
                     }
 
                     if (ChildTestReporters?.Any(ctr => ctr.FinishTask.IsFaulted) == true)
                     {
-                        var message = "Cannot finish test item due finishing of child items failed.";
-                        TraceLogger.Error(message);
-                        throw new AggregateException(message, ChildTestReporters.Where(ctr => ctr.FinishTask.IsFaulted).Select(ctr => ctr.FinishTask.Exception).ToArray());
+                        var exp = new AggregateException("Cannot finish test item due finishing of child items failed.");
+                        TraceLogger.Error(exp.Message);
+                        throw exp;
                     }
 
                     TestInfo.EndTime = request.EndTime;
