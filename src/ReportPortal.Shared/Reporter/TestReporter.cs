@@ -26,7 +26,7 @@ namespace ReportPortal.Shared.Reporter
             if (StartTask != null)
             {
                 var exp = new InsufficientExecutionStackException("The test item is already scheduled for starting.");
-                TraceLogger.Error(exp.Message);
+                TraceLogger.Error(exp.ToString());
                 throw exp;
             }
 
@@ -36,7 +36,7 @@ namespace ReportPortal.Shared.Reporter
             {
                 if (pt.IsFaulted)
                 {
-                    TraceLogger.Error(pt.Exception?.Message);
+                    TraceLogger.Error(pt.Exception.ToString());
                     throw pt.Exception;
                 }
 
@@ -93,14 +93,14 @@ namespace ReportPortal.Shared.Reporter
             if (StartTask == null)
             {
                 var exp = new InsufficientExecutionStackException("The test item wasn't scheduled for starting to finish it properly.");
-                TraceLogger.Error(exp.Message);
+                TraceLogger.Error(exp.ToString());
                 throw exp;
             }
 
             if (FinishTask != null)
             {
                 var exp = new InsufficientExecutionStackException("The test item is already scheduled for finishing.");
-                TraceLogger.Error(exp.Message);
+                TraceLogger.Error(exp.ToString());
                 throw exp;
             }
 
@@ -122,14 +122,14 @@ namespace ReportPortal.Shared.Reporter
                     if (StartTask.IsFaulted)
                     {
                         var exp = new Exception("Cannot finish test item due starting item failed.");
-                        TraceLogger.Error(exp.Message);
+                        TraceLogger.Error(exp.ToString());
                         throw exp;
                     }
 
                     if (ChildTestReporters?.Any(ctr => ctr.FinishTask.IsFaulted) == true)
                     {
                         var exp = new AggregateException("Cannot finish test item due finishing of child items failed.");
-                        TraceLogger.Error(exp.Message);
+                        TraceLogger.Error(exp.ToString());
                         throw exp;
                     }
 
@@ -194,9 +194,9 @@ namespace ReportPortal.Shared.Reporter
         {
             if (StartTask == null)
             {
-                var message = "The test item wasn't scheduled for starting to add log messages.";
-                TraceLogger.Error(message);
-                throw new InsufficientExecutionStackException(message);
+                var exp = new InsufficientExecutionStackException("The test item wasn't scheduled for starting to add log messages.");
+                TraceLogger.Error(exp.ToString());
+                throw (exp);
             }
 
             if (StartTask.IsFaulted || StartTask.IsCanceled)

@@ -43,7 +43,7 @@ namespace ReportPortal.Shared.Reporter
             if (StartTask != null)
             {
                 var exp = new InsufficientExecutionStackException("`The launch is already scheduled for starting.");
-                TraceLogger.Error(exp.Message);
+                TraceLogger.Error(exp.ToString());
                 throw exp;
             }
 
@@ -80,14 +80,14 @@ namespace ReportPortal.Shared.Reporter
             if (StartTask == null)
             {
                 var exp = new InsufficientExecutionStackException("The launch wasn't scheduled for starting to finish it properly.");
-                TraceLogger.Error(exp.Message);
+                TraceLogger.Error(exp.ToString());
                 throw exp;
             }
 
             if (FinishTask != null)
             {
                 var exp = new InsufficientExecutionStackException("The launch is already scheduled for finishing.");
-                TraceLogger.Error(exp.Message);
+                TraceLogger.Error(exp.ToString());
                 throw exp;
             }
 
@@ -105,14 +105,14 @@ namespace ReportPortal.Shared.Reporter
                     if (StartTask.IsFaulted)
                     {
                         var exp = new Exception("Cannot finish launch due starting launch failed.");
-                        TraceLogger.Error(exp.Message);
+                        TraceLogger.Error(exp.ToString());
                         throw exp;
                     }
 
                     if (ChildTestReporters?.Any(ctr => ctr.FinishTask.IsFaulted) == true)
                     {
                         var exp = new AggregateException("Cannot finish launch due inner items failed to finish.");
-                        TraceLogger.Error(exp.Message);
+                        TraceLogger.Error(exp.ToString());
                         throw exp;
                     }
 
