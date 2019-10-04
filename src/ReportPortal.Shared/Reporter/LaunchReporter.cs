@@ -111,7 +111,7 @@ namespace ReportPortal.Shared.Reporter
 
                     if (ChildTestReporters?.Any(ctr => ctr.FinishTask.IsFaulted) == true)
                     {
-                        var exp = new AggregateException("Cannot finish launch due inner items failed to finish.");
+                        var exp = new AggregateException("Cannot finish launch due inner items failed to finish.", ChildTestReporters.Where(ctr => ctr.FinishTask.IsFaulted).Select(ctr => ctr.FinishTask.Exception).ToArray());
                         TraceLogger.Error(exp.ToString());
                         throw exp;
                     }
