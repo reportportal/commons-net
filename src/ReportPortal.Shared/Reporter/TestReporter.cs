@@ -128,7 +128,7 @@ namespace ReportPortal.Shared.Reporter
 
                     if (ChildTestReporters?.Any(ctr => ctr.FinishTask.IsFaulted) == true)
                     {
-                        var exp = new AggregateException("Cannot finish test item due finishing of child items failed.");
+                        var exp = new AggregateException("Cannot finish test item due finishing of child items failed.", ChildTestReporters.Where(ctr => ctr.FinishTask.IsFaulted).Select(ctr => ctr.FinishTask.Exception).ToArray());
                         TraceLogger.Error(exp.ToString());
                         throw exp;
                     }
