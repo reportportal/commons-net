@@ -121,7 +121,7 @@ namespace ReportPortal.Shared.Reporter
                 {
                     if (StartTask.IsFaulted)
                     {
-                        var exp = new Exception("Cannot finish test item due starting item failed.");
+                        var exp = new Exception("Cannot finish test item due starting item failed.", StartTask.Exception);
                         TraceLogger.Error(exp.ToString());
                         throw exp;
                     }

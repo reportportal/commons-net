@@ -104,7 +104,7 @@ namespace ReportPortal.Shared.Reporter
                 {
                     if (StartTask.IsFaulted)
                     {
-                        var exp = new Exception("Cannot finish launch due starting launch failed.");
+                        var exp = new Exception("Cannot finish launch due starting launch failed.", StartTask.Exception);
                         TraceLogger.Error(exp.ToString());
                         throw exp;
                     }
