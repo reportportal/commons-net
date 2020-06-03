@@ -430,5 +430,36 @@ namespace ReportPortal.Shared.Tests.Reporter
 
             act.Should().Throw<InsufficientExecutionStackException>().WithMessage("*launch wasn't scheduled for starting*");
         }
+
+        [Fact]
+        public void ShouldNotLogIfLaunchFailedToStart()
+        {
+            var service = new MockServiceBuilder().Build();
+            service.Setup(s => s.Launch.StartAsync(It.IsAny<StartLaunchRequest>())).Throws(new Exception());
+
+            var launch = new LaunchReporter(service.Object, null, null, new ExtensionManager());
+            launch.Start(new StartLaunchRequest() { StartTime = DateTime.UtcNow });
+
+            launch.Log(new CreateLogItemRequest { Time = DateTime.UtcNow, Text = "log" });
+
+            Action waitAct = () => launch.Sync();
+            waitAct.Should().Throw<Exception>();
+
+            service.Verify(s => s.LogItem.CreateAsync(It.IsAny<CreateLogItemRequest>()), Times.Never);
+        }
+
+        [Fact]
+        public void FailedLaunchLogShouldNotBreakReporting()
+        {
+            var service = new MockServiceBuilder().Build();
+            service.Setup(s => s.LogItem.CreateAsync(It.IsAny<CreateLogItemRequest>())).Throws(new Exception());
+
+            var launch = new LaunchReporter(service.Object, null, null, new ExtensionManager());
+            launch.Start(new StartLaunchRequest() { StartTime = DateTime.UtcNow });
+            launch.Log(new CreateLogItemRequest { Time = DateTime.UtcNow, Text = "log" });
+            launch.Finish(new FinishLaunchRequest() { EndTime = DateTime.UtcNow });
+
+            launch.Sync();
+        }
     }
 }
