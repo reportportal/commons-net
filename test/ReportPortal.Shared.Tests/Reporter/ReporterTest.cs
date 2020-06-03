@@ -405,5 +405,30 @@ namespace ReportPortal.Shared.Tests.Reporter
 
             launch.LaunchInfo.EndTime.Should().Be(launch.LaunchInfo.StartTime);
         }
+
+        [Fact]
+        public void ShouldBeAbleToLogIntoLaunch()
+        {
+            var service = new MockServiceBuilder().Build();
+
+            var launch = new LaunchReporter(service.Object, null, null, new ExtensionManager());
+            launch.Start(new StartLaunchRequest() { StartTime = DateTime.UtcNow });
+            launch.Log(new CreateLogItemRequest { Time = DateTime.UtcNow, Text = "log" });
+            launch.Finish(new FinishLaunchRequest() { EndTime = DateTime.UtcNow });
+            launch.Sync();
+
+            service.Verify(s => s.LogItem.CreateAsync(It.IsAny<CreateLogItemRequest>()), Times.Once);
+        }
+
+        [Fact]
+        public void CannotLogIfLaunchNotStarted()
+        {
+            var service = new MockServiceBuilder().Build();
+
+            var launch = new LaunchReporter(service.Object, null, null, new ExtensionManager());
+            Action act = () => launch.Log(new CreateLogItemRequest { Time = DateTime.UtcNow, Text = "log" });
+
+            act.Should().Throw<InsufficientExecutionStackException>().WithMessage("*launch wasn't scheduled for starting*");
+        }
     }
 }
