@@ -404,5 +404,24 @@ namespace ReportPortal.Shared.Tests.Configuration
 
             dir.Delete(true);
         }
+        
+        [Fact]
+        public void ShouldUseUserConfig()
+        {
+            var dir = Directory.CreateDirectory(Path.GetRandomFileName());
+            File.AppendAllText(dir + "/ReportPortal_prop1", "value1");
+            File.AppendAllText(dir + "/ReportPortal.config.json", @"{""prop2"": ""value2""}");
+            File.AppendAllText(dir + "/ReportPortal.config.user.json", @"{""prop2"": ""value changed""}");
+
+            var config = new ConfigurationBuilder().AddDefaults(dir.FullName).Build();
+
+            config.Properties.Should()
+                .HaveCountGreaterOrEqualTo(2)
+                .And.ContainKeys("prop1", "prop2")
+                .And.ContainKey("prop2")
+                    .WhichValue.Should().Be("value changed");
+            
+            dir.Delete(true);
+        }
     }
 }
