@@ -1,18 +1,63 @@
-﻿using System;
-
-namespace ReportPortal.Shared.Reporter.Statistics
+﻿namespace ReportPortal.Shared.Reporter.Statistics
 {
+    /// <inheritdoc/>
     public class StatisticsCounter : IStatisticsCounter
     {
-        public long Min => throw new NotImplementedException();
+        private readonly object _lockObj = new object();
 
-        public long Max => throw new NotImplementedException();
+        private long _count;
 
-        public long Avg => throw new NotImplementedException();
+        private long _sum;
 
-        public void Count(long duration)
+        /// <inheritdoc/>
+        public long Min { get; private set; }
+
+        /// <inheritdoc/>
+        public long Max { get; private set; }
+
+        /// <inheritdoc/>
+        public long Avg
         {
-            throw new NotImplementedException();
+            get
+            {
+                if (_count == 0)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return _sum / _count;
+                }
+            }
+        }
+
+        /// <inheritdoc/>
+        public void Measure(long duration)
+        {
+            lock (_lockObj)
+            {
+                if (_count == 0)
+                {
+                    Min = duration;
+                    Max = duration;
+                    _sum = duration;
+                }
+                else
+                {
+                    if (duration < Min)
+                    {
+                        Min = duration;
+                    }
+                    else if (duration > Max)
+                    {
+                        Max = duration;
+                    }
+
+                    _sum += duration;
+                }
+
+                _count++;
+            }
         }
     }
 }

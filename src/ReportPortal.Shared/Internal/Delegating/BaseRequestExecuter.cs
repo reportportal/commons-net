@@ -25,7 +25,7 @@ namespace ReportPortal.Shared.Internal.Delegating
             {
                 sw.Stop();
 
-                statisticsCounter?.Count(sw.ElapsedMilliseconds);
+                statisticsCounter?.Measure(sw.ElapsedMilliseconds);
             }
         }
     }
