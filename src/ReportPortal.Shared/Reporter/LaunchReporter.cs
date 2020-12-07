@@ -8,6 +8,7 @@ using ReportPortal.Shared.Configuration;
 using ReportPortal.Shared.Extensibility;
 using ReportPortal.Shared.Extensibility.ReportEvents.EventArgs;
 using ReportPortal.Shared.Internal.Delegating;
+using ReportPortal.Shared.Reporter.Statistics;
 
 namespace ReportPortal.Shared.Reporter
 {
@@ -20,6 +21,9 @@ namespace ReportPortal.Shared.Reporter
         private readonly IRequestExecuter _requestExecuter;
         private readonly IExtensionManager _extensionManager;
         private readonly ReportEventsSource _reportEventsSource;
+
+        private readonly IStatisticsCounter _startTestItemStatisticsCounter;
+        private readonly IStatisticsCounter _finishTestItemStatisticsCounter;
 
         private LogsReporter _logsReporter;
 
@@ -38,6 +42,9 @@ namespace ReportPortal.Shared.Reporter
                 var jsonPath = System.IO.Path.GetDirectoryName(new Uri(typeof(LaunchReporter).Assembly.CodeBase).LocalPath) + "/ReportPortal.config.json";
                 _configuration = new ConfigurationBuilder().AddJsonFile(jsonPath).AddEnvironmentVariables().Build();
             }
+
+            _startTestItemStatisticsCounter = new StatisticsCounter();
+            _finishTestItemStatisticsCounter = new StatisticsCounter();
 
             _requestExecuter = requestExecuter ?? new RequestExecuterFactory(_configuration).Create();
 
@@ -110,7 +117,7 @@ namespace ReportPortal.Shared.Reporter
                 {
                     NotifyStarting(request);
 
-                    var launch = await _requestExecuter.ExecuteAsync(() => _service.Launch.StartAsync(request), null).ConfigureAwait(false);
+                    var launch = await _requestExecuter.ExecuteAsync(() => _service.Launch.StartAsync(request), null, null).ConfigureAwait(false);
 
                     _launchInfo = new LaunchInfo
                     {
@@ -134,7 +141,7 @@ namespace ReportPortal.Shared.Reporter
                 {
                     NotifyStarting(request);
 
-                    var launch = await _requestExecuter.ExecuteAsync(() => _service.Launch.StartAsync(request), null).ConfigureAwait(false);
+                    var launch = await _requestExecuter.ExecuteAsync(() => _service.Launch.StartAsync(request), null, null).ConfigureAwait(false);
 
                     _launchInfo = new LaunchInfo
                     {
@@ -151,7 +158,7 @@ namespace ReportPortal.Shared.Reporter
                 // get launch info
                 StartTask = Task.Run(async () =>
                 {
-                    var launch = await _requestExecuter.ExecuteAsync(() => _service.Launch.GetAsync(Info.Uuid), null).ConfigureAwait(false);
+                    var launch = await _requestExecuter.ExecuteAsync(() => _service.Launch.GetAsync(Info.Uuid), null, null).ConfigureAwait(false);
 
                     _launchInfo = new LaunchInfo
                     {
@@ -259,7 +266,7 @@ namespace ReportPortal.Shared.Reporter
                     {
                         NotifyFinishing(request);
 
-                        await _requestExecuter.ExecuteAsync(() => _service.Launch.FinishAsync(Info.Uuid, request), null).ConfigureAwait(false);
+                        await _requestExecuter.ExecuteAsync(() => _service.Launch.FinishAsync(Info.Uuid, request), null, null).ConfigureAwait(false);
 
                         NotifyFinished();
                     }

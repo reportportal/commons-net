@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Moq;
 using ReportPortal.Shared.Internal.Delegating;
+using ReportPortal.Shared.Reporter.Statistics;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -77,7 +78,7 @@ namespace ReportPortal.Shared.Tests.Internal.Delegating
             var throttler = new Mock<IRequestExecutionThrottler>();
 
             var executer = new LinearRetryRequestExecuter(5, 0, throttler.Object);
-            
+
             var action = new Mock<Func<Task<string>>>();
             action.Setup(a => a()).Throws<TaskCanceledException>();
 

@@ -64,7 +64,7 @@ namespace ReportPortal.Shared.Reporter
                                     }
                                 }
 
-                                await _requestExecuter.ExecuteAsync(() => _service.LogItem.CreateAsync(requests.ToArray()), null).ConfigureAwait(false);
+                                await _requestExecuter.ExecuteAsync(() => _service.LogItem.CreateAsync(requests.ToArray()), null, null).ConfigureAwait(false);
                             }
                         }
                     }

@@ -4,6 +4,7 @@ using ReportPortal.Client.Abstractions.Requests;
 using ReportPortal.Shared.Extensibility;
 using ReportPortal.Shared.Internal.Delegating;
 using ReportPortal.Shared.Reporter;
+using ReportPortal.Shared.Reporter.Statistics;
 using ReportPortal.Shared.Tests.Helpers;
 using System;
 using System.Collections.Generic;

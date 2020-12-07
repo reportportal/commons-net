@@ -1,4 +1,5 @@
 ﻿using ReportPortal.Shared.Configuration;
+using ReportPortal.Shared.Reporter.Statistics;
 using System;
 
 namespace ReportPortal.Shared.Internal.Delegating

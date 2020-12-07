@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Moq;
 using ReportPortal.Shared.Internal.Delegating;
+using ReportPortal.Shared.Reporter.Statistics;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;

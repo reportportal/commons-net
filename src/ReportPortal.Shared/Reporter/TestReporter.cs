@@ -85,7 +85,7 @@ namespace ReportPortal.Shared.Reporter
 
                     NotifyStarting(startTestItemRequest);
 
-                    var testModel = await _requestExecuter.ExecuteAsync(() => _service.TestItem.StartAsync(startTestItemRequest), null).ConfigureAwait(false);
+                    var testModel = await _requestExecuter.ExecuteAsync(() => _service.TestItem.StartAsync(startTestItemRequest), null, null).ConfigureAwait(false);
 
                     _testInfo = new TestInfo
                     {
@@ -105,7 +105,7 @@ namespace ReportPortal.Shared.Reporter
 
                     NotifyStarting(startTestItemRequest);
 
-                    var testModel = await _requestExecuter.ExecuteAsync(() => _service.TestItem.StartAsync(ParentTestReporter.Info.Uuid, startTestItemRequest), null).ConfigureAwait(false);
+                    var testModel = await _requestExecuter.ExecuteAsync(() => _service.TestItem.StartAsync(ParentTestReporter.Info.Uuid, startTestItemRequest), null, null).ConfigureAwait(false);
 
                     _testInfo = new TestInfo
                     {
@@ -218,7 +218,7 @@ namespace ReportPortal.Shared.Reporter
 
                     NotifyFinishing(request);
 
-                    await _requestExecuter.ExecuteAsync(() => _service.TestItem.FinishAsync(Info.Uuid, request), null).ConfigureAwait(false);
+                    await _requestExecuter.ExecuteAsync(() => _service.TestItem.FinishAsync(Info.Uuid, request), null, null).ConfigureAwait(false);
 
                     NotifyFinished();
                 }
