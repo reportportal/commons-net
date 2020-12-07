@@ -143,9 +143,10 @@ namespace ReportPortal.Shared.Reporter
                 throw exp;
             }
 
-            var dependentTasks = new List<Task>();
-
-            dependentTasks.Add(StartTask);
+            var dependentTasks = new List<Task>
+            {
+                StartTask
+            };
 
             if (_logsReporter != null)
             {

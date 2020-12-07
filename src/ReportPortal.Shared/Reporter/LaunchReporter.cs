@@ -87,11 +87,11 @@ namespace ReportPortal.Shared.Reporter
         private LaunchInfo _launchInfo;
         public IReporterInfo Info => _launchInfo;
 
-        private bool _isExternalLaunchId = false;
-        private string _rerunOfUuid = null;
-        private bool _isRerun;
+        private readonly bool _isExternalLaunchId = false;
+        private readonly string _rerunOfUuid = null;
+        private readonly bool _isRerun;
 
-        private IList<Task> _additionalTasks;
+        private readonly IList<Task> _additionalTasks;
 
         public Task StartTask { get; private set; }
 
@@ -191,9 +191,10 @@ namespace ReportPortal.Shared.Reporter
                 throw exp;
             }
 
-            var dependentTasks = new List<Task>();
-
-            dependentTasks.Add(StartTask);
+            var dependentTasks = new List<Task>
+            {
+                StartTask
+            };
 
             if (_logsReporter != null)
             {

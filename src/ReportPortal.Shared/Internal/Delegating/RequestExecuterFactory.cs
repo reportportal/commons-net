@@ -7,7 +7,7 @@ namespace ReportPortal.Shared.Internal.Delegating
     /// <inheritdoc/>
     public class RequestExecuterFactory : IRequestExecuterFactory
     {
-        private IConfiguration _configuration;
+        private readonly IConfiguration _configuration;
 
         /// <summary>
         /// Initializes new instance of <see cref="RequestExecuterFactory"/>
@@ -15,12 +15,7 @@ namespace ReportPortal.Shared.Internal.Delegating
         /// <param name="configuration">Configuration object for considering when structs new <see cref="IRequestExecuter"/> instance.</param>
         public RequestExecuterFactory(IConfiguration configuration)
         {
-            if (configuration == null)
-            {
-                throw new ArgumentNullException(nameof(configuration));
-            }
-
-            _configuration = configuration;
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }
 
         /// <inheritdoc/>

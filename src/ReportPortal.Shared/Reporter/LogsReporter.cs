@@ -31,7 +31,7 @@ namespace ReportPortal.Shared.Reporter
             _logRequestAmender = logRequestAmender;
         }
 
-        private object _syncObj = new object();
+        private readonly object _syncObj = new object();
 
         public int BatchCapacity { get; set; } = 10;
 

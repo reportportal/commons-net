@@ -12,7 +12,7 @@ namespace ReportPortal.Shared.Internal.Delegating
     {
         private Logging.ITraceLogger TraceLogger { get; } = Logging.TraceLogManager.Instance.GetLogger<ExponentialRetryRequestExecuter>();
 
-        private IRequestExecutionThrottler _concurrentThrottler;
+        private readonly IRequestExecutionThrottler _concurrentThrottler;
 
         /// <summary>
         /// Initializes new instance of <see cref="ExponentialRetryRequestExecuter"/>.
@@ -60,7 +60,7 @@ namespace ReportPortal.Shared.Internal.Delegating
         /// <inheritdoc/>
         public override async Task<T> ExecuteAsync<T>(Func<Task<T>> func, Action<Exception> beforeNextAttempt = null, IStatisticsCounter statisticsCounter = null)
         {
-            T result = default(T);
+            T result = default;
 
             for (int i = 0; i < MaxRetryAttemps; i++)
             {

@@ -4,7 +4,6 @@ using ReportPortal.Client.Abstractions.Requests;
 using ReportPortal.Shared.Extensibility;
 using ReportPortal.Shared.Internal.Delegating;
 using ReportPortal.Shared.Reporter;
-using ReportPortal.Shared.Reporter.Statistics;
 using ReportPortal.Shared.Tests.Helpers;
 using System;
 using System.Collections.Generic;
@@ -15,10 +14,10 @@ namespace ReportPortal.Shared.Tests.Reporter
 {
     public class LogsReporterFixture
     {
-        Mock<ITestReporter> _testReporter;
-        IRequestExecuter _requestExecuter;
-        IExtensionManager _extensionManager;
-        Mock<ILogRequestAmender> _logRequestAmender;
+        readonly Mock<ITestReporter> _testReporter;
+        readonly IRequestExecuter _requestExecuter;
+        readonly IExtensionManager _extensionManager;
+        readonly Mock<ILogRequestAmender> _logRequestAmender;
 
         public LogsReporterFixture()
         {
@@ -38,8 +37,10 @@ namespace ReportPortal.Shared.Tests.Reporter
         {
             var service = new MockServiceBuilder().Build();
 
-            var logsReporter = new LogsReporter(_testReporter.Object, service.Object, _extensionManager, _requestExecuter, _logRequestAmender.Object);
-            logsReporter.BatchCapacity = 1;
+            var logsReporter = new LogsReporter(_testReporter.Object, service.Object, _extensionManager, _requestExecuter, _logRequestAmender.Object)
+            {
+                BatchCapacity = 1
+            };
 
             for (int i = 0; i < 50; i++)
             {
@@ -82,8 +83,10 @@ namespace ReportPortal.Shared.Tests.Reporter
             var service = new MockServiceBuilder().Build();
             service.Setup(s => s.LogItem.CreateAsync(It.IsAny<CreateLogItemRequest[]>())).Throws<Exception>();
 
-            var logsReporter = new LogsReporter(_testReporter.Object, service.Object, _extensionManager, _requestExecuter, _logRequestAmender.Object);
-            logsReporter.BatchCapacity = 1;
+            var logsReporter = new LogsReporter(_testReporter.Object, service.Object, _extensionManager, _requestExecuter, _logRequestAmender.Object)
+            {
+                BatchCapacity = 1
+            };
 
             for (int i = 0; i < 2; i++)
             {
