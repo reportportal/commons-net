@@ -8,22 +8,22 @@
         /// <summary>
         /// Minimum duration of measured requests.
         /// </summary>
-        long Min { get; }
+        double Min { get; }
 
         /// <summary>
         /// Maximum duration of measured requests.
         /// </summary>
-        long Max { get; }
+        double Max { get; }
 
         /// <summary>
         /// Average duration of measured requests.
         /// </summary>
-        long Avg { get; }
+        double Avg { get; }
 
         /// <summary>
         /// Measure of request's duration in sequence.
         /// </summary>
-        /// <param name="duration">Duration in milliseconds.</param>
-        void Measure(long duration);
+        /// <param name="duration">Duration in seconds.</param>
+        void Measure(double duration);
     }
 }

@@ -22,9 +22,6 @@ namespace ReportPortal.Shared.Reporter
         private readonly IExtensionManager _extensionManager;
         private readonly ReportEventsSource _reportEventsSource;
 
-        private readonly IStatisticsCounter _startTestItemStatisticsCounter;
-        private readonly IStatisticsCounter _finishTestItemStatisticsCounter;
-
         private LogsReporter _logsReporter;
 
         private readonly object _lockObj = new object();
@@ -39,12 +36,9 @@ namespace ReportPortal.Shared.Reporter
             }
             else
             {
-                var jsonPath = System.IO.Path.GetDirectoryName(new Uri(typeof(LaunchReporter).Assembly.CodeBase).LocalPath) + "/ReportPortal.config.json";
-                _configuration = new ConfigurationBuilder().AddJsonFile(jsonPath).AddEnvironmentVariables().Build();
+                var configurationDirectory = System.IO.Path.GetDirectoryName(new Uri(typeof(LaunchReporter).Assembly.CodeBase).LocalPath);
+                _configuration = new ConfigurationBuilder().AddDefaults(configurationDirectory).Build();
             }
-
-            _startTestItemStatisticsCounter = new StatisticsCounter();
-            _finishTestItemStatisticsCounter = new StatisticsCounter();
 
             _requestExecuter = requestExecuter ?? new RequestExecuterFactory(_configuration).Create();
 
@@ -86,6 +80,8 @@ namespace ReportPortal.Shared.Reporter
 
         private LaunchInfo _launchInfo;
         public IReporterInfo Info => _launchInfo;
+
+        public ILaunchStatisticsCounter StatisticsCounter { get; } = new LaunchStatisticsCounter();
 
         private readonly bool _isExternalLaunchId = false;
         private readonly string _rerunOfUuid = null;

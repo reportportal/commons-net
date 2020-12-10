@@ -1,4 +1,5 @@
 ﻿using ReportPortal.Client.Abstractions.Requests;
+using ReportPortal.Shared.Reporter.Statistics;
 using System.Collections.Generic;
 
 namespace ReportPortal.Shared.Reporter
@@ -16,5 +17,7 @@ namespace ReportPortal.Shared.Reporter
         void Log(CreateLogItemRequest createLogItemRequest);
 
         void Sync();
+
+        ILaunchStatisticsCounter StatisticsCounter { get; }
     }
 }

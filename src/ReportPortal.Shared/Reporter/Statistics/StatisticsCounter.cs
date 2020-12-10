@@ -7,16 +7,16 @@
 
         private long _count;
 
-        private long _sum;
+        private double _sum;
 
         /// <inheritdoc/>
-        public long Min { get; private set; }
+        public double Min { get; private set; }
 
         /// <inheritdoc/>
-        public long Max { get; private set; }
+        public double Max { get; private set; }
 
         /// <inheritdoc/>
-        public long Avg
+        public double Avg
         {
             get
             {
@@ -32,7 +32,7 @@
         }
 
         /// <inheritdoc/>
-        public void Measure(long duration)
+        public void Measure(double duration)
         {
             lock (_lockObj)
             {

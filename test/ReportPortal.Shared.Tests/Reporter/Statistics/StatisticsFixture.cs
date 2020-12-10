@@ -60,7 +60,7 @@ namespace ReportPortal.Shared.Tests.Reporter.Statistics
             counter.Measure(1);
             counter.Measure(2);
 
-            counter.Avg.Should().Be(1);
+            counter.Avg.Should().Be(1.5);
         }
 
         [Fact]
@@ -72,7 +72,7 @@ namespace ReportPortal.Shared.Tests.Reporter.Statistics
 
             Parallel.ForEach(values, (v) => counter.Measure(v));
 
-            counter.Avg.Should().Be(500);
+            counter.Avg.Should().Be(500.5);
         }
     }
 }
