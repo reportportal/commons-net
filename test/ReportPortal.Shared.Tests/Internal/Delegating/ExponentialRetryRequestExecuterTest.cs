@@ -102,5 +102,22 @@ namespace ReportPortal.Shared.Tests.Internal.Delegating
 
             invokedTimes.Should().Be(4);
         }
+
+        [Fact]
+        public async Task ShouldMeasureRequestsStatistics()
+        {
+            var counter = new StatisticsCounter();
+
+            var executer = new ExponentialRetryRequestExecuter(1, 0);
+
+            var action = new Mock<Func<Task<string>>>();
+            action.Setup(a => a()).Callback(() => System.Threading.Thread.Sleep(100)).ReturnsAsync("a");
+
+            await executer.ExecuteAsync(action.Object, null, counter);
+
+            counter.Min.Should().BeApproximately(0.1, precision: 0.05);
+            counter.Max.Should().BeApproximately(0.1, precision: 0.05);
+            counter.Avg.Should().BeApproximately(0.1, precision: 0.05);
+        }
     }
 }
