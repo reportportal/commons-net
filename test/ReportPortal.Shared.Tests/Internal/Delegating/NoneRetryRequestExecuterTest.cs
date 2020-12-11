@@ -67,18 +67,16 @@ namespace ReportPortal.Shared.Tests.Internal.Delegating
         [Fact]
         public async Task ShouldMeasureRequestsStatistics()
         {
-            var counter = new StatisticsCounter();
+            var counter = new Mock<IStatisticsCounter>();
 
             var executer = new NoneRetryRequestExecuter(null);
 
             var action = new Mock<Func<Task<string>>>();
-            action.Setup(a => a()).Callback(() => System.Threading.Thread.Sleep(100)).ReturnsAsync("a");
+            action.Setup(a => a()).ReturnsAsync("a");
 
-            await executer.ExecuteAsync(action.Object, null, counter);
+            await executer.ExecuteAsync(action.Object, null, counter.Object);
 
-            counter.Min.Should().BeApproximately(0.1, precision: 0.05);
-            counter.Max.Should().BeApproximately(0.1, precision: 0.05);
-            counter.Avg.Should().BeApproximately(0.1, precision: 0.05);
+            counter.Verify(c => c.Measure(It.IsAny<double>()), Times.Once);
         }
     }
 }
