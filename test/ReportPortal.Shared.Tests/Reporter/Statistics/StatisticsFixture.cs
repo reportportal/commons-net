@@ -16,6 +16,18 @@ namespace ReportPortal.Shared.Tests.Reporter.Statistics
             counter.Min.Should().Be(0);
             counter.Max.Should().Be(0);
             counter.Avg.Should().Be(0);
+            counter.Count.Should().Be(0);
+        }
+
+        [Fact]
+        public void ShouldCountRequests()
+        {
+            var counter = new StatisticsCounter();
+
+            counter.Measure(0);
+            counter.Measure(0);
+
+            counter.Count.Should().Be(2);
         }
 
         [Fact]
@@ -73,6 +85,19 @@ namespace ReportPortal.Shared.Tests.Reporter.Statistics
             Parallel.ForEach(values, (v) => counter.Measure(v));
 
             counter.Avg.Should().Be(500.5);
+            counter.Min.Should().Be(1);
+            counter.Max.Should().Be(1000);
+        }
+
+        [Fact]
+        public void ShouldHaveStringRepresentation()
+        {
+            var counter = new StatisticsCounter();
+            counter.Measure(1.111);
+            counter.Measure(2.222);
+            counter.Measure(3.333);
+
+            counter.ToString().Should().Be("Cnt 3 Avg/Min/Max 2.22/1.11/3.33s");
         }
     }
 }

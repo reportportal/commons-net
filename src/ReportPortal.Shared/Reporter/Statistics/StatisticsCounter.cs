@@ -5,8 +5,6 @@
     {
         private readonly object _lockObj = new object();
 
-        private long _count;
-
         private double _sum;
 
         /// <inheritdoc/>
@@ -20,23 +18,26 @@
         {
             get
             {
-                if (_count == 0)
+                if (Count == 0)
                 {
                     return 0;
                 }
                 else
                 {
-                    return _sum / _count;
+                    return _sum / Count;
                 }
             }
         }
+
+        /// <inheritdoc/>
+        public long Count { get; private set; }
 
         /// <inheritdoc/>
         public void Measure(double duration)
         {
             lock (_lockObj)
             {
-                if (_count == 0)
+                if (Count == 0)
                 {
                     Min = duration;
                     Max = duration;
@@ -56,8 +57,17 @@
                     _sum += duration;
                 }
 
-                _count++;
+                Count++;
             }
+        }
+
+        /// <summary>
+        /// Returns a string that represents the statistics counter.
+        /// </summary>
+        /// <returns>A string that represents the statistics counter.</returns>
+        public override string ToString()
+        {
+            return $"Cnt {Count} Avg/Min/Max {Avg:0.##}/{Min:0.##}/{Max:0.##}s";
         }
     }
 }

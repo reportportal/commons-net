@@ -8,5 +8,10 @@
 
         /// <inheritdoc/>
         public IStatisticsCounter FinishTestItemStatisticsCounter { get; } = new StatisticsCounter();
+
+        public override string ToString()
+        {
+            return $"STR - {StartTestItemStatisticsCounter}, FTR - {FinishTestItemStatisticsCounter}";
+        }
     }
 }
