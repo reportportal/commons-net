@@ -74,7 +74,8 @@ namespace ReportPortal.Shared.Tests.Reporter
 
             logsReporter.Sync();
 
-            service.Verify(s => s.LogItem.CreateAsync(It.IsAny<CreateLogItemRequest[]>()), Times.Exactly(5));
+            // sometimes on slow machines it's not exact 5 invocations
+            service.Verify(s => s.LogItem.CreateAsync(It.IsAny<CreateLogItemRequest[]>()), Times.Between(5, 6, Moq.Range.Inclusive));
         }
 
         [Fact]
