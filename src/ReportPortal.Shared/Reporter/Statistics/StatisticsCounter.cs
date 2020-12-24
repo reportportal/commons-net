@@ -1,30 +1,32 @@
-﻿namespace ReportPortal.Shared.Reporter.Statistics
+﻿using System;
+
+namespace ReportPortal.Shared.Reporter.Statistics
 {
     /// <inheritdoc/>
     public class StatisticsCounter : IStatisticsCounter
     {
         private readonly object _lockObj = new object();
 
-        private double _sum;
+        private TimeSpan _sum;
 
         /// <inheritdoc/>
-        public double Min { get; private set; }
+        public TimeSpan Min { get; private set; }
 
         /// <inheritdoc/>
-        public double Max { get; private set; }
+        public TimeSpan Max { get; private set; }
 
         /// <inheritdoc/>
-        public double Avg
+        public TimeSpan Avg
         {
             get
             {
                 if (Count == 0)
                 {
-                    return 0;
+                    return TimeSpan.Zero;
                 }
                 else
                 {
-                    return _sum / Count;
+                    return TimeSpan.FromTicks(_sum.Ticks / Count);
                 }
             }
         }
@@ -33,7 +35,7 @@
         public long Count { get; private set; }
 
         /// <inheritdoc/>
-        public void Measure(double duration)
+        public void Measure(TimeSpan duration)
         {
             lock (_lockObj)
             {
@@ -67,7 +69,7 @@
         /// <returns>A string that represents the statistics counter.</returns>
         public override string ToString()
         {
-            return $"Cnt {Count} Avg/Min/Max {Avg:0.##}/{Min:0.##}/{Max:0.##}s";
+            return $"cnt {Count} min/max/avg {Min.TotalMilliseconds:###}/{Max.TotalMilliseconds:###}/{Avg.TotalMilliseconds:###}(ms)";
         }
     }
 }

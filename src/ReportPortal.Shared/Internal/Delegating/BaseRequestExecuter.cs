@@ -11,7 +11,7 @@ namespace ReportPortal.Shared.Internal.Delegating
     public abstract class BaseRequestExecuter : IRequestExecuter
     {
         /// <inheritdoc />
-        public virtual Task<T> ExecuteAsync<T>(Func<Task<T>> func, Action<Exception> beforeNextAttemptCallback, IStatisticsCounter statisticsCounter)
+        public virtual async Task<T> ExecuteAsync<T>(Func<Task<T>> func, Action<Exception> beforeNextAttemptCallback, IStatisticsCounter statisticsCounter)
         {
             if (func == null) throw new ArgumentNullException(nameof(func));
 
@@ -19,13 +19,13 @@ namespace ReportPortal.Shared.Internal.Delegating
 
             try
             {
-                return func();
+                return await func();
             }
             finally
             {
                 sw.Stop();
 
-                statisticsCounter?.Measure(sw.Elapsed.TotalSeconds);
+                statisticsCounter?.Measure(sw.Elapsed);
             }
         }
     }

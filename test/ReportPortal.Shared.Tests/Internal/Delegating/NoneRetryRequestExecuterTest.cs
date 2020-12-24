@@ -76,7 +76,7 @@ namespace ReportPortal.Shared.Tests.Internal.Delegating
 
             await executer.ExecuteAsync(action.Object, null, counter.Object);
 
-            counter.Verify(c => c.Measure(It.IsAny<double>()), Times.Once);
+            counter.Verify(c => c.Measure(It.IsAny<TimeSpan>()), Times.Once);
         }
     }
 }

@@ -26,7 +26,8 @@ namespace ReportPortal.Shared.Reporter
 
         private readonly object _lockObj = new object();
 
-        public LaunchReporter(IClientService service, IConfiguration configuration, IRequestExecuter requestExecuter, IExtensionManager extensionManager)
+        public LaunchReporter(IClientService service, IConfiguration configuration, IRequestExecuter requestExecuter,
+                              IExtensionManager extensionManager)
         {
             _service = service;
 

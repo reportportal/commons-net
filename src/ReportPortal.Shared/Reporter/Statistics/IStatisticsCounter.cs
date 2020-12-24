@@ -1,4 +1,6 @@
-﻿namespace ReportPortal.Shared.Reporter.Statistics
+﻿using System;
+
+namespace ReportPortal.Shared.Reporter.Statistics
 {
     /// <summary>
     /// Measuring of requests duration.
@@ -8,17 +10,17 @@
         /// <summary>
         /// Minimum duration of measured requests.
         /// </summary>
-        double Min { get; }
+        TimeSpan Min { get; }
 
         /// <summary>
         /// Maximum duration of measured requests.
         /// </summary>
-        double Max { get; }
+        TimeSpan Max { get; }
 
         /// <summary>
         /// Average duration of measured requests.
         /// </summary>
-        double Avg { get; }
+        TimeSpan Avg { get; }
 
         /// <summary>
         /// Total count of measured requests.
@@ -28,7 +30,7 @@
         /// <summary>
         /// Measure of request's duration in sequence.
         /// </summary>
-        /// <param name="duration">Duration in seconds.</param>
-        void Measure(double duration);
+        /// <param name="duration">Duration to be measured.</param>
+        void Measure(TimeSpan duration);
     }
 }

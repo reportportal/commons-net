@@ -1,5 +1,8 @@
 ﻿using FluentAssertions;
+using FluentAssertions.Extensions;
 using ReportPortal.Shared.Reporter.Statistics;
+using ReportPortal.Shared.Tests.Helpers;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
@@ -13,9 +16,9 @@ namespace ReportPortal.Shared.Tests.Reporter.Statistics
         {
             var counter = new StatisticsCounter();
 
-            counter.Min.Should().Be(0);
-            counter.Max.Should().Be(0);
-            counter.Avg.Should().Be(0);
+            counter.Min.Should().Be(TimeSpan.Zero);
+            counter.Max.Should().Be(TimeSpan.Zero);
+            counter.Avg.Should().Be(TimeSpan.Zero);
             counter.Count.Should().Be(0);
         }
 
@@ -24,8 +27,8 @@ namespace ReportPortal.Shared.Tests.Reporter.Statistics
         {
             var counter = new StatisticsCounter();
 
-            counter.Measure(0);
-            counter.Measure(0);
+            counter.Measure(TimeSpan.Zero);
+            counter.Measure(TimeSpan.Zero);
 
             counter.Count.Should().Be(2);
         }
@@ -35,10 +38,10 @@ namespace ReportPortal.Shared.Tests.Reporter.Statistics
         {
             var counter = new StatisticsCounter();
 
-            counter.Measure(1);
-            counter.Measure(2);
+            counter.Measure(1.Seconds());
+            counter.Measure(2.Seconds());
 
-            counter.Min.Should().Be(1);
+            counter.Min.Should().Be(1.Seconds());
         }
 
         [Fact]
@@ -46,10 +49,10 @@ namespace ReportPortal.Shared.Tests.Reporter.Statistics
         {
             var counter = new StatisticsCounter();
 
-            counter.Measure(1);
-            counter.Measure(2);
+            counter.Measure(1.Seconds());
+            counter.Measure(2.Seconds());
 
-            counter.Max.Should().Be(2);
+            counter.Max.Should().Be(2.Seconds());
         }
 
         [Fact]
@@ -57,11 +60,11 @@ namespace ReportPortal.Shared.Tests.Reporter.Statistics
         {
             var counter = new StatisticsCounter();
 
-            counter.Measure(1);
-            counter.Measure(2);
-            counter.Measure(3);
+            counter.Measure(1.Seconds());
+            counter.Measure(2.Seconds());
+            counter.Measure(3.Seconds());
 
-            counter.Avg.Should().Be(2);
+            counter.Avg.Should().Be(2.Seconds());
         }
 
         [Fact]
@@ -69,10 +72,10 @@ namespace ReportPortal.Shared.Tests.Reporter.Statistics
         {
             var counter = new StatisticsCounter();
 
-            counter.Measure(1);
-            counter.Measure(2);
+            counter.Measure(1.Seconds());
+            counter.Measure(2.Seconds());
 
-            counter.Avg.Should().Be(1.5);
+            counter.Avg.Should().Be(1.5.Seconds());
         }
 
         [Fact]
@@ -82,22 +85,37 @@ namespace ReportPortal.Shared.Tests.Reporter.Statistics
 
             var values = Enumerable.Range(1, 1000);
 
-            Parallel.ForEach(values, (v) => counter.Measure(v));
+            Parallel.ForEach(values, (v) => counter.Measure(v.Milliseconds()));
 
-            counter.Avg.Should().Be(500.5);
-            counter.Min.Should().Be(1);
-            counter.Max.Should().Be(1000);
+            counter.Avg.Should().Be(500.5.Milliseconds());
+            counter.Min.Should().Be(1.Milliseconds());
+            counter.Max.Should().Be(1000.Milliseconds());
         }
 
         [Fact]
         public void ShouldHaveStringRepresentation()
         {
             var counter = new StatisticsCounter();
-            counter.Measure(1.111);
-            counter.Measure(2.222);
-            counter.Measure(3.333);
+            counter.Measure(1.111.Seconds());
+            counter.Measure(2.222.Seconds());
+            counter.Measure(3.333.Seconds());
 
-            counter.ToString().Should().Be("Cnt 3 Avg/Min/Max 2.22/1.11/3.33s");
+            counter.ToString().Should().Be("cnt 3 min/max/avg 1111/3333/2222(ms)");
+        }
+
+        [Fact]
+        public void LaunchShouldUseStatisticsCounter()
+        {
+            var service = new MockServiceBuilder().Build();
+
+            var launchScheduler = new LaunchReporterBuilder(service.Object).Build(2, 5, 0);
+
+            launchScheduler.Sync();
+
+            var expectedInvocations = 2 * 5 + 2;
+
+            launchScheduler.StatisticsCounter.StartTestItemStatisticsCounter.Count.Should().Be(expectedInvocations);
+            launchScheduler.StatisticsCounter.FinishTestItemStatisticsCounter.Count.Should().Be(expectedInvocations);
         }
     }
 }
