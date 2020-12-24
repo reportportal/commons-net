@@ -85,11 +85,11 @@ namespace ReportPortal.Shared.Tests.Reporter.Statistics
 
             var values = Enumerable.Range(1, 1000);
 
-            Parallel.ForEach(values, (v) => counter.Measure(v.Milliseconds()));
+            Parallel.ForEach(values, (v) => counter.Measure(v.Seconds()));
 
-            counter.Avg.Should().Be(500.5.Milliseconds());
-            counter.Min.Should().Be(1.Milliseconds());
-            counter.Max.Should().Be(1000.Milliseconds());
+            counter.Min.Should().Be(1.Seconds());
+            counter.Max.Should().Be(1000.Seconds());
+            counter.Avg.Should().Be(500.5.Seconds());
         }
 
         [Fact]
