@@ -33,7 +33,7 @@ namespace ReportPortal.Shared.Tests
             var extManager = new ExtensionManager();
 
             var launchScheduler = new LaunchReporterBuilder(_service).With(extManager);
-            var launchReporter = launchScheduler.Build(20, 20, 0);
+            var launchReporter = launchScheduler.Build(1, 20, 20);
 
             launchReporter.Sync();
 
