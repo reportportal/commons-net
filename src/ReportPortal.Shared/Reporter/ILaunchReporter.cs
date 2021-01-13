@@ -17,7 +17,5 @@ namespace ReportPortal.Shared.Reporter
         void Log(CreateLogItemRequest createLogItemRequest);
 
         void Sync();
-
-        ILaunchStatisticsCounter StatisticsCounter { get; }
     }
 }

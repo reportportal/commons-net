@@ -241,6 +241,8 @@ namespace ReportPortal.Shared.Reporter
 
         public IList<ITestReporter> ChildTestReporters { get; private set; }
 
+        public ILaunchStatisticsCounter StatisticsCounter => LaunchReporter.StatisticsCounter;
+
         public ITestReporter StartChildTestReporter(StartTestItemRequest request)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));

@@ -9,9 +9,16 @@
         /// <inheritdoc/>
         public IStatisticsCounter FinishTestItemStatisticsCounter { get; } = new StatisticsCounter();
 
+        /// <inheritdoc/>
+        public IStatisticsCounter LogItemStatisticsCounter { get; } = new StatisticsCounter();
+
+        /// <summary>
+        /// Returns a string that represents the statistics counter for launch.
+        /// </summary>
+        /// <returns>A string that represents the statistics counter.</returns>
         public override string ToString()
         {
-            return $"STR - {StartTestItemStatisticsCounter}, FTR - {FinishTestItemStatisticsCounter}";
+            return $"ST {StartTestItemStatisticsCounter}, FT {FinishTestItemStatisticsCounter}, L {LogItemStatisticsCounter}";
         }
     }
 }

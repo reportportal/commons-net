@@ -14,5 +14,10 @@
         /// Returns statistics about FinishTestItem requests.
         /// </summary>
         IStatisticsCounter FinishTestItemStatisticsCounter { get; }
+
+        /// <summary>
+        /// Returns statistics about LogItem requests.
+        /// </summary>
+        IStatisticsCounter LogItemStatisticsCounter { get; }
     }
 }

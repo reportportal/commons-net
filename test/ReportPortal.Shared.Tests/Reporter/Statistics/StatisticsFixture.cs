@@ -100,7 +100,7 @@ namespace ReportPortal.Shared.Tests.Reporter.Statistics
             counter.Measure(2.222.Seconds());
             counter.Measure(3.333.Seconds());
 
-            counter.ToString().Should().Be("3(cnt) min/max/avg 1111/3333/2222(ms)");
+            counter.ToString().Should().Be("3 cnt min/max/avg 1111/3333/2222 ms");
         }
 
         [Fact]
@@ -108,14 +108,15 @@ namespace ReportPortal.Shared.Tests.Reporter.Statistics
         {
             var service = new MockServiceBuilder().Build();
 
-            var launchScheduler = new LaunchReporterBuilder(service.Object).Build(2, 5, 0);
+            var launchScheduler = new LaunchReporterBuilder(service.Object).Build(2, 5, 10);
 
             launchScheduler.Sync();
 
-            var expectedInvocations = 2 * 5 + 2;
+            var expectedItemInvocations = 2 * 5 + 2;
 
-            launchScheduler.StatisticsCounter.StartTestItemStatisticsCounter.Count.Should().Be(expectedInvocations);
-            launchScheduler.StatisticsCounter.FinishTestItemStatisticsCounter.Count.Should().Be(expectedInvocations);
+            launchScheduler.StatisticsCounter.StartTestItemStatisticsCounter.Count.Should().Be(expectedItemInvocations);
+            launchScheduler.StatisticsCounter.FinishTestItemStatisticsCounter.Count.Should().Be(expectedItemInvocations);
+            launchScheduler.StatisticsCounter.LogItemStatisticsCounter.Count.Should().BeGreaterOrEqualTo(2 * 5 * 10 / 10); // default logs buffer size for processing is 10
         }
     }
 }

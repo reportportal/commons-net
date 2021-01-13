@@ -4,6 +4,7 @@ using ReportPortal.Client.Abstractions.Requests;
 using ReportPortal.Shared.Extensibility;
 using ReportPortal.Shared.Internal.Delegating;
 using ReportPortal.Shared.Reporter;
+using ReportPortal.Shared.Reporter.Statistics;
 using ReportPortal.Shared.Tests.Helpers;
 using System;
 using System.Collections.Generic;
@@ -22,6 +23,7 @@ namespace ReportPortal.Shared.Tests.Reporter
         public LogsReporterFixture()
         {
             _testReporter = new Mock<ITestReporter>();
+            _testReporter.SetupGet(r => r.StatisticsCounter).Returns(() => new LaunchStatisticsCounter());
             _testReporter.SetupGet(r => r.StartTask).Returns(() => Task.FromResult(0));
             _testReporter.SetupGet(r => r.Info).Returns(() => new TestInfo { });
 
