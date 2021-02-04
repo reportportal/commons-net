@@ -1,9 +1,11 @@
 using ReportPortal.Client;
+using ReportPortal.Client.Abstractions;
 using ReportPortal.Client.Abstractions.Models;
 using ReportPortal.Client.Abstractions.Requests;
 using ReportPortal.Shared.Configuration;
 using ReportPortal.Shared.Extensibility;
 using ReportPortal.Shared.Reporter;
+using ReportPortal.Shared.Reporter.Http;
 using ReportPortal.Shared.Tests.Helpers;
 using System;
 using System.Collections.Generic;
@@ -16,15 +18,26 @@ namespace ReportPortal.Shared.Tests
     [Collection("Static")]
     public class ReportingTest
     {
-        private readonly Service _service = new Service(new Uri("https://beta.demo.reportportal.io/api/v1/"), "default_personal", "5c356bea-c2fb-4988-9a82-e63424859381");
+        private readonly IClientService _service;
+
+        //private readonly Service _service = new Service(new Uri("https://beta.demo.reportportal.io/api/v1/"), "default_personal", "5c356bea-c2fb-4988-9a82-e63424859381");
 
         //private readonly Service _service = new Service(new Uri("http://localhost:8080/api/v1/"), "default_personal", "26f171a9-8bb2-45e8-9e0b-cd75bb7de670");
 
-        private ITestOutputHelper _output;
+        private readonly ITestOutputHelper _output;
 
         public ReportingTest(ITestOutputHelper output)
         {
             _output = output;
+
+            var config = new Shared.Configuration.Configuration(new Dictionary<string, object>
+            {
+                {ConfigurationPath.ServerUrl, "https://beta.demo.reportportal.io/api/v1" },
+                {ConfigurationPath.ServerProject, "default_personal" },
+                {ConfigurationPath.ServerAuthenticationUuid, "5c356bea-c2fb-4988-9a82-e63424859381" }
+            });
+
+            _service = new ClientServiceBuilder(config).Build();
         }
 
         [Fact]
@@ -102,7 +115,7 @@ namespace ReportPortal.Shared.Tests
             await _service.Launch.DeleteAsync(gotLaunch.Id);
         }
 
-        [Fact(Skip = "There are issues with rerun on server side")]
+        [Fact]
         public async Task UseRerunLaunchId()
         {
             var launchDateTime = DateTime.UtcNow;
@@ -123,7 +136,7 @@ namespace ReportPortal.Shared.Tests
             {
                 tasks.Add(Task.Run(() =>
                 {
-                    var r_launch = new LaunchReporter(_service, config, null, null);
+                    var r_launch = new LaunchReporter(_service, config, null, new ExtensionManager());
 
                     r_launch.Start(new StartLaunchRequest
                     {
