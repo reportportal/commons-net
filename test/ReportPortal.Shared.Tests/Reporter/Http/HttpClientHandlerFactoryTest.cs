@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using ReportPortal.Shared.Configuration;
 using ReportPortal.Shared.Reporter.Http;
+using System;
 using System.Net;
 using Xunit;
 
@@ -16,6 +17,14 @@ namespace ReportPortal.Shared.Tests.Reporter.Http
             var factory = new HttpClientHandlerFactory(configuration);
 
             factory.Create().Should().NotBeNull();
+        }
+
+        [Fact]
+        public void ShouldThrowExceptionWhenConfigurationIsNull()
+        {
+            Action act = () => new HttpClientHandlerFactory(null);
+
+            act.Should().Throw<ArgumentNullException>();
         }
 
         [Theory]
