@@ -5,8 +5,15 @@ using System.Net.Http;
 
 namespace ReportPortal.Shared.Reporter.Http
 {
+    /// <summary>
+    /// Class to create <see cref="HttpClientHandler"/> instance based on <see cref="IConfiguration"/> object.
+    /// </summary>
     public class HttpClientHandlerFactory
     {
+        /// <summary>
+        /// Creates an instance of <see cref="HttpClientHandlerFactory"/> class.
+        /// </summary>
+        /// <param name="configuration">Flatten configuration values.</param>
         public HttpClientHandlerFactory(IConfiguration configuration)
         {
             if (configuration is null) throw new ArgumentNullException(nameof(configuration));
@@ -14,8 +21,15 @@ namespace ReportPortal.Shared.Reporter.Http
             Configuration = configuration;
         }
 
+        /// <summary>
+        /// Flatten configuration values.
+        /// </summary>
         protected IConfiguration Configuration { get; }
 
+        /// <summary>
+        /// Parses all well known configuration values and returns new instance of <see cref="HttpClientHandler"/> class.
+        /// </summary>
+        /// <returns></returns>
         public virtual HttpClientHandler Create()
         {
             var httpClientHandler = new HttpClientHandler();
@@ -32,7 +46,11 @@ namespace ReportPortal.Shared.Reporter.Http
             return httpClientHandler;
         }
 
-        public virtual IWebProxy GetProxy()
+        /// <summary>
+        /// Identify whether proxy is configured.
+        /// </summary>
+        /// <returns>Object of <see cref="IWebProxy"/>. Null if proxy is not configured.</returns>
+        protected virtual IWebProxy GetProxy()
         {
             WebProxy webProxy = null;
 
