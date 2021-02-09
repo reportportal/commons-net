@@ -35,7 +35,7 @@ Sometimes it's useful to specify configuration properties via environment variab
 
 # HTTP
 ## Proxy
-`Server:Proxy:Url` - url to proxy server to be used when for http requests like `http://myproxy.corp:8080`.
+`Server:Proxy:Url` - url to proxy server to be used for http requests like `http://myproxy.corp:8080`.
 `Server:Proxy:Username`, `Server:Proxy:Domain` and `Server:Proxy:Password` to specify credentials for proxy servers which require authoorization.
 
 # HTTP requests retry
