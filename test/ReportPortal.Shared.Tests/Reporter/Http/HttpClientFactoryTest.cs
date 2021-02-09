@@ -53,5 +53,19 @@ namespace ReportPortal.Shared.Tests.Reporter.Http
 
             act.Should().Throw<Exception>();
         }
+
+        [Fact]
+        public void ConfigurationShouldBeMandatory()
+        {
+            IConfiguration configuration = null;
+
+            Action ctor1 = () => new HttpClientFactory(configuration, _handler);
+
+            ctor1.Should().ThrowExactly<ArgumentNullException>().And.Message.Should().Contain("configuration");
+
+            Action ctor2 = () => new HttpClientFactory(new ConfigurationBuilder().Build(), null);
+
+            ctor2.Should().ThrowExactly<ArgumentNullException>().And.Message.Should().Contain("httpClientHandler");
+        }
     }
 }
