@@ -224,9 +224,9 @@ namespace ReportPortal.Shared.Tests
                 EndTime = DateTime.UtcNow
             });
 
-            //var gotLaunch = await _service.Launch.GetAsync(launchReporter.LaunchInfo.Uuid);
+            var gotLaunch = await _service.Launch.GetAsync(reportedLaunch.Uuid);
 
-            //await _service.Launch.DeleteAsync(gotLaunch.Id);
+            await _service.Launch.DeleteAsync(gotLaunch.Id);
         }
 
         [Fact]
