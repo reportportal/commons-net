@@ -1,4 +1,3 @@
-using ReportPortal.Client;
 using ReportPortal.Client.Abstractions;
 using ReportPortal.Client.Abstractions.Models;
 using ReportPortal.Client.Abstractions.Requests;
@@ -32,9 +31,9 @@ namespace ReportPortal.Shared.Tests
 
             var config = new Shared.Configuration.Configuration(new Dictionary<string, object>
             {
-                {ConfigurationPath.ServerUrl, "https://beta.demo.reportportal.io/api/v1" },
+                {ConfigurationPath.ServerUrl, "https://demo.reportportal.io/api/v1" },
                 {ConfigurationPath.ServerProject, "default_personal" },
-                {ConfigurationPath.ServerAuthenticationUuid, "5c356bea-c2fb-4988-9a82-e63424859381" }
+                {ConfigurationPath.ServerAuthenticationUuid, "5439c9e2-3289-4607-b342-8509b61d4b3c" }
             });
 
             _service = new ClientServiceBuilder(config).Build();
