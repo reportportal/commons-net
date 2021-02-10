@@ -32,6 +32,8 @@ namespace ReportPortal.Shared.Tests.Reporter.Http
             ctor.Should().ThrowExactly<ArgumentNullException>();
         }
 
+// ignore test for .net framework 452 and 46 because it always bypasses proxy for localhost
+#if !NET452 && !NET46
         [Fact]
         public async Task ShouldUseProxy()
         {
@@ -58,5 +60,6 @@ namespace ReportPortal.Shared.Tests.Reporter.Http
 
             proxyServer.Stop();
         }
+#endif
     }
 }
