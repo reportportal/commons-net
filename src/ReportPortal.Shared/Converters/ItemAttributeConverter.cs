@@ -1,7 +1,7 @@
 ﻿using ReportPortal.Client.Abstractions.Models;
 using System;
 
-namespace ReportPortal.Shared.Converter
+namespace ReportPortal.Shared.Converters
 {
     /// <summary>
     /// Converter of any string to <see cref="ItemAttribute"/> instance.

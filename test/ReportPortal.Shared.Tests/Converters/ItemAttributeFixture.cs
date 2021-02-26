@@ -1,8 +1,8 @@
 ﻿using FluentAssertions;
-using ReportPortal.Shared.Converter;
+using ReportPortal.Shared.Converters;
 using Xunit;
 
-namespace ReportPortal.Shared.Tests.Converter
+namespace ReportPortal.Shared.Tests.Converters
 {
     public class ItemAttributeFixture
     {
