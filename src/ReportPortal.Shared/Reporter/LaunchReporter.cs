@@ -262,7 +262,7 @@ namespace ReportPortal.Shared.Reporter
                         _launchInfo.FinishTime = request.EndTime;
                     }
 
-                    if (!_isExternalLaunchId && _rerunOfUuid == null)
+                    if (!_isExternalLaunchId)
                     {
                         NotifyFinishing(request);
 
