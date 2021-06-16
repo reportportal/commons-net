@@ -3,6 +3,7 @@ using ReportPortal.Shared.Internal.Logging;
 using System;
 using System.Net.Http;
 using System.Reflection;
+using System.Runtime.Versioning;
 using System.Threading.Tasks;
 
 namespace ReportPortal.Shared.Extensibility.Analytics
@@ -22,6 +23,8 @@ namespace ReportPortal.Shared.Extensibility.Analytics
 
         private readonly string _clientVersion;
 
+        private readonly string _platformVersion;
+
         private HttpClient _httpClient;
 
         public AnalyticsReportEventsObserver()
@@ -30,7 +33,11 @@ namespace ReportPortal.Shared.Extensibility.Analytics
 
             // Client is this assembly
             _clientVersion = typeof(AnalyticsReportEventsObserver).Assembly.GetName().Version.ToString(3);
-
+#if !NET45 && !NET46
+            _platformVersion = typeof(AnalyticsReportEventsObserver).Assembly.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName;
+#else
+            _platformVersion = AppDomain.CurrentDomain.SetupInformation.TargetFrameworkName;
+#endif
             var clientHandler = new HttpClientHandler
             {
 #if !NET45 && !NET46
@@ -97,7 +104,7 @@ namespace ReportPortal.Shared.Extensibility.Analytics
         {
             if (args.Configuration.GetValue("Analytics:Enabled", true))
             {
-                var category = $"Client name \"{CLIENT_NAME}\", version \"{_clientVersion}\"";
+                var category = $"Client name \"{CLIENT_NAME}\", version \"{_clientVersion}\", interpreter \"{_platformVersion}\"";
                 var label = $"Agent name \"{AgentName}\", version \"{AgentVersion}\"";
 
                 var requestData = $"/collect?v=1&tid={MEASUREMENT_ID}&cid={_clientId}&t=event&ec={category}&ea=Start launch&el={label}";
