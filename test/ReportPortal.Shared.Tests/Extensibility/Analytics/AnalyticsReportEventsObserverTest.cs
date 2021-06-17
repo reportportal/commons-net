@@ -25,7 +25,8 @@ namespace ReportPortal.Shared.Tests.Extensibility.Analytics
         public void ShouldHAveCorrectCategoryFormat()
         {
             var mockHttpHandler = new MockHttpMessageHandler();
-            mockHttpHandler.Expect(HttpMethod.Post, "https://www.google-analytics.com/collect").With(new CustomMatcher(m => {
+            mockHttpHandler.Expect(HttpMethod.Post, "https://www.google-analytics.com/collect").With(new CustomMatcher(m =>
+            {
                 var content = m.RequestUri.Query.TrimStart('?').Split('&')
                 .Select(pair => pair.Split(new char[] { '=' }, 2))
                 .ToDictionary(pair => HttpUtility.UrlDecode(pair[0]), pair => pair.Length == 2 ? HttpUtility.UrlDecode(pair[1]) : "");
