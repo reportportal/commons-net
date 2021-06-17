@@ -27,21 +27,25 @@ namespace ReportPortal.Shared.Extensibility.Analytics
 
         private HttpClient _httpClient;
 
-        public AnalyticsReportEventsObserver()
+        public AnalyticsReportEventsObserver() : this(new HttpClientHandler
+        {
+#if !NET45 && !NET46
+            ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; }
+#endif
+        })
+        {
+        }
+
+        public AnalyticsReportEventsObserver(HttpMessageHandler httpHandler)
         {
             _clientId = Guid.NewGuid().ToString();
 
             // Client is this assembly
-            _clientVersion = typeof(AnalyticsReportEventsObserver).Assembly.GetName().Version.ToString(3);
-            _platformVersion = typeof(AnalyticsReportEventsObserver).Assembly.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName;
-            var clientHandler = new HttpClientHandler
-            {
-#if !NET45 && !NET46
-                ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; }
-#endif
-            };
+            var assembly = typeof(AnalyticsReportEventsObserver).Assembly;
+            _clientVersion = assembly.GetName().Version.ToString(3);
+            _platformVersion = assembly.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName;
 
-            _httpClient = new HttpClient(clientHandler)
+            _httpClient = new HttpClient(httpHandler)
             {
                 BaseAddress = new Uri(BASE_URI)
             };
