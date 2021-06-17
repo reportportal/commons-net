@@ -33,11 +33,7 @@ namespace ReportPortal.Shared.Extensibility.Analytics
 
             // Client is this assembly
             _clientVersion = typeof(AnalyticsReportEventsObserver).Assembly.GetName().Version.ToString(3);
-#if !NET45 && !NET46
             _platformVersion = typeof(AnalyticsReportEventsObserver).Assembly.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName;
-#else
-            _platformVersion = AppDomain.CurrentDomain.SetupInformation.TargetFrameworkName;
-#endif
             var clientHandler = new HttpClientHandler
             {
 #if !NET45 && !NET46
