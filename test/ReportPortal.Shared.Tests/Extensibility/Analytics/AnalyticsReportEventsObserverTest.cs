@@ -35,8 +35,7 @@ namespace ReportPortal.Shared.Tests.Extensibility.Analytics
                     return false;
                 }
                 return Regex.IsMatch(content["ec"], CATEGORY_VALIDATION_PATTERN);
-            }))
-                .Respond(HttpStatusCode.OK);
+            })).Respond(HttpStatusCode.OK);
 
             var analyticsObserver = new AnalyticsReportEventsObserver(mockHttpHandler);
             var extManager = new Shared.Extensibility.ExtensionManager();
