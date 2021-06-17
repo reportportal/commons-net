@@ -1,19 +1,13 @@
-﻿using Moq;
-using ReportPortal.Shared.Extensibility;
-using ReportPortal.Shared.Extensibility.Analytics;
-using ReportPortal.Shared.Extensibility.ReportEvents;
+﻿using ReportPortal.Shared.Extensibility.Analytics;
 using ReportPortal.Shared.Tests.Helpers;
 using RichardSzalay.MockHttp;
 using RichardSzalay.MockHttp.Matchers;
-using System.Text;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using Xunit;
-using System.Web;
-using System;
 using System.Text.RegularExpressions;
+using System.Web;
+using Xunit;
 
 namespace ReportPortal.Shared.Tests.Extensibility.Analytics
 {
