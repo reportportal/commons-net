@@ -4,6 +4,7 @@ using System;
 using System.Net.Http;
 using System.Reflection;
 using System.Runtime.Versioning;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace ReportPortal.Shared.Extensibility.Analytics
@@ -16,6 +17,7 @@ namespace ReportPortal.Shared.Extensibility.Analytics
         private const string MEASUREMENT_ID = "UA-173456809-1";
         private const string BASE_URI = "https://www.google-analytics.com";
         private const string CLIENT_NAME = "commons-dotnet";
+        private const string PLATFORM_VERSION_PATTERN = @"^(\d+\.\d+)";
 
         private static ITraceLogger TraceLogger => TraceLogManager.Instance.GetLogger<AnalyticsReportEventsObserver>();
 
@@ -41,9 +43,9 @@ namespace ReportPortal.Shared.Extensibility.Analytics
             _clientId = Guid.NewGuid().ToString();
 
             // Client is this assembly
-            var assembly = typeof(AnalyticsReportEventsObserver).Assembly;
-            _clientVersion = assembly.GetName().Version.ToString(3);
-            _platformVersion = assembly.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName;
+            _clientVersion = typeof(AnalyticsReportEventsObserver).Assembly.GetName().Version.ToString(3);
+            _platformVersion = Regex.Match(typeof(object).Assembly.GetCustomAttribute<AssemblyFileVersionAttribute>().Version,
+                PLATFORM_VERSION_PATTERN).Groups[1].Value;
 
             _httpClient = new HttpClient(httpHandler)
             {
@@ -104,7 +106,7 @@ namespace ReportPortal.Shared.Extensibility.Analytics
         {
             if (args.Configuration.GetValue("Analytics:Enabled", true))
             {
-                var category = $"Client name \"{CLIENT_NAME}\", version \"{_clientVersion}\", interpreter \"{_platformVersion}\"";
+                var category = $"Client name \"{CLIENT_NAME}\", version \"{_clientVersion}\", interpreter \".NET {_platformVersion}\"";
                 var label = $"Agent name \"{AgentName}\", version \"{AgentVersion}\"";
 
                 var requestData = $"/collect?v=1&tid={MEASUREMENT_ID}&cid={_clientId}&t=event&ec={category}&ea=Start launch&el={label}";
