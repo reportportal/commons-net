@@ -44,8 +44,12 @@ namespace ReportPortal.Shared.Extensibility.Analytics
 
             // Client is this assembly
             _clientVersion = typeof(AnalyticsReportEventsObserver).Assembly.GetName().Version.ToString(3);
-            _platformVersion = Regex.Match(typeof(object).Assembly.GetCustomAttribute<AssemblyFileVersionAttribute>().Version,
-                PLATFORM_VERSION_PATTERN).Groups[1].Value;
+
+#if NETSTANDARD
+            _platformVersion = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription;
+#else
+            _platformVersion = AppDomain.CurrentDomain.SetupInformation.TargetFrameworkName;
+#endif
 
             _httpClient = new HttpClient(httpHandler)
             {
@@ -106,7 +110,7 @@ namespace ReportPortal.Shared.Extensibility.Analytics
         {
             if (args.Configuration.GetValue("Analytics:Enabled", true))
             {
-                var category = $"Client name \"{CLIENT_NAME}\", version \"{_clientVersion}\", interpreter \".NET {_platformVersion}\"";
+                var category = $"Client name \"{CLIENT_NAME}\", version \"{_clientVersion}\", interpreter \"{_platformVersion}\"";
                 var label = $"Agent name \"{AgentName}\", version \"{AgentVersion}\"";
 
                 var requestData = $"/collect?v=1&tid={MEASUREMENT_ID}&cid={_clientId}&t=event&ec={category}&ea=Start launch&el={label}";
