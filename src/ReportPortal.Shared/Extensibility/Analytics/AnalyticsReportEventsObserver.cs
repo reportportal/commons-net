@@ -17,7 +17,7 @@ namespace ReportPortal.Shared.Extensibility.Analytics
         private const string MEASUREMENT_ID = "UA-173456809-1";
         private const string BASE_URI = "https://www.google-analytics.com";
         private const string CLIENT_NAME = "commons-dotnet";
-        private const string PLATFORM_VERSION_PATTERN = @"^(\d+\.\d+)";
+        private const string PLATFORM_VERSION_PATTERN = @"^([^,]+),Version=v(\d+\.\d+(?:\.\d+)?)";
 
         private static ITraceLogger TraceLogger => TraceLogManager.Instance.GetLogger<AnalyticsReportEventsObserver>();
 
@@ -48,7 +48,9 @@ namespace ReportPortal.Shared.Extensibility.Analytics
 #if NETSTANDARD
             _platformVersion = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription;
 #else
-            _platformVersion = AppDomain.CurrentDomain.SetupInformation.TargetFrameworkName;
+            var platform = AppDomain.CurrentDomain.SetupInformation.TargetFrameworkName;
+            var platformMatch = Regex.Match(platform, PLATFORM_VERSION_PATTERN);
+            _platformVersion = $"{platformMatch.Groups[1].Value} {platformMatch.Groups[2].Value}";
 #endif
 
             _httpClient = new HttpClient(httpHandler)
