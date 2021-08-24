@@ -5,7 +5,7 @@ using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace ReportPortal.Shared.Extensibility.Analytics
+namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
 {
     /// <summary>
     /// Google Analytics launch events tracker.
