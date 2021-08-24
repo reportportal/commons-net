@@ -71,7 +71,11 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.LogFormatter
             _eventSource.Invoking(e => e.Raise(es => es.OnBeforeLogsSending += null, null, new BeforeLogsSendingEventArgs(null, null, logRequests)))
                 .Should()
                 .Throw<FormatException>()
+#if NET452 || NET46
+                .WithMessage("*Invalid length for a Base-64*");
+#else
                 .WithMessage("*not a valid Base-64 string*");
+#endif
         }
     }
 }
