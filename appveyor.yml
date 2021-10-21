@@ -12,6 +12,9 @@ configuration:
 build_script:
   - cmd: dotnet pack
 
+after_build:
+  - appveyor PushArtifact src\ReportPortal.Shared\bin\%configuration%\ReportPortal.Shared.*.nupkg
+
 test_script:
   - cmd: dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=OpenCover /p:CoverletOutput=./Coverage.xml
 
@@ -20,5 +23,4 @@ after_test:
   - dotnet run -c Release --project test/ReportPortal.Shared.Benchmark
 
 artifacts:
-  - path: '**\*.nupkg'
   - path: '**\*.html'
