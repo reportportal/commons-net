@@ -1,7 +1,6 @@
 ﻿using ReportPortal.Shared.Extensibility;
 using ReportPortal.Shared.Extensibility.Commands;
 using ReportPortal.Shared.Extensibility.Commands.CommandArgs;
-using System;
 using System.Collections.Generic;
 
 namespace ReportPortal.Shared.Execution
@@ -9,8 +8,6 @@ namespace ReportPortal.Shared.Execution
     public class CommandsSource : ICommandsSource
     {
         private IList<ICommandsListener> _listeners;
-
-        private static Internal.Logging.ITraceLogger _traceLogger = Internal.Logging.TraceLogManager.Instance.GetLogger<CommandsSource>();
 
         public CommandsSource(IList<ICommandsListener> listeners)
         {
@@ -45,28 +42,7 @@ namespace ReportPortal.Shared.Execution
 
         public static void RaiseOnLogMessageCommand(CommandsSource commandsSource, ILogContext logContext, LogMessageCommandArgs args)
         {
-            //commandsSource.OnLogMessageCommand?.Invoke(logContext, args);
-            RaiseSafe(commandsSource.OnLogMessageCommand, logContext, args);
-        }
-
-        private static void RaiseSafe<T>(LogCommandHandler<T> logCommandHandler, ILogContext logContext, EventArgs args)
-        {
-            var handlers = logCommandHandler?.GetInvocationList();
-
-            if (handlers != null)
-            {
-                foreach (var handler in handlers)
-                {
-                    try
-                    {
-                        handler.DynamicInvoke(logContext, args);
-                    }
-                    catch (Exception ex)
-                    {
-                        _traceLogger.Error(new Exception($"Unhandled error occurred in handler '{handler.Method}' for log commands", ex).ToString());
-                    }
-                }
-            }
+            commandsSource.OnLogMessageCommand?.Invoke(logContext, args);
         }
     }
 
