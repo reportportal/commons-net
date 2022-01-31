@@ -86,7 +86,7 @@ namespace ReportPortal.Shared.Reporter
                     }
                     catch (Exception ex)
                     {
-                        _traceLogger.Error(new Exception($"Unhandled error occurred in handler '{handler.Method}' for log commands", ex).ToString());
+                        _traceLogger.Error(new Exception($"Unhandled error occurred in handler '{handler.Method}' for one of the reporting event.", ex).ToString());
                     }
                 }
             }
