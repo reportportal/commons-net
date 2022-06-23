@@ -32,7 +32,7 @@ namespace ReportPortal.Shared.Tests
             {
                 {ConfigurationPath.ServerUrl, "https://demo.reportportal.io/api/v1" },
                 {ConfigurationPath.ServerProject, "default_personal" },
-                {ConfigurationPath.ServerAuthenticationUuid, "5b1e5023-8d0b-43ae-a66d-a5996dba2a31" }
+                {ConfigurationPath.ServerAuthenticationUuid, "695bb79b-0419-472f-bb7c-dd1e6e932a4f" }
             });
 
             _service = new ClientServiceBuilder(config).Build();
