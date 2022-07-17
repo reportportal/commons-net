@@ -37,8 +37,13 @@ namespace ReportPortal.Shared.Configuration
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            builder.AddEnvironmentVariables("RP_");
-            builder.AddEnvironmentVariables("REPORTPORTAL_");
+            var delimiters = new string[] { "_", "__" };
+
+            foreach(var delimiter in delimiters)
+            {
+                builder.AddEnvironmentVariables($"RP{delimiter}", delimiter);
+                builder.AddEnvironmentVariables($"REPORTPORTAL{delimiter}", delimiter);
+            }
 
             return builder;
         }
