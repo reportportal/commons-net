@@ -1,5 +1,7 @@
 ﻿using ReportPortal.Shared.Extensibility;
 using System;
+using Microsoft.AspNetCore.StaticFiles;
+using System.IO;
 
 namespace ReportPortal.Shared.Execution.Logging
 {
@@ -100,6 +102,17 @@ namespace ReportPortal.Shared.Execution.Logging
             var logMessage = GetDefaultLogRequest(message);
             logMessage.Level = LogMessageLevel.Info;
             logMessage.Attachment = GetAttachFromContent(mimeType, content);
+            Message(logMessage);
+        }
+
+        public void Info(string message, FileInfo file)
+        {
+            var logMessage = GetDefaultLogRequest(message);
+            logMessage.Level = LogMessageLevel.Info;
+            new FileExtensionContentTypeProvider().TryGetContentType(file.Name, out string contentType);
+           
+            if (contentType != null)
+            logMessage.Attachment = GetAttachFromContent(contentType, File.ReadAllBytes(file.FullName));
             Message(logMessage);
         }
 
