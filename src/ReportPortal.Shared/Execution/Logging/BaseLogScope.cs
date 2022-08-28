@@ -60,6 +60,13 @@ namespace ReportPortal.Shared.Execution.Logging
             Message(logMessage);
         }
 
+        public void Debug(string message, FileInfo file)
+        {
+            var logMessage = GetDefaultLogRequest(message);
+            logMessage.Level = LogMessageLevel.Debug;
+            Message(GetLogMessageWithAttachmentFromFileInfo(logMessage, file));
+        }
+
         public void Error(string message)
         {
             var logMessage = GetDefaultLogRequest(message);
@@ -75,6 +82,13 @@ namespace ReportPortal.Shared.Execution.Logging
             Message(logMessage);
         }
 
+        public void Error(string message, FileInfo file)
+        {
+            var logMessage = GetDefaultLogRequest(message);
+            logMessage.Level = LogMessageLevel.Error;
+            Message(GetLogMessageWithAttachmentFromFileInfo(logMessage, file));
+        }
+
         public void Fatal(string message)
         {
             var logMessage = GetDefaultLogRequest(message);
@@ -88,6 +102,13 @@ namespace ReportPortal.Shared.Execution.Logging
             logMessage.Level = LogMessageLevel.Fatal;
             logMessage.Attachment = GetAttachFromContent(mimeType, content);
             Message(logMessage);
+        }
+
+        public void Fatal(string message, FileInfo file)
+        {
+            var logMessage = GetDefaultLogRequest(message);
+            logMessage.Level = LogMessageLevel.Fatal;
+            Message(GetLogMessageWithAttachmentFromFileInfo(logMessage, file));
         }
 
         public void Info(string message)
@@ -109,9 +130,7 @@ namespace ReportPortal.Shared.Execution.Logging
         {
             var logMessage = GetDefaultLogRequest(message);
             logMessage.Level = LogMessageLevel.Info;
-            var contentType = MimeTypeMap.GetMimeType(file.Extension);            
-            logMessage.Attachment = GetAttachFromContent(contentType, File.ReadAllBytes(file.FullName));
-            Message(logMessage);
+            Message(GetLogMessageWithAttachmentFromFileInfo(logMessage, file));
         }
 
         public void Trace(string message)
@@ -129,6 +148,13 @@ namespace ReportPortal.Shared.Execution.Logging
             Message(logMessage);
         }
 
+        public void Trace(string message, FileInfo file)
+        {
+            var logMessage = GetDefaultLogRequest(message);
+            logMessage.Level = LogMessageLevel.Trace;
+            Message(GetLogMessageWithAttachmentFromFileInfo(logMessage, file));
+        }
+
         public void Warn(string message)
         {
             var logMessage = GetDefaultLogRequest(message);
@@ -142,6 +168,13 @@ namespace ReportPortal.Shared.Execution.Logging
             logMessage.Level = LogMessageLevel.Warning;
             logMessage.Attachment = GetAttachFromContent(mimeType, content);
             Message(logMessage);
+        }
+
+        public void Warn(string message, FileInfo file)
+        {
+            var logMessage = GetDefaultLogRequest(message);
+            logMessage.Level = LogMessageLevel.Warning;
+            Message(GetLogMessageWithAttachmentFromFileInfo(logMessage, file));
         }
 
         public virtual void Message(ILogMessage log)
@@ -159,6 +192,29 @@ namespace ReportPortal.Shared.Execution.Logging
         protected ILogMessageAttachment GetAttachFromContent(string mimeType, byte[] content)
         {
             return new LogMessageAttachment(mimeType, content);
+        }
+
+        protected ILogMessage GetLogMessageWithAttachmentFromFileInfo(ILogMessage message, FileInfo file)
+        {
+            if (file == null)
+            {
+                message.Message = string.Concat(message.Message, "\nFile information was not specified (null).");
+                return message;
+            }
+
+            try
+            {
+                var contentType = MimeTypeMap.GetMimeType(file.Extension);
+                message.Attachment = new LogMessageAttachment(contentType, File.ReadAllBytes(file.FullName));
+                return message;
+            }
+
+            catch (Exception e)
+            {
+                message.Message = string
+                    .Concat(message.Message, $"\nCouldn't read file by path {file.FullName}. \nException message: {e.Message}");
+                return message;
+            }
         }
 
         public virtual void Dispose()
