@@ -16,7 +16,7 @@ namespace ReportPortal.Shared.Tests.Execution
         private readonly string mimeType = "image/png";
         private readonly byte[] data = new byte[] { 1 };
         private readonly string filePath = "logFilePath";
-        private readonly string errorText = "Couldn't read file by path";
+        private readonly string errorText = "Couldn't read content of";
 
         ILogMessage logMessage;
         readonly ICommandsListener listener;

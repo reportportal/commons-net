@@ -1,7 +1,7 @@
 ﻿using ReportPortal.Shared.Extensibility;
+using ReportPortal.Shared.MimeTypes;
 using System;
 using System.IO;
-using ReportPortal.Shared.MimeTypes;
 
 namespace ReportPortal.Shared.Execution.Logging
 {
@@ -196,25 +196,22 @@ namespace ReportPortal.Shared.Execution.Logging
 
         protected ILogMessage GetLogMessageWithAttachmentFromFileInfo(ILogMessage message, FileInfo file)
         {
-            if (file == null)
-            {
-                message.Message = string.Concat(message.Message, "\nFile information was not specified (null).");
-                return message;
-            }
-
             try
             {
+                if (file == null)
+                {
+                    throw new ArgumentNullException(nameof(file));
+                }
+
                 var contentType = MimeTypeMap.GetMimeType(file.Extension);
                 message.Attachment = new LogMessageAttachment(contentType, File.ReadAllBytes(file.FullName));
-                return message;
+            }
+            catch (Exception ex)
+            {
+                message.Message = $"{message.Message}\n> Couldn't read content of `{file?.FullName}` file. \n{ex}";
             }
 
-            catch (Exception e)
-            {
-                message.Message = string
-                    .Concat(message.Message, $"\nCouldn't read file by path {file.FullName}. \nException message: {e.Message}");
-                return message;
-            }
+            return message;
         }
 
         public virtual void Dispose()
