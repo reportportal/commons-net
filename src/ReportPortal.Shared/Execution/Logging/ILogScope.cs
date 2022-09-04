@@ -79,7 +79,7 @@ namespace ReportPortal.Shared.Execution.Logging
         /// Sends file to current test context.
         /// </summary>
         /// <param name="message">Text of the message</param>
-        /// <param name="file">File on computer</param>
+        /// <param name="file">File on the disk</param>
         void Info(string message, FileInfo file);
 
         /// <summary>
@@ -100,7 +100,7 @@ namespace ReportPortal.Shared.Execution.Logging
         /// Sends file to current test context.
         /// </summary>
         /// <param name="message">Text of the message</param>
-        /// <param name="file">File on computer</param>
+        /// <param name="file">File on the disk</param>
         void Debug(string message, FileInfo file);
 
         /// <summary>
@@ -121,7 +121,7 @@ namespace ReportPortal.Shared.Execution.Logging
         /// Sends file to current test context.
         /// </summary>
         /// <param name="message">Text of the message</param>
-        /// <param name="file">File on computer</param>
+        /// <param name="file">File on the disk</param>
         void Trace(string message, FileInfo file);
 
         /// <summary>
@@ -142,7 +142,7 @@ namespace ReportPortal.Shared.Execution.Logging
         /// Sends file to current test context.
         /// </summary>
         /// <param name="message">Text of the message</param>
-        /// <param name="file">File on computer</param>
+        /// <param name="file">File on the disk</param>
         void Error(string message, FileInfo file);
 
         /// <summary>
@@ -163,7 +163,7 @@ namespace ReportPortal.Shared.Execution.Logging
         /// Sends file to current test context.
         /// </summary>
         /// <param name="message">Text of the message</param>
-        /// <param name="file">File on computer</param>
+        /// <param name="file">File on the disk</param>
         void Fatal(string message, FileInfo file);
 
         /// <summary>
@@ -184,7 +184,7 @@ namespace ReportPortal.Shared.Execution.Logging
         /// Sends file to current test context.
         /// </summary>
         /// <param name="message">Text of the message</param>
-        /// <param name="file">File on computer</param>
+        /// <param name="file">File on the disk</param>
         void Warn(string message, FileInfo file);
     }
 }
