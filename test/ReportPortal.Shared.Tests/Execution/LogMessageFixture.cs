@@ -15,7 +15,7 @@ namespace ReportPortal.Shared.Tests.Execution
         private readonly string text = "text";
         private readonly string mimeType = "image/png";
         private readonly byte[] data = new byte[] { 1 };
-        private readonly string filePath = "logFilePath";
+        private readonly string filePath = "Execution/data.txt";
         private readonly string errorText = "Couldn't read content of";
 
         ILogMessage logMessage;
@@ -34,7 +34,7 @@ namespace ReportPortal.Shared.Tests.Execution
 
             var extensionManager = new ExtensionManager();
             extensionManager.CommandsListeners.Add(listener);
-            
+
             testContext = new TestContext(extensionManager, new CommandsSource(new List<ICommandsListener> { mockListener.Object }));
         }
 
@@ -44,7 +44,11 @@ namespace ReportPortal.Shared.Tests.Execution
             testContext.Log.Debug(text);
 
             VerifyLogMessage(logMessage, LogMessageLevel.Debug);
+        }
 
+        [Fact]
+        public void ShouldRaiseLogDebugMessageWithAttachment()
+        {
             testContext.Log.Debug(text, mimeType, data);
 
             VerifyLogMessageWithAttach(logMessage, LogMessageLevel.Debug);
@@ -53,13 +57,17 @@ namespace ReportPortal.Shared.Tests.Execution
         [Fact]
         public void ShouldRaiseLogDebugMessageWithFileAttachment()
         {
-            testContext.Log.Debug(text);
-
-            VerifyLogMessage(logMessage, LogMessageLevel.Debug);
-
             testContext.Log.Debug(text, new FileInfo(filePath));
 
             VerifyLogMessageWithFileAttach(logMessage, LogMessageLevel.Debug);
+        }
+
+        [Fact]
+        public void ShouldRaiseLogDebugMessageWithIncorrectFileAttachment()
+        {
+            testContext.Log.Debug(text, new FileInfo("unexisting"));
+
+            VerifyLogMessageWithIncorrectFileAttach(logMessage, LogMessageLevel.Debug);
         }
 
         [Fact]
@@ -68,7 +76,11 @@ namespace ReportPortal.Shared.Tests.Execution
             testContext.Log.Error(text);
 
             VerifyLogMessage(logMessage, LogMessageLevel.Error);
+        }
 
+        [Fact]
+        public void ShouldRaiseLogErrorMessageWithAttachment()
+        {
             testContext.Log.Error(text, mimeType, data);
 
             VerifyLogMessageWithAttach(logMessage, LogMessageLevel.Error);
@@ -77,13 +89,17 @@ namespace ReportPortal.Shared.Tests.Execution
         [Fact]
         public void ShouldRaiseLogErrorMessageWithFileAttachment()
         {
-            testContext.Log.Error(text);
-
-            VerifyLogMessage(logMessage, LogMessageLevel.Error);
-
             testContext.Log.Error(text, new FileInfo(filePath));
 
             VerifyLogMessageWithFileAttach(logMessage, LogMessageLevel.Error);
+        }
+
+        [Fact]
+        public void ShouldRaiseLogErrorMessageWithIncorrectFileAttachment()
+        {
+            testContext.Log.Error(text, new FileInfo("unexisting"));
+
+            VerifyLogMessageWithIncorrectFileAttach(logMessage, LogMessageLevel.Error);
         }
 
         [Fact]
@@ -92,7 +108,11 @@ namespace ReportPortal.Shared.Tests.Execution
             testContext.Log.Fatal(text);
 
             VerifyLogMessage(logMessage, LogMessageLevel.Fatal);
+        }
 
+        [Fact]
+        public void ShouldRaiseLogFatalMessageWithAttachment()
+        {
             testContext.Log.Fatal(text, mimeType, data);
 
             VerifyLogMessageWithAttach(logMessage, LogMessageLevel.Fatal);
@@ -101,13 +121,17 @@ namespace ReportPortal.Shared.Tests.Execution
         [Fact]
         public void ShouldRaiseLogFatalMessageWithFileAttachment()
         {
-            testContext.Log.Fatal(text);
-
-            VerifyLogMessage(logMessage, LogMessageLevel.Fatal);
-
             testContext.Log.Fatal(text, new FileInfo(filePath));
 
             VerifyLogMessageWithFileAttach(logMessage, LogMessageLevel.Fatal);
+        }
+
+        [Fact]
+        public void ShouldRaiseLogFatalMessageWithIncorrectFileAttachment()
+        {
+            testContext.Log.Fatal(text, new FileInfo("unexisting"));
+
+            VerifyLogMessageWithIncorrectFileAttach(logMessage, LogMessageLevel.Fatal);
         }
 
         [Fact]
@@ -116,7 +140,11 @@ namespace ReportPortal.Shared.Tests.Execution
             testContext.Log.Info(text);
 
             VerifyLogMessage(logMessage, LogMessageLevel.Info);
+        }
 
+        [Fact]
+        public void ShouldRaiseLogInfoMessageWithAttachment()
+        {
             testContext.Log.Info(text, mimeType, data);
 
             VerifyLogMessageWithAttach(logMessage, LogMessageLevel.Info);
@@ -125,13 +153,17 @@ namespace ReportPortal.Shared.Tests.Execution
         [Fact]
         public void ShouldRaiseLogInfoMessageWithFileAttachment()
         {
-            testContext.Log.Info(text);
-
-            VerifyLogMessage(logMessage, LogMessageLevel.Info);
-
             testContext.Log.Info(text, new FileInfo(filePath));
 
             VerifyLogMessageWithFileAttach(logMessage, LogMessageLevel.Info);
+        }
+
+        [Fact]
+        public void ShouldRaiseLogInfoMessageWithIncorrectFileAttachment()
+        {
+            testContext.Log.Info(text, new FileInfo("unexisting"));
+
+            VerifyLogMessageWithIncorrectFileAttach(logMessage, LogMessageLevel.Info);
         }
 
         [Fact]
@@ -140,7 +172,11 @@ namespace ReportPortal.Shared.Tests.Execution
             testContext.Log.Trace(text);
 
             VerifyLogMessage(logMessage, LogMessageLevel.Trace);
+        }
 
+        [Fact]
+        public void ShouldRaiseLogTraceMessageWithAttachment()
+        {
             testContext.Log.Trace(text, mimeType, data);
 
             VerifyLogMessageWithAttach(logMessage, LogMessageLevel.Trace);
@@ -149,13 +185,17 @@ namespace ReportPortal.Shared.Tests.Execution
         [Fact]
         public void ShouldRaiseLogTraceMessageWithFileAttachment()
         {
-            testContext.Log.Trace(text);
-
-            VerifyLogMessage(logMessage, LogMessageLevel.Trace);
-
             testContext.Log.Trace(text, new FileInfo(filePath));
 
             VerifyLogMessageWithFileAttach(logMessage, LogMessageLevel.Trace);
+        }
+
+        [Fact]
+        public void ShouldRaiseLogTraceMessageWithIncorrectFileAttachment()
+        {
+            testContext.Log.Trace(text, new FileInfo("unexisting"));
+
+            VerifyLogMessageWithIncorrectFileAttach(logMessage, LogMessageLevel.Trace);
         }
 
         [Fact]
@@ -164,7 +204,11 @@ namespace ReportPortal.Shared.Tests.Execution
             testContext.Log.Warn(text);
 
             VerifyLogMessage(logMessage, LogMessageLevel.Warning);
+        }
 
+        [Fact]
+        public void ShouldRaiseLogWarnMessageWithAttachment()
+        {
             testContext.Log.Warn(text, mimeType, data);
 
             VerifyLogMessageWithAttach(logMessage, LogMessageLevel.Warning);
@@ -173,19 +217,24 @@ namespace ReportPortal.Shared.Tests.Execution
         [Fact]
         public void ShouldRaiseLogWarnMessageWithFileAttachment()
         {
-            testContext.Log.Warn(text);
-
-            VerifyLogMessage(logMessage, LogMessageLevel.Warning);
-
             testContext.Log.Warn(text, new FileInfo(filePath));
 
             VerifyLogMessageWithFileAttach(logMessage, LogMessageLevel.Warning);
+        }
+
+        [Fact]
+        public void ShouldRaiseLogWarnMessageWithIncorrectFileAttachment()
+        {
+            testContext.Log.Warn(text, new FileInfo("unexisting"));
+
+            VerifyLogMessageWithIncorrectFileAttach(logMessage, LogMessageLevel.Warning);
         }
 
         private void VerifyLogMessage(ILogMessage logMessage, LogMessageLevel level)
         {
             logMessage.Level.Should().Be(level);
             logMessage.Message.Should().Be(text);
+            logMessage.Attachment.Should().BeNull();
         }
 
         private void VerifyLogMessageWithAttach(ILogMessage logMessage, LogMessageLevel level)
@@ -198,6 +247,16 @@ namespace ReportPortal.Shared.Tests.Execution
         }
 
         private void VerifyLogMessageWithFileAttach(ILogMessage logMessage, LogMessageLevel level)
+        {
+            logMessage.Level.Should().Be(level);
+            logMessage.Message.Should().Be(text);
+            logMessage.Attachment.Should().NotBeNull();
+            logMessage.Attachment.MimeType.Should().Be("text/plain");
+            // data.txt
+            logMessage.Attachment.Data.Should().BeEquivalentTo(new byte[] { 0xEF, 0xBB, 0xBF, 0x31 });
+        }
+
+        private void VerifyLogMessageWithIncorrectFileAttach(ILogMessage logMessage, LogMessageLevel level)
         {
             logMessage.Level.Should().Be(level);
             logMessage.Message.Should().Contain(text);
