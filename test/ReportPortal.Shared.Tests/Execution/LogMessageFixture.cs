@@ -16,7 +16,6 @@ namespace ReportPortal.Shared.Tests.Execution
         private readonly string mimeType = "image/png";
         private readonly byte[] data = new byte[] { 1 };
         private readonly string filePath = "Execution/data.txt";
-        private readonly string errorText = "Couldn't read content of";
 
         ILogMessage logMessage;
         readonly ICommandsListener listener;
@@ -71,6 +70,14 @@ namespace ReportPortal.Shared.Tests.Execution
         }
 
         [Fact]
+        public void ShouldRaiseLogDebugMessageWithNullFileAttachment()
+        {
+            testContext.Log.Debug(text, null);
+
+            VerifyLogMessageWithNullFileAttach(logMessage, LogMessageLevel.Debug);
+        }
+
+        [Fact]
         public void ShouldRaiseLogErrorMessage()
         {
             testContext.Log.Error(text);
@@ -100,6 +107,14 @@ namespace ReportPortal.Shared.Tests.Execution
             testContext.Log.Error(text, new FileInfo("unexisting"));
 
             VerifyLogMessageWithIncorrectFileAttach(logMessage, LogMessageLevel.Error);
+        }
+
+        [Fact]
+        public void ShouldRaiseLogErrorMessageWithNullFileAttachment()
+        {
+            testContext.Log.Error(text, null);
+
+            VerifyLogMessageWithNullFileAttach(logMessage, LogMessageLevel.Error);
         }
 
         [Fact]
@@ -135,6 +150,14 @@ namespace ReportPortal.Shared.Tests.Execution
         }
 
         [Fact]
+        public void ShouldRaiseLogFatalMessageWithNullFileAttachment()
+        {
+            testContext.Log.Fatal(text, null);
+
+            VerifyLogMessageWithNullFileAttach(logMessage, LogMessageLevel.Fatal);
+        }
+
+        [Fact]
         public void ShouldRaiseLogInfoMessage()
         {
             testContext.Log.Info(text);
@@ -164,6 +187,14 @@ namespace ReportPortal.Shared.Tests.Execution
             testContext.Log.Info(text, new FileInfo("unexisting"));
 
             VerifyLogMessageWithIncorrectFileAttach(logMessage, LogMessageLevel.Info);
+        }
+
+        [Fact]
+        public void ShouldRaiseLogInfoMessageWithNullFileAttachment()
+        {
+            testContext.Log.Info(text, null);
+
+            VerifyLogMessageWithNullFileAttach(logMessage, LogMessageLevel.Info);
         }
 
         [Fact]
@@ -199,6 +230,14 @@ namespace ReportPortal.Shared.Tests.Execution
         }
 
         [Fact]
+        public void ShouldRaiseLogTraceMessageWithNullFileAttachment()
+        {
+            testContext.Log.Trace(text, null);
+
+            VerifyLogMessageWithNullFileAttach(logMessage, LogMessageLevel.Trace);
+        }
+
+        [Fact]
         public void ShouldRaiseLogWarnMessage()
         {
             testContext.Log.Warn(text);
@@ -228,6 +267,14 @@ namespace ReportPortal.Shared.Tests.Execution
             testContext.Log.Warn(text, new FileInfo("unexisting"));
 
             VerifyLogMessageWithIncorrectFileAttach(logMessage, LogMessageLevel.Warning);
+        }
+
+        [Fact]
+        public void ShouldRaiseLogWarnMessageWithNullFileAttachment()
+        {
+            testContext.Log.Warn(text, null);
+
+            VerifyLogMessageWithNullFileAttach(logMessage, LogMessageLevel.Warning);
         }
 
         private void VerifyLogMessage(ILogMessage logMessage, LogMessageLevel level)
@@ -260,7 +307,16 @@ namespace ReportPortal.Shared.Tests.Execution
         {
             logMessage.Level.Should().Be(level);
             logMessage.Message.Should().Contain(text);
-            logMessage.Message.Should().Contain(errorText);
+            logMessage.Message.Should().Contain("Couldn't read content of");
+            logMessage.Attachment.Should().BeNull();
+        }
+
+        private void VerifyLogMessageWithNullFileAttach(ILogMessage logMessage, LogMessageLevel level)
+        {
+            logMessage.Level.Should().Be(level);
+            logMessage.Message.Should().Contain(text);
+            logMessage.Message.Should().Contain("Couldn't read content of");
+            logMessage.Message.Should().Contain(nameof(System.ArgumentNullException));
             logMessage.Attachment.Should().BeNull();
         }
     }
