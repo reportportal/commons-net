@@ -134,20 +134,8 @@ namespace ReportPortal.Shared.Reporter
         private BeforeLogsSendingEventArgs NotifySending(IList<CreateLogItemRequest> requests)
         {
             var args = new BeforeLogsSendingEventArgs(_service, _configuration, requests);
-            Notify(() => ReportEventsSource.RaiseBeforeLogsSending(_reportEventsSource, this, args));
+            ReportEventsSource.RaiseBeforeLogsSending(_reportEventsSource, this, args);
             return args;
-        }
-
-        private void Notify(Action act)
-        {
-            try
-            {
-                act.Invoke();
-            }
-            catch (Exception exp)
-            {
-                TraceLogger.Error($"Unhandled error while notifying logs event observers: {exp}");
-            }
         }
     }
 }
