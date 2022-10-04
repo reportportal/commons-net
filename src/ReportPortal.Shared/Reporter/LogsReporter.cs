@@ -70,11 +70,6 @@ namespace ReportPortal.Shared.Reporter
                                 foreach (var logItemRequest in requests)
                                 {
                                     _logRequestAmender.Amend(logItemRequest);
-
-                                    foreach (var formatter in _extensionManager.LogFormatters)
-                                    {
-                                        formatter.FormatLog(logItemRequest);
-                                    }
                                 }
 
                                 NotifySending(requests);

@@ -10,7 +10,7 @@ namespace ReportPortal.Shared.Extensibility
     {
         private static Internal.Logging.ITraceLogger TraceLogger { get; } = Internal.Logging.TraceLogManager.Instance.GetLogger(typeof(ExtensionManager));
 
-        private static Lazy<IExtensionManager> _instance = new Lazy<IExtensionManager>(() =>
+        private static readonly Lazy<IExtensionManager> _instance = new Lazy<IExtensionManager>(() =>
             {
                 var ext = new ExtensionManager();
 
@@ -54,7 +54,6 @@ namespace ReportPortal.Shared.Extensibility
                 {
                     if (!_exploredPaths.Contains(path))
                     {
-                        var logFormatters = new List<ILogFormatter>();
                         var reportEventObservers = new List<IReportEventsObserver>();
                         var commandsListeners = new List<ICommandsListener>();
 
@@ -68,7 +67,6 @@ namespace ReportPortal.Shared.Extensibility
                             AppDomain.CurrentDomain.Load(Path.GetFileNameWithoutExtension(file.Name));
                         }
 
-                        var iLogFormatterExtensionInterfaceType = typeof(ILogFormatter);
                         var iReportEventObserseExtensionInterfaceType = typeof(IReportEventsObserver);
                         var iCommandsListenerInterfaceType = typeof(ICommandsListener);
 
@@ -84,13 +82,6 @@ namespace ReportPortal.Shared.Extensibility
                                     {
                                         if (!type.IsAbstract && type.GetConstructors().Any(ctor => ctor.GetParameters().Length == 0))
                                         {
-                                            if (iLogFormatterExtensionInterfaceType.IsAssignableFrom(type))
-                                            {
-                                                var extension = Activator.CreateInstance(type);
-                                                logFormatters.Add((ILogFormatter)extension);
-                                                TraceLogger.Info($"Registered '{type.FullName}' type as {nameof(ILogFormatter)} extension.");
-                                            }
-
                                             if (iReportEventObserseExtensionInterfaceType.IsAssignableFrom(type))
                                             {
                                                 var extension = Activator.CreateInstance(type);
@@ -118,7 +109,6 @@ namespace ReportPortal.Shared.Extensibility
                             }
                         }
 
-                        logFormatters.OrderBy(ext => ext.Order).ToList().ForEach(lf => LogFormatters.Add(lf));
                         reportEventObservers.ToList().ForEach(reo => ReportEventObservers.Add(reo));
                         commandsListeners.ForEach(cl => CommandsListeners.Add(cl));
 
@@ -127,8 +117,6 @@ namespace ReportPortal.Shared.Extensibility
                 }
             }
         }
-
-        public IList<ILogFormatter> LogFormatters { get; } = new List<ILogFormatter>();
 
         public IList<IReportEventsObserver> ReportEventObservers { get; } = new List<IReportEventsObserver>();
 
