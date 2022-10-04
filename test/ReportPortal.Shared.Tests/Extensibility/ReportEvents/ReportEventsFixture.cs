@@ -46,6 +46,8 @@ namespace ReportPortal.Shared.Tests.Extensibility.ReportEvents
                 s.OnAfterTestStarted += (a, b) => throw new Exception();
                 s.OnBeforeTestFinishing += (a, b) => throw new Exception();
                 s.OnAfterTestFinished += (a, b) => throw new Exception();
+
+                s.OnBeforeLogsSending += (a, b) => throw new Exception();
             });
 
             var extManager = new Shared.Extensibility.ExtensionManager();
