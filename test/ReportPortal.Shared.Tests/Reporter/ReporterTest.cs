@@ -55,6 +55,28 @@ namespace ReportPortal.Shared.Tests.Reporter
         }
 
         [Fact]
+        public void ShouldFulfillTestInfo()
+        {
+            var now = DateTime.UtcNow;
+
+            var service = new MockServiceBuilder().Build();
+
+            var launchScheduler = new LaunchReporterBuilder(service.Object);
+            var launchReporter = launchScheduler.Build(1, 0, 0);
+
+            launchReporter.Sync();
+
+            var testReporter = launchReporter.ChildTestReporters[0];
+
+            Assert.NotNull(testReporter);
+            Assert.NotNull(testReporter.Info.Uuid);
+            Assert.NotNull(testReporter.Info.Name);
+            testReporter.Info.StartTime.Should().BeCloseTo(now, precision: TimeSpan.FromMilliseconds(100));
+            testReporter.Info.FinishTime.Should().BeCloseTo(now, precision: TimeSpan.FromMilliseconds(100));
+            (testReporter.Info as TestInfo).Status.Should().Be(Client.Abstractions.Models.Status.Passed);
+        }
+
+        [Fact]
         public void MixingTestsAndLogs()
         {
             var service = new MockServiceBuilder().Build();
