@@ -96,7 +96,7 @@ namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
         /// <inheritdoc />
         public void Initialize(IReportEventsSource reportEventsSource)
         {
-            _reportEventsSource = reportEventsSource;
+            _reportEventsSource = reportEventsSource ?? throw new ArgumentNullException(nameof(reportEventsSource));
             reportEventsSource.OnBeforeLaunchStarting += ReportEventsSource_OnBeforeLaunchStarting;
             reportEventsSource.OnAfterLaunchFinished += ReportEventsSource_OnAfterLaunchFinished;
         }

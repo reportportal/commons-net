@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using ReportPortal.Shared.Extensibility.Embedded.Analytics;
+using ReportPortal.Shared.Reporter;
 using ReportPortal.Shared.Tests.Helpers;
 using RichardSzalay.MockHttp;
 using RichardSzalay.MockHttp.Matchers;
@@ -86,6 +87,8 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Analytics
         public void ShouldDispose()
         {
             var ga = new AnalyticsReportEventsObserver();
+
+            ga.Initialize(new ReportEventsSource());
 
             ga.Dispose();
         }

@@ -64,7 +64,14 @@ namespace ReportPortal.Shared.Extensibility
                         foreach (var file in currentDirectory.GetFiles("*ReportPortal*.dll"))
                         {
                             TraceLogger.Verbose($"Found '{file.Name}' and loading it into current AppDomain.");
-                            AppDomain.CurrentDomain.Load(Path.GetFileNameWithoutExtension(file.Name));
+                            try
+                            {
+                                AppDomain.CurrentDomain.Load(Path.GetFileNameWithoutExtension(file.Name));
+                            }
+                            catch(Exception ex)
+                            {
+                                TraceLogger.Warn($"Could not load extension assembly into application domain. {ex}");
+                            }
                         }
 
                         var iReportEventObserseExtensionInterfaceType = typeof(IReportEventsObserver);

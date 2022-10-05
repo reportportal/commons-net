@@ -14,5 +14,14 @@ namespace ReportPortal.Shared.Tests.Extensibility.ExtensionManager
 
             manager.ReportEventObservers.Count.Should().Be(1, "google analytic event observer");
         }
+
+        [Fact]
+        public void ShouldSkipIncorrectExtensions()
+        {
+            var manager = new Shared.Extensibility.ExtensionManager();
+            manager.Explore("Extensibility/ExtensionManager/Data");
+
+            manager.ReportEventObservers.Count.Should().Be(1, "google analytic event observer");
+        }
     }
 }
