@@ -552,5 +552,15 @@ namespace ReportPortal.Shared.Tests.Reporter
             Action act = () => test.Finish(null);
             act.Should().Throw<ArgumentNullException>();
         }
+
+        [Fact]
+        public void ShouldThrowWhenExtensionManagerIsNull()
+        {
+            var service = new MockServiceBuilder().Build();
+
+            Action act = () => new LaunchReporter(service.Object, null, null, extensionManager: null);
+
+            act.Should().Throw<ArgumentNullException>();
+        }
     }
 }
