@@ -500,5 +500,57 @@ namespace ReportPortal.Shared.Tests.Reporter
 
             launch.Sync();
         }
+
+        [Fact]
+        public void ShouldThrowWhenLaunchStartingNullRequest()
+        {
+            var service = new MockServiceBuilder().Build();
+
+            var launch = new LaunchReporter(service.Object, null, null, new ExtensionManager());
+
+            Action act = () => launch.Start(null);
+            act.Should().Throw<ArgumentNullException>();
+        }
+
+        [Fact]
+        public void ShouldThrowWhenLaunchFinishingNullRequest()
+        {
+            var service = new MockServiceBuilder().Build();
+
+            var launch = new LaunchReporter(service.Object, null, null, new ExtensionManager());
+
+            launch.Start(new StartLaunchRequest());
+
+            Action act = () => launch.Finish(null);
+            act.Should().Throw<ArgumentNullException>();
+        }
+
+        [Fact]
+        public void ShouldThrowWhenTestStartingNullRequest()
+        {
+            var service = new MockServiceBuilder().Build();
+
+            var launch = new LaunchReporter(service.Object, null, null, new ExtensionManager());
+
+            launch.Start(new StartLaunchRequest());
+
+            Action act = () => launch.StartChildTestReporter(null);
+            act.Should().Throw<ArgumentNullException>();
+        }
+
+        [Fact]
+        public void ShouldThrowWhenTestFinishingNullRequest()
+        {
+            var service = new MockServiceBuilder().Build();
+
+            var launch = new LaunchReporter(service.Object, null, null, new ExtensionManager());
+
+            launch.Start(new StartLaunchRequest());
+
+            var test = launch.StartChildTestReporter(new StartTestItemRequest());
+
+            Action act = () => test.Finish(null);
+            act.Should().Throw<ArgumentNullException>();
+        }
     }
 }
