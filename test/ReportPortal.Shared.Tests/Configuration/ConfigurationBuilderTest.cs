@@ -442,7 +442,7 @@ namespace ReportPortal.Shared.Tests.Configuration
         }
 
         [Fact]
-        public void ShouldUseDefaults()
+        public void ShouldUseDefaultsWithBaseDir()
         {
             var dir = Directory.CreateDirectory(Path.GetRandomFileName());
             File.AppendAllText(dir + "/ReportPortal_prop1", "value1");
@@ -453,6 +453,14 @@ namespace ReportPortal.Shared.Tests.Configuration
             config.Properties.Should().HaveCountGreaterOrEqualTo(2).And.ContainKeys("prop1", "prop2");
 
             dir.Delete(true);
+        }
+
+        [Fact]
+        public void ShouldUseDefaults()
+        {
+            var config = new ConfigurationBuilder().AddDefaults().Build();
+
+            config.Properties.Should().HaveCountGreaterOrEqualTo(0);
         }
 
         [Fact]
