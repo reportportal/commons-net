@@ -27,12 +27,29 @@ namespace ReportPortal.Shared.Tests.Execution
         [InlineData(LogMessageLevel.Fatal, LogLevel.Fatal)]
         public void ShouldConvertLogMessage(LogMessageLevel level, LogLevel expectedLevel)
         {
-            ILogMessage logMessage = new LogMessage("message") { Level = level};
+            ILogMessage logMessage = new LogMessage("message") { Level = level };
 
             var request = logMessage.ConvertToRequest();
 
             request.Text.Should().Be("message");
             request.Level.Should().Be(expectedLevel);
+            request.Time.Should().Be(logMessage.Time);
+        }
+
+        [Fact]
+        public void ShouldConvertLogMessageWithAttachment()
+        {
+            ILogMessage logMessage = new LogMessage("message") { Attachment = new LogMessageAttachment("image/png", new byte[] { 1, 2, 3 }) };
+
+            var request = logMessage.ConvertToRequest();
+
+            request.Text.Should().Be("message");
+            request.Level.Should().Be(LogLevel.Info);
+            request.Time.Should().Be(logMessage.Time);
+
+            request.Attach.Should().NotBeNull();
+            request.Attach.MimeType.Should().Be("image/png");
+            request.Attach.Data.Should().BeEquivalentTo(new byte[] { 1, 2, 3 });
         }
     }
 }
