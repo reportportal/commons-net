@@ -454,5 +454,29 @@ namespace ReportPortal.Shared.Tests.Configuration
 
             dir.Delete(true);
         }
+
+        [Fact]
+        public void ShouldThrowNullExceptionIfBuilderIsNull()
+        {
+            ConfigurationBuilder builder = null;
+
+            Action act = () => builder.AddDefaults();
+            act.Should().Throw<ArgumentNullException>();
+
+            act = () => builder.AddDefaults(baseDir: Environment.CurrentDirectory);
+            act.Should().Throw<ArgumentNullException>();
+
+            act = () => builder.AddJsonFile("file");
+            act.Should().Throw<ArgumentNullException>();
+
+            act = () => builder.AddEnvironmentVariables();
+            act.Should().Throw<ArgumentNullException>();
+
+            act = () => builder.AddEnvironmentVariables("", "");
+            act.Should().Throw<ArgumentNullException>();
+
+            act = () => builder.AddDirectoryProbing(Environment.CurrentDirectory);
+            act.Should().Throw<ArgumentNullException>();
+        }
     }
 }
