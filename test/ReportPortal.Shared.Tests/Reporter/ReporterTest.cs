@@ -68,9 +68,9 @@ namespace ReportPortal.Shared.Tests.Reporter
 
             var testReporter = launchReporter.ChildTestReporters[0];
 
-            Assert.NotNull(testReporter);
-            Assert.NotNull(testReporter.Info.Uuid);
-            Assert.NotNull(testReporter.Info.Name);
+            testReporter.Should().NotBeNull();
+            testReporter.Info.Uuid.Should().NotBeNullOrEmpty();
+            testReporter.Info.Name.Should().NotBeNullOrEmpty();
             testReporter.Info.StartTime.Should().BeCloseTo(now, precision: TimeSpan.FromMilliseconds(100));
             testReporter.Info.FinishTime.Should().BeCloseTo(now, precision: TimeSpan.FromMilliseconds(100));
             (testReporter.Info as TestInfo).Status.Should().Be(Client.Abstractions.Models.Status.Passed);
