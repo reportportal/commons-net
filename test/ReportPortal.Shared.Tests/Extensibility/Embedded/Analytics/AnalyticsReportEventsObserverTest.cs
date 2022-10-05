@@ -81,5 +81,13 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Analytics
             AnalyticsReportEventsObserver.AgentName.Should().Be("ReportPortal.Shared.Tests");
             AnalyticsReportEventsObserver.AgentVersion.Should().Be("1.0.0");
         }
+
+        [Fact]
+        public void ShouldDispose()
+        {
+            var ga = new AnalyticsReportEventsObserver();
+
+            ga.Dispose();
+        }
     }
 }
