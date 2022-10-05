@@ -117,8 +117,10 @@ namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
                 {
                     try
                     {
-                        var response = await _httpClient.PostAsync(requestData, null);
-                        response.EnsureSuccessStatusCode();
+                        using (var response = await _httpClient.PostAsync(requestData, null))
+                        {
+                            response.EnsureSuccessStatusCode();
+                        }
                     }
                     catch (Exception exp)
                     {

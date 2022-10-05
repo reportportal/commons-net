@@ -16,7 +16,7 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Analytics
         private const string CATEGORY_VALIDATION_PATTERN = "Client name \"[^\"]+\", version \"[^\"]+\", interpreter \".NET[^\"]+\"";
 
         [Fact]
-        public void ShouldHAveCorrectCategoryFormat()
+        public void ShouldHaveCorrectCategoryFormat()
         {
             var mockHttpHandler = new MockHttpMessageHandler();
             mockHttpHandler.Expect(HttpMethod.Post, "https://www.google-analytics.com/collect").With(new CustomMatcher(m =>
@@ -30,6 +30,22 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Analytics
                 }
                 return Regex.IsMatch(content["ec"], CATEGORY_VALIDATION_PATTERN);
             })).Respond(HttpStatusCode.OK);
+
+            var analyticsObserver = new AnalyticsReportEventsObserver(mockHttpHandler);
+            var extManager = new Shared.Extensibility.ExtensionManager();
+            extManager.ReportEventObservers.Add(analyticsObserver);
+
+            var client = new MockServiceBuilder().Build().Object;
+            new LaunchReporterBuilder(client).With(extManager).Build(1, 0, 0).Sync();
+
+            mockHttpHandler.VerifyNoOutstandingExpectation();
+        }
+
+        [Fact]
+        public void ShouldNotThrow()
+        {
+            var mockHttpHandler = new MockHttpMessageHandler();
+            mockHttpHandler.Expect(HttpMethod.Post, "https://www.google-analytics.com/collect").Respond(HttpStatusCode.InternalServerError);
 
             var analyticsObserver = new AnalyticsReportEventsObserver(mockHttpHandler);
             var extManager = new Shared.Extensibility.ExtensionManager();
