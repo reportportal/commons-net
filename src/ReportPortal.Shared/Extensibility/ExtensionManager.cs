@@ -83,6 +83,7 @@ namespace ReportPortal.Shared.Extensibility
                             {
                                 _exploredAssemblies.Add(assembly.Location);
                                 TraceLogger.Verbose($"Exploring '{assembly.FullName}' assembly for extensions.");
+                                
                                 try
                                 {
                                     foreach (var type in assembly.GetTypes().Where(t => t.IsClass))
@@ -116,7 +117,7 @@ namespace ReportPortal.Shared.Extensibility
                             }
                         }
 
-                        reportEventObservers.ToList().ForEach(reo => ReportEventObservers.Add(reo));
+                        reportEventObservers.ForEach(reo => ReportEventObservers.Add(reo));
                         commandsListeners.ForEach(cl => CommandsListeners.Add(cl));
 
                         _exploredPaths.Add(path);

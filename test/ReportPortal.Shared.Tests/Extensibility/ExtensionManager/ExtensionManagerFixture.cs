@@ -1,4 +1,6 @@
 ﻿using FluentAssertions;
+using ReportPortal.Shared.Extensibility;
+using ReportPortal.Shared.Extensibility.Commands;
 using System;
 using Xunit;
 
@@ -13,6 +15,7 @@ namespace ReportPortal.Shared.Tests.Extensibility.ExtensionManager
             manager.Explore(Environment.CurrentDirectory);
 
             manager.ReportEventObservers.Count.Should().Be(1, "google analytic event observer");
+            manager.CommandsListeners.Should().HaveCount(1);
         }
 
         [Fact]
@@ -20,8 +23,14 @@ namespace ReportPortal.Shared.Tests.Extensibility.ExtensionManager
         {
             var manager = new Shared.Extensibility.ExtensionManager();
             manager.Explore("Extensibility/ExtensionManager/Data");
+        }
+    }
 
-            manager.ReportEventObservers.Count.Should().Be(1, "google analytic event observer");
+    public class MyCommandListenerExtension : ICommandsListener
+    {
+        public void Initialize(ICommandsSource commandsSource)
+        {
+
         }
     }
 }
