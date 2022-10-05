@@ -306,41 +306,29 @@ namespace ReportPortal.Shared.Reporter
         private BeforeTestStartingEventArgs NotifyStarting(StartTestItemRequest request)
         {
             var args = new BeforeTestStartingEventArgs(_service, _configuration, request);
-            Notify(() => ReportEventsSource.RaiseBeforeTestStarting(_reportEventsSource, this, args));
+            ReportEventsSource.RaiseBeforeTestStarting(_reportEventsSource, this, args);
             return args;
         }
 
         private AfterTestStartedEventArgs NotifyStarted()
         {
             var args = new AfterTestStartedEventArgs(_service, _configuration);
-            Notify(() => ReportEventsSource.RaiseAfterTestStarted(_reportEventsSource, this, args));
+            ReportEventsSource.RaiseAfterTestStarted(_reportEventsSource, this, args);
             return args;
         }
 
         private BeforeTestFinishingEventArgs NotifyFinishing(FinishTestItemRequest request)
         {
             var args = new BeforeTestFinishingEventArgs(_service, _configuration, request);
-            Notify(() => ReportEventsSource.RaiseBeforeTestFinishing(_reportEventsSource, this, args));
+            ReportEventsSource.RaiseBeforeTestFinishing(_reportEventsSource, this, args);
             return args;
         }
 
         private AfterTestFinishedEventArgs NotifyFinished()
         {
             var args = new AfterTestFinishedEventArgs(_service, _configuration);
-            Notify(() => ReportEventsSource.RaiseAfterTestFinished(_reportEventsSource, this, args));
+            ReportEventsSource.RaiseAfterTestFinished(_reportEventsSource, this, args);
             return args;
-        }
-
-        private void Notify(Action act)
-        {
-            try
-            {
-                act.Invoke();
-            }
-            catch (Exception exp)
-            {
-                TraceLogger.Error($"Unhandled error while notifying test event observers: {exp}");
-            }
         }
     }
 
