@@ -18,6 +18,14 @@ namespace ReportPortal.Shared.Tests.Execution
             act.Should().ThrowExactly<ArgumentNullException>();
         }
 
+        [Fact]
+        public void ShouldNotCreateNullableLogMessage()
+        {
+            Action ctor = () => new LogMessage(null);
+
+            ctor.Should().ThrowExactly<ArgumentException>();
+        }
+
         [Theory]
         [InlineData(LogMessageLevel.Info, LogLevel.Info)]
         [InlineData(LogMessageLevel.Warning, LogLevel.Warning)]
@@ -34,6 +42,8 @@ namespace ReportPortal.Shared.Tests.Execution
             request.Text.Should().Be("message");
             request.Level.Should().Be(expectedLevel);
             request.Time.Should().Be(logMessage.Time);
+
+            request.Attach.Should().BeNull();
         }
 
         [Fact]
