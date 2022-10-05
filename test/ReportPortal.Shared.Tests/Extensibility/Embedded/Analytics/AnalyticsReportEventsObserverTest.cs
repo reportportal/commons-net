@@ -1,4 +1,5 @@
-﻿using ReportPortal.Shared.Extensibility.Embedded.Analytics;
+﻿using FluentAssertions;
+using ReportPortal.Shared.Extensibility.Embedded.Analytics;
 using ReportPortal.Shared.Tests.Helpers;
 using RichardSzalay.MockHttp;
 using RichardSzalay.MockHttp.Matchers;
@@ -55,6 +56,30 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Analytics
             new LaunchReporterBuilder(client).With(extManager).Build(1, 0, 0).Sync();
 
             mockHttpHandler.VerifyNoOutstandingExpectation();
+        }
+
+        [Fact]
+        public void ShouldDefineConsumer()
+        {
+            var mockHttpHandler = new MockHttpMessageHandler();
+            mockHttpHandler.Expect(HttpMethod.Post, "https://www.google-analytics.com/collect").Respond(HttpStatusCode.InternalServerError);
+
+            AnalyticsReportEventsObserver.DefineConsumer("agent1", "5.0");
+
+            AnalyticsReportEventsObserver.AgentName.Should().Be("agent1");
+            AnalyticsReportEventsObserver.AgentVersion.Should().Be("5.0");
+        }
+
+        [Fact]
+        public void ShouldDefineConsumerWithEmptyAgentName()
+        {
+            var mockHttpHandler = new MockHttpMessageHandler();
+            mockHttpHandler.Expect(HttpMethod.Post, "https://www.google-analytics.com/collect").Respond(HttpStatusCode.InternalServerError);
+
+            AnalyticsReportEventsObserver.DefineConsumer(null);
+
+            AnalyticsReportEventsObserver.AgentName.Should().Be("ReportPortal.Shared.Tests");
+            AnalyticsReportEventsObserver.AgentVersion.Should().Be("1.0.0");
         }
     }
 }

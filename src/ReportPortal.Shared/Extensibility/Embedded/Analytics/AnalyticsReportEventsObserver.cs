@@ -61,15 +61,15 @@ namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
         /// <param name="agentVersion">Automatically identified as calling assembly version if null.</param>
         public static void DefineConsumer(string agentName, string agentVersion = null)
         {
-            AgentName = agentName;
-
-            if (string.IsNullOrEmpty(agentVersion))
+            if (string.IsNullOrEmpty(agentName) || string.IsNullOrEmpty(agentVersion))
             {
                 var agentAssemblyName = Assembly.GetCallingAssembly().GetName();
+                AgentName = agentAssemblyName.Name;
                 _agentVersion = agentAssemblyName.Version.ToString(3);
             }
             else
             {
+                AgentName = agentName;
                 _agentVersion = agentVersion;
             }
         }
@@ -143,7 +143,7 @@ namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
         }
 
         /// <summary>
-        /// Release HtpClient if needed.
+        /// Release HttpClient if needed.
         /// </summary>
         public void Dispose()
         {
