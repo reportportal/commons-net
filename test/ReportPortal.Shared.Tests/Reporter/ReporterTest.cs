@@ -278,6 +278,16 @@ namespace ReportPortal.Shared.Tests.Reporter
         }
 
         [Fact]
+        public void ShouldSyncNotStartedLaunch()
+        {
+            var service = new MockServiceBuilder().Build();
+
+            var launch = new LaunchReporter(service.Object, null, null, new ExtensionManager());
+
+            launch.Sync();
+        }
+
+        [Fact]
         public void StartLaunchTimeout()
         {
             var service = new MockServiceBuilder().Build();
