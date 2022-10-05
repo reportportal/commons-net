@@ -4,6 +4,7 @@ using ReportPortal.Shared.Reporter;
 using ReportPortal.Shared.Tests.Helpers;
 using RichardSzalay.MockHttp;
 using RichardSzalay.MockHttp.Matchers;
+using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -81,6 +82,16 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Analytics
 
             AnalyticsReportEventsObserver.AgentName.Should().Be("ReportPortal.Shared.Tests");
             AnalyticsReportEventsObserver.AgentVersion.Should().Be("1.0.0");
+        }
+
+        [Fact]
+        public void ShouldThrowIfEventsSourceIsNull()
+        {
+            var ga = new AnalyticsReportEventsObserver();
+
+            Action act = () => ga.Initialize(reportEventsSource: null);
+
+            act.Should().Throw<ArgumentNullException>();
         }
 
         [Fact]
