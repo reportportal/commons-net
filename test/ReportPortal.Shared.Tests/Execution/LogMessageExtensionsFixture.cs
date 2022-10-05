@@ -19,9 +19,13 @@ namespace ReportPortal.Shared.Tests.Execution
         }
 
         [Fact]
-        public void ShouldNotCreateNullableLogMessage()
+        public void ShouldNotCreateNullableOrEmptyLogMessage()
         {
             Action ctor = () => new LogMessage(null);
+
+            ctor.Should().ThrowExactly<ArgumentException>();
+
+            ctor = () => new LogMessage("");
 
             ctor.Should().ThrowExactly<ArgumentException>();
         }
