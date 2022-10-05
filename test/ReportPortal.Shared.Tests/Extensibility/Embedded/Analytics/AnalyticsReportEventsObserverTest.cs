@@ -1,5 +1,8 @@
 ﻿using FluentAssertions;
+using Moq;
 using ReportPortal.Shared.Extensibility.Embedded.Analytics;
+using ReportPortal.Shared.Extensibility.ReportEvents;
+using ReportPortal.Shared.Extensibility.ReportEvents.EventArgs;
 using ReportPortal.Shared.Reporter;
 using ReportPortal.Shared.Tests.Helpers;
 using RichardSzalay.MockHttp;
@@ -92,6 +95,20 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Analytics
             Action act = () => ga.Initialize(reportEventsSource: null);
 
             act.Should().Throw<ArgumentNullException>();
+        }
+
+        [Fact]
+        public void ShouldBeSilentIfLaunchIsNotStartedButFinished()
+        {
+            var ga = new AnalyticsReportEventsObserver();
+
+            var launchReporter = new Mock<ILaunchReporter>();
+
+            var source = new Mock<IReportEventsSource>();
+
+            ga.Initialize(source.Object);
+
+            source.Raise(es => es.OnAfterLaunchFinished += null, launchReporter.Object, new AfterLaunchFinishedEventArgs(null, null));
         }
 
         [Fact]
