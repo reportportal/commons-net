@@ -224,6 +224,22 @@ namespace ReportPortal.Shared.Tests.Configuration
 
             var exp = Assert.Throws<KeyNotFoundException>(() => config.GetValue<string>("someproperty"));
             Assert.Contains("someproperty", exp.Message);
+
+            exp = Assert.Throws<KeyNotFoundException>(() => config.GetValues<string>("someproperty"));
+            Assert.Contains("someproperty", exp.Message);
+
+            exp = Assert.Throws<KeyNotFoundException>(() => config.GetKeyValues<string>("someproperty"));
+            Assert.Contains("someproperty", exp.Message);
+        }
+
+        [Fact]
+        public void ShouldRaiseExceptionIfBoolNotRecognized()
+        {
+            var config = new ConfigurationBuilder().Build();
+
+            config.Properties["a"] = "invalid_bool";
+
+            var exp = Assert.Throws<InvalidCastException>(() => config.GetValue<bool>("a"));
         }
 
         [Fact]
@@ -234,6 +250,16 @@ namespace ReportPortal.Shared.Tests.Configuration
             var a = config.GetValue("a", "abc");
 
             Assert.Equal("abc", a);
+        }
+
+        [Fact]
+        public void ShouldReturnDefaultIfKeyValuesNotFound()
+        {
+            var config = new ConfigurationBuilder().Build();
+
+            var a = config.GetKeyValues<string>("a", null);
+
+            Assert.Null(a);
         }
 
         [Fact]
