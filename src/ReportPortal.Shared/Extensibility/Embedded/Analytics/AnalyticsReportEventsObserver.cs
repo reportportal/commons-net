@@ -132,14 +132,7 @@ namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
 
         private void ReportEventsSource_OnAfterLaunchFinished(Reporter.ILaunchReporter launchReporter, ReportEvents.EventArgs.AfterLaunchFinishedEventArgs args)
         {
-            if (_sendGaUsageTask != null)
-            {
-                try
-                {
-                    _sendGaUsageTask.GetAwaiter().GetResult();
-                }
-                catch (Exception) { }
-            }
+            _sendGaUsageTask?.GetAwaiter().GetResult();
         }
 
         /// <summary>
