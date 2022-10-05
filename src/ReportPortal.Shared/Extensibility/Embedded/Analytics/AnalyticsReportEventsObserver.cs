@@ -24,7 +24,7 @@ namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
 
         private readonly string _platformVersion;
 
-        private HttpClient _httpClient;
+        private readonly HttpClient _httpClient;
 
         public AnalyticsReportEventsObserver() : this(new HttpClientHandler
         {
@@ -91,7 +91,7 @@ namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
             }
         }
 
-        IReportEventsSource _reportEventsSource;
+        private IReportEventsSource _reportEventsSource;
 
         /// <inheritdoc />
         public void Initialize(IReportEventsSource reportEventsSource)
