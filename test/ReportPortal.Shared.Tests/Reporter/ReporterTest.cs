@@ -424,7 +424,7 @@ namespace ReportPortal.Shared.Tests.Reporter
         }
 
         [Fact]
-        public void RerunLaunch()
+        public void RerunOfLaunch()
         {
             var service = new MockServiceBuilder().Build();
 
@@ -438,6 +438,31 @@ namespace ReportPortal.Shared.Tests.Reporter
 
             service.Verify(s => s.Launch.StartAsync(It.IsAny<StartLaunchRequest>()), Times.Once);
             service.Verify(s => s.Launch.FinishAsync(It.IsAny<string>(), It.IsAny<FinishLaunchRequest>()), Times.Once);
+        }
+
+        [Fact]
+        public void RerunLaunch()
+        {
+            var service = new MockServiceBuilder().Build();
+
+            StartLaunchRequest startLaunchRequest = null;
+
+            service.Setup(s => s.Launch.StartAsync(It.IsAny<StartLaunchRequest>()))
+                .Returns(() => Task.FromResult(new LaunchCreatedResponse { Uuid = Guid.NewGuid().ToString() }))
+                .Callback<StartLaunchRequest>(r => startLaunchRequest = r);
+
+            var config = new Shared.Configuration.ConfigurationBuilder().Build();
+            config.Properties["Launch:Rerun"] = "true";
+
+            var launch = new LaunchReporter(service.Object, config, null, new Mock<IExtensionManager>().Object);
+            launch.Start(new StartLaunchRequest() { StartTime = DateTime.UtcNow });
+            launch.Finish(new FinishLaunchRequest() { EndTime = DateTime.UtcNow });
+            launch.Sync();
+
+            service.Verify(s => s.Launch.StartAsync(It.IsAny<StartLaunchRequest>()), Times.Once);
+            service.Verify(s => s.Launch.FinishAsync(It.IsAny<string>(), It.IsAny<FinishLaunchRequest>()), Times.Once);
+
+            startLaunchRequest.IsRerun.Should().BeTrue();
         }
 
         [Fact]
