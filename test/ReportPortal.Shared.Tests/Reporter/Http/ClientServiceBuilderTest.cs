@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using Moq;
 using ReportPortal.Shared.Configuration;
 using ReportPortal.Shared.Reporter.Http;
 using System;
@@ -65,7 +64,7 @@ namespace ReportPortal.Shared.Tests.Reporter.Http
 #endif
 
         [Fact]
-        public void ShouldUseClientFactory()
+        public void ShouldUseHttpClientFactory()
         {
             var configuration = new ConfigurationBuilder().Build();
 
@@ -85,6 +84,26 @@ namespace ReportPortal.Shared.Tests.Reporter.Http
 
             clientFactory.IsInvoked.Should().BeTrue();
         }
+
+        [Fact]
+        public void ShouldUseHttpClientHandlerFactory()
+        {
+            var configuration = new ConfigurationBuilder().Build();
+
+            configuration.Properties["Server:Url"] = $"http://abc.com";
+            configuration.Properties["Server:Project"] = "proj1";
+            configuration.Properties["Server:Authentication:Uuid"] = "123";
+
+            var builder = new ClientServiceBuilder(configuration);
+
+            var clientHandlerFactory = new MyCustomHttpClientHandlerFactory(configuration);
+
+            builder.UseHttpClientHandlerFactory(clientHandlerFactory);
+
+            builder.Build();
+
+            clientHandlerFactory.IsInvoked.Should().BeTrue();
+        }
     }
 
     class MyCustomHttpClientFactory : Shared.Reporter.Http.HttpClientFactory
@@ -103,9 +122,20 @@ namespace ReportPortal.Shared.Tests.Reporter.Http
         public bool IsInvoked { get; set; }
     }
 
-    class MyCustomHttpClientHandler : HttpClientHandler
+    class MyCustomHttpClientHandlerFactory : HttpClientHandlerFactory
     {
+        public MyCustomHttpClientHandlerFactory(IConfiguration configuration) : base(configuration)
+        {
+        }
 
+        public override HttpClientHandler Create()
+        {
+            IsInvoked = true;
+
+            return base.Create();
+        }
+
+        public bool IsInvoked { get; set; }
     }
 
 }
