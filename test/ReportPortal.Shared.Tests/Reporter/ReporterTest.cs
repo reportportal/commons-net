@@ -441,6 +441,28 @@ namespace ReportPortal.Shared.Tests.Reporter
         }
 
         [Fact]
+        public void ExternalLaunch()
+        {
+            var service = new MockServiceBuilder().Build();
+            service.Setup(s => s.Launch.GetAsync(It.IsAny<string>())).Returns(Task.FromResult(new LaunchResponse { Uuid = "123"}));
+
+            var config = new Shared.Configuration.ConfigurationBuilder().Build();
+            config.Properties["Launch:Id"] = "any_uuid_of_existing_launch";
+
+            var launch = new LaunchReporter(service.Object, config, null, new Mock<IExtensionManager>().Object);
+            launch.Start(new StartLaunchRequest() { StartTime = DateTime.UtcNow });
+            launch.Finish(new FinishLaunchRequest() { EndTime = DateTime.UtcNow });
+            launch.Sync();
+
+            service.Verify(s => s.Launch.StartAsync(It.IsAny<StartLaunchRequest>()), Times.Never);
+            service.Verify(s => s.Launch.FinishAsync(It.IsAny<string>(), It.IsAny<FinishLaunchRequest>()), Times.Never);
+
+            service.Verify(s => s.Launch.GetAsync(It.IsAny<string>()), Times.Once);
+
+            launch.Info.Uuid.Should().Be("123");
+        }
+
+        [Fact]
         public void LaunchShouldCareOfFinishTime()
         {
             var launchStartTime = DateTime.UtcNow;
