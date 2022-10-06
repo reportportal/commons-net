@@ -90,8 +90,6 @@ namespace ReportPortal.Shared.Reporter
         private readonly string _rerunOfUuid = null;
         private readonly bool _isRerun;
 
-        private readonly IList<Task> _additionalTasks;
-
         public Task StartTask { get; private set; }
 
         public void Start(StartLaunchRequest request)
@@ -198,11 +196,6 @@ namespace ReportPortal.Shared.Reporter
             if (_logsReporter != null)
             {
                 dependentTasks.Add(_logsReporter.ProcessingTask);
-            }
-
-            if (_additionalTasks != null)
-            {
-                dependentTasks.AddRange(_additionalTasks);
             }
 
             if (ChildTestReporters != null)

@@ -156,11 +156,6 @@ namespace ReportPortal.Shared.Reporter
                 dependentTasks.Add(_logsReporter.ProcessingTask);
             }
 
-            if (_additionalTasks != null)
-            {
-                dependentTasks.AddRange(_additionalTasks);
-            }
-
             if (ChildTestReporters != null)
             {
                 var childTestReporterFinishTasks = ChildTestReporters.Select(tn => tn.FinishTask);
@@ -230,14 +225,9 @@ namespace ReportPortal.Shared.Reporter
                 {
                     // clean up childs
                     //ChildTestReporters = null;
-
-                    // clean up addition tasks
-                    _additionalTasks = null;
                 }
             }, TaskContinuationOptions.PreferFairness).Unwrap();
         }
-
-        private IList<Task> _additionalTasks;
 
         public IList<ITestReporter> ChildTestReporters { get; private set; }
 
