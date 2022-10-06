@@ -1,7 +1,9 @@
 ﻿using FluentAssertions;
+using Moq;
 using ReportPortal.Shared.Configuration;
 using ReportPortal.Shared.Reporter.Http;
 using System;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -32,8 +34,8 @@ namespace ReportPortal.Shared.Tests.Reporter.Http
             ctor.Should().ThrowExactly<ArgumentNullException>();
         }
 
-// ignore test for .net framework 452 and 46 because it always bypasses proxy for localhost
-#if !NET452 && !NET46
+        // ignore test for .net framework 452 and 46 because it always bypasses proxy for localhost
+#if !NET46
         [Fact]
         public async Task ShouldUseProxy()
         {
@@ -61,5 +63,49 @@ namespace ReportPortal.Shared.Tests.Reporter.Http
             proxyServer.Stop();
         }
 #endif
+
+        [Fact]
+        public void ShouldUseClientFactory()
+        {
+            var configuration = new ConfigurationBuilder().Build();
+
+            configuration.Properties["Server:Url"] = $"http://abc.com";
+            configuration.Properties["Server:Project"] = "proj1";
+            configuration.Properties["Server:Authentication:Uuid"] = "123";
+
+            var builder = new ClientServiceBuilder(configuration);
+
+            var clientHandler = new HttpClientHandler();
+
+            var clientFactory = new MyCustomHttpClientFactory(configuration, clientHandler);
+
+            builder.UseHttpClientFactory(clientFactory);
+
+            builder.Build();
+
+            clientFactory.IsInvoked.Should().BeTrue();
+        }
     }
+
+    class MyCustomHttpClientFactory : Shared.Reporter.Http.HttpClientFactory
+    {
+        public MyCustomHttpClientFactory(IConfiguration configuration, HttpClientHandler httpClientHandler) : base(configuration, httpClientHandler)
+        {
+        }
+
+        public override HttpClient Create()
+        {
+            IsInvoked = true;
+
+            return base.Create();
+        }
+
+        public bool IsInvoked { get; set; }
+    }
+
+    class MyCustomHttpClientHandler : HttpClientHandler
+    {
+
+    }
+
 }
