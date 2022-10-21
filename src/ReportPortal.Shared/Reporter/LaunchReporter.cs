@@ -105,7 +105,7 @@ namespace ReportPortal.Shared.Reporter
                 throw exp;
             }
 
-            if (_rerunOfUuid != null)
+            if (_rerunOfUuid != null && _isRerun)
             {
                 request.IsRerun = true;
                 request.RerunOfLaunchUuid = _rerunOfUuid;
