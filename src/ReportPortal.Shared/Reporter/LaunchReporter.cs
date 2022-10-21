@@ -105,35 +105,19 @@ namespace ReportPortal.Shared.Reporter
                 throw exp;
             }
 
-            if (_rerunOfUuid != null && _isRerun)
-            {
-                request.IsRerun = true;
-                request.RerunOfLaunchUuid = _rerunOfUuid;
-                // start rerun launch item
-                StartTask = Task.Run(async () =>
-                {
-                    NotifyStarting(request);
-
-                    var launch = await _requestExecuter.ExecuteAsync(() => _service.Launch.StartAsync(request), null, null).ConfigureAwait(false);
-
-                    _launchInfo = new LaunchInfo
-                    {
-                        Uuid = launch.Uuid,
-                        Name = request.Name,
-                        StartTime = request.StartTime
-                    };
-
-                    NotifyStarted();
-                });
-            }
-            else if (!_isExternalLaunchId)
+            if (!_isExternalLaunchId)
             {
                 if (_isRerun)
                 {
                     request.IsRerun = true;
+
+                    if (_rerunOfUuid != null)
+                    {
+                        request.RerunOfLaunchUuid = _rerunOfUuid;
+                    }
                 }
 
-                // start new launch item
+                // start new launch item or rerun 
                 StartTask = Task.Run(async () =>
                 {
                     NotifyStarting(request);
@@ -368,3 +352,4 @@ namespace ReportPortal.Shared.Reporter
         }
     }
 }
+
