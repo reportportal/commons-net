@@ -37,14 +37,14 @@ namespace ReportPortal.Shared.Internal.Delegating
                 case "exponential":
                     var maxExponentialAttempts = _configuration.GetValue("Server:Retry:MaxAttempts", 3U);
                     var baseExponentialIndex = _configuration.GetValue("Server:Retry:BaseIndex", 2U);
-                    var statusCodes = _configuration.GetValues<HttpStatusCode>("Server:Retry:StatusCodes", null);
-                    executer = new ExponentialRetryRequestExecuter(maxExponentialAttempts, baseExponentialIndex, throttler, statusCodes?.ToArray());
+                    var httpStatusCodes = _configuration.GetValues<HttpStatusCode>("Server:Retry:HttpStatusCodes", null);
+                    executer = new ExponentialRetryRequestExecuter(maxExponentialAttempts, baseExponentialIndex, throttler, httpStatusCodes?.ToArray());
                     break;
                 case "linear":
                     var maxLinearAttempts = _configuration.GetValue("Server:Retry:MaxAttempts", 3U);
                     var linearDelay = _configuration.GetValue("Server:Retry:Delay", 5U * 1000);
-                    statusCodes = _configuration.GetValues<HttpStatusCode>("Server:Retry:StatusCodes", null);
-                    executer = new LinearRetryRequestExecuter(maxLinearAttempts, linearDelay, throttler, statusCodes?.ToArray());
+                    httpStatusCodes = _configuration.GetValues<HttpStatusCode>("Server:Retry:HttpStatusCodes", null);
+                    executer = new LinearRetryRequestExecuter(maxLinearAttempts, linearDelay, throttler, httpStatusCodes?.ToArray());
                     break;
                 default:
                     throw new Exception($"Unknown '{retryStrategy}' retry strategy.");

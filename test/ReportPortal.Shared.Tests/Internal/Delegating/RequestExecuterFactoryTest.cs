@@ -61,7 +61,7 @@ namespace ReportPortal.Shared.Tests.Internal.Delegating
             configuration.Properties["Server:Retry:Strategy"] = "exponential";
             configuration.Properties["Server:Retry:MaxAttempts"] = 5;
             configuration.Properties["Server:Retry:BaseIndex"] = 6;
-            configuration.Properties["Server:Retry:StatusCodes"] = "500";
+            configuration.Properties["Server:Retry:HttpStatusCodes"] = "500";
             var executer = new RequestExecuterFactory(configuration).Create() as ExponentialRetryRequestExecuter;
 
             executer.MaxRetryAttemps.Should().Be(5);
@@ -76,7 +76,7 @@ namespace ReportPortal.Shared.Tests.Internal.Delegating
             configuration.Properties["Server:Retry:Strategy"] = "linear";
             configuration.Properties["Server:Retry:MaxAttempts"] = 5;
             configuration.Properties["Server:Retry:Delay"] = 6000;
-            configuration.Properties["Server:Retry:StatusCodes"] = "500";
+            configuration.Properties["Server:Retry:HttpStatusCodes"] = "500";
             var executer = new RequestExecuterFactory(configuration).Create() as LinearRetryRequestExecuter;
 
             executer.MaxRetryAttemps.Should().Be(5);
