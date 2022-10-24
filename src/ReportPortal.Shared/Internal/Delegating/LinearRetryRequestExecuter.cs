@@ -43,7 +43,7 @@ namespace ReportPortal.Shared.Internal.Delegating
             _concurrentThrottler = throttler;
             MaxRetryAttemps = maxRetryAttempts;
             Delay = delay;
-            RetryHttpStatusCodes = httpStatusCodes;
+            HttpStatusCodes = httpStatusCodes;
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace ReportPortal.Shared.Internal.Delegating
         /// <summary>
         /// Http status codes to be retried.
         /// </summary>
-        public HttpStatusCode[] RetryHttpStatusCodes { get; private set; }
+        public HttpStatusCode[] HttpStatusCodes { get; private set; }
 
         /// <inheritdoc/>
         public override async Task<T> ExecuteAsync<T>(Func<Task<T>> func, Action<Exception> beforeNextAttempt = null, IStatisticsCounter statisticsCounter = null)
@@ -81,7 +81,7 @@ namespace ReportPortal.Shared.Internal.Delegating
                 }
                 catch (Exception exp) when (exp is TaskCanceledException ||
                     exp is HttpRequestException ||
-                    Array.IndexOf(RetryHttpStatusCodes, (exp as Client.ServiceException)?.HttpStatusCode) > -1)
+                    Array.IndexOf(HttpStatusCodes, (exp as Client.ServiceException)?.HttpStatusCode) > -1)
                 {
                     if (i < MaxRetryAttemps - 1)
                     {

@@ -41,7 +41,7 @@ namespace ReportPortal.Shared.Tests.Internal.Delegating
             var linearExecuter = executer as LinearRetryRequestExecuter;
             linearExecuter.MaxRetryAttemps.Should().Be(3);
             linearExecuter.Delay.Should().Be(5000);
-            linearExecuter.RetryHttpStatusCodes.Should().BeNull();
+            linearExecuter.HttpStatusCodes.Should().BeNull();
         }
 
         [Fact]
@@ -61,10 +61,12 @@ namespace ReportPortal.Shared.Tests.Internal.Delegating
             configuration.Properties["Server:Retry:Strategy"] = "exponential";
             configuration.Properties["Server:Retry:MaxAttempts"] = 5;
             configuration.Properties["Server:Retry:BaseIndex"] = 6;
+            configuration.Properties["Server:Retry:StatusCodes"] = "500";
             var executer = new RequestExecuterFactory(configuration).Create() as ExponentialRetryRequestExecuter;
 
             executer.MaxRetryAttemps.Should().Be(5);
             executer.BaseIndex.Should().Be(6);
+            executer.HttpStatusCodes.Should().BeEquivalentTo(new HttpStatusCode[] { HttpStatusCode.InternalServerError });
         }
 
         [Fact]
@@ -79,7 +81,7 @@ namespace ReportPortal.Shared.Tests.Internal.Delegating
 
             executer.MaxRetryAttemps.Should().Be(5);
             executer.Delay.Should().Be(6000);
-            executer.RetryHttpStatusCodes.Should().BeEquivalentTo(new HttpStatusCode[] { HttpStatusCode.InternalServerError});
+            executer.HttpStatusCodes.Should().BeEquivalentTo(new HttpStatusCode[] { HttpStatusCode.InternalServerError});
         }
 
         [Fact]

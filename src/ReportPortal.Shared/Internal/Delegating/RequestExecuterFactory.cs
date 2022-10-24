@@ -1,5 +1,4 @@
 ﻿using ReportPortal.Shared.Configuration;
-using ReportPortal.Shared.Reporter.Statistics;
 using System;
 using System.Linq;
 using System.Net;
@@ -36,14 +35,15 @@ namespace ReportPortal.Shared.Internal.Delegating
                     executer = new NoneRetryRequestExecuter(throttler);
                     break;
                 case "exponential":
-                    var maxExponentialAttempts = _configuration.GetValue("Server:Retry:MaxAttempts", 3);
-                    var baseExponentialIndex = _configuration.GetValue("Server:Retry:BaseIndex", 2);
-                    executer = new ExponentialRetryRequestExecuter(maxExponentialAttempts, baseExponentialIndex, throttler);
+                    var maxExponentialAttempts = _configuration.GetValue("Server:Retry:MaxAttempts", 3U);
+                    var baseExponentialIndex = _configuration.GetValue("Server:Retry:BaseIndex", 2U);
+                    var statusCodes = _configuration.GetValues<HttpStatusCode>("Server:Retry:StatusCodes", null);
+                    executer = new ExponentialRetryRequestExecuter(maxExponentialAttempts, baseExponentialIndex, throttler, statusCodes?.ToArray());
                     break;
                 case "linear":
                     var maxLinearAttempts = _configuration.GetValue("Server:Retry:MaxAttempts", 3U);
                     var linearDelay = _configuration.GetValue("Server:Retry:Delay", 5U * 1000);
-                    var statusCodes = _configuration.GetValues<HttpStatusCode>("Server:Retry:StatusCodes", null);
+                    statusCodes = _configuration.GetValues<HttpStatusCode>("Server:Retry:StatusCodes", null);
                     executer = new LinearRetryRequestExecuter(maxLinearAttempts, linearDelay, throttler, statusCodes?.ToArray());
                     break;
                 default:
