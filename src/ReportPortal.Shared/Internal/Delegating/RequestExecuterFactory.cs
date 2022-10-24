@@ -1,6 +1,8 @@
 ﻿using ReportPortal.Shared.Configuration;
 using ReportPortal.Shared.Reporter.Statistics;
 using System;
+using System.Linq;
+using System.Net;
 
 namespace ReportPortal.Shared.Internal.Delegating
 {
@@ -39,9 +41,10 @@ namespace ReportPortal.Shared.Internal.Delegating
                     executer = new ExponentialRetryRequestExecuter(maxExponentialAttempts, baseExponentialIndex, throttler);
                     break;
                 case "linear":
-                    var maxLinearAttempts = _configuration.GetValue("Server:Retry:MaxAttempts", 3);
-                    var linearDelay = _configuration.GetValue("Server:Retry:Delay", 5 * 1000);
-                    executer = new LinearRetryRequestExecuter(maxLinearAttempts, linearDelay, throttler);
+                    var maxLinearAttempts = _configuration.GetValue("Server:Retry:MaxAttempts", 3U);
+                    var linearDelay = _configuration.GetValue("Server:Retry:Delay", 5U * 1000);
+                    var statusCodes = _configuration.GetValues<HttpStatusCode>("Server:Retry:StatusCodes", null);
+                    executer = new LinearRetryRequestExecuter(maxLinearAttempts, linearDelay, throttler, statusCodes?.ToArray());
                     break;
                 default:
                     throw new Exception($"Unknown '{retryStrategy}' retry strategy.");

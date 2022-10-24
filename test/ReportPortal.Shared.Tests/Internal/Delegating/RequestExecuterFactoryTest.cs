@@ -2,6 +2,7 @@
 using ReportPortal.Shared.Configuration;
 using ReportPortal.Shared.Internal.Delegating;
 using System;
+using System.Net;
 using Xunit;
 
 namespace ReportPortal.Shared.Tests.Internal.Delegating
@@ -37,9 +38,10 @@ namespace ReportPortal.Shared.Tests.Internal.Delegating
             var executer = factory.Create();
 
             executer.Should().BeOfType<LinearRetryRequestExecuter>();
-            var exponentialExecuter = executer as LinearRetryRequestExecuter;
-            exponentialExecuter.MaxRetryAttemps.Should().Be(3);
-            exponentialExecuter.Delay.Should().Be(5000);
+            var linearExecuter = executer as LinearRetryRequestExecuter;
+            linearExecuter.MaxRetryAttemps.Should().Be(3);
+            linearExecuter.Delay.Should().Be(5000);
+            linearExecuter.RetryHttpStatusCodes.Should().BeNull();
         }
 
         [Fact]
@@ -71,11 +73,13 @@ namespace ReportPortal.Shared.Tests.Internal.Delegating
             var configuration = new ConfigurationBuilder().Build();
             configuration.Properties["Server:Retry:Strategy"] = "linear";
             configuration.Properties["Server:Retry:MaxAttempts"] = 5;
-            configuration.Properties["Server:Retry:Delay"] = 6000; //secs
+            configuration.Properties["Server:Retry:Delay"] = 6000;
+            configuration.Properties["Server:Retry:StatusCodes"] = "500";
             var executer = new RequestExecuterFactory(configuration).Create() as LinearRetryRequestExecuter;
 
             executer.MaxRetryAttemps.Should().Be(5);
             executer.Delay.Should().Be(6000);
+            executer.RetryHttpStatusCodes.Should().BeEquivalentTo(new HttpStatusCode[] { HttpStatusCode.InternalServerError});
         }
 
         [Fact]
