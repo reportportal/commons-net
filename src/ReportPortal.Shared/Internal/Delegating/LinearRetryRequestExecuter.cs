@@ -40,11 +40,6 @@ namespace ReportPortal.Shared.Internal.Delegating
                 throw new ArgumentException("Maximum attempts cannot be less than 1.", nameof(maxRetryAttempts));
             }
 
-            if (delay < 0)
-            {
-                throw new ArgumentException("Delay cannot be less than 0.", nameof(delay));
-            }
-
             _concurrentThrottler = throttler;
             MaxRetryAttemps = maxRetryAttempts;
             Delay = delay;
