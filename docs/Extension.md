@@ -83,14 +83,14 @@ public class ReportPortalEventsObserver : IReportEventsObserver
 ### What can be observed?
 `IReportEventsObserver` interface allows to observe next events:
 
-- <span style="font-family: 'Courier New', monospace">Before launch starting</span>
-- <span style="font-family: 'Courier New', monospace">Launch initializing</span>
-- <span style="font-family: 'Courier New', monospace">After launch starting</span>
-- <span style="font-family: 'Courier New', monospace">Before test starting</span>
-- <span style="font-family: 'Courier New', monospace">After test started</span>
-- <span style="font-family: 'Courier New', monospace">Before logs sending</span>
-- <span style="font-family: 'Courier New', monospace">After logs sent</span>
-- <span style="font-family: 'Courier New', monospace">Before test finishing</span>
-- <span style="font-family: 'Courier New', monospace">After test finished</span>
-- <span style="font-family: 'Courier New', monospace">Before launch finished</span>
-- <span style="font-family: 'Courier New', monospace">After launch finished</span>
+- Before launch starting
+- Launch initializing
+- After launch starting
+- Before test starting
+- After test started
+- Before logs sending
+- After logs sent
+- Before test finishing
+- After test finished
+- Before launch finished
+- After launch finished
