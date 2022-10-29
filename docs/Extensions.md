@@ -6,8 +6,8 @@ Sometimes it would be great to have ability to explore what payload is sent to R
 ## How to use own observers?
 
 To be able to observe events, next conditions should be met:
-1. Implement `IReportEventsObserver` interface.
-2. Name of an assembly with implementation from previous step should contain `ReportPortal`.
+1. Implement `IReportEventsObserver` interface
+2. Name of an assembly with implementation from previous step should contain `ReportPortal`
 3. The assembly should be in the same directory with `ReportPortal.Shared.dll`
 
 ## Examples
