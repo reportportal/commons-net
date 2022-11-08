@@ -18,7 +18,7 @@ Please, have a look the interface for understanding what actions also can be obs
 
 # Examples
 
-### 1. Test names updating
+## 1. Test names updating
 
 Let's imagine that you use snake case for naming your tests, but would like to improve readability of test names on ReportPortal server by replacing each underscore by empty space.
 
@@ -38,7 +38,7 @@ public class ReportPortalEventsObserver : IReportEventsObserver
 }
 ```
 
-### 2. Adding dynamic information
+## 2. Adding dynamic information
 
 Let's imagine that you have to add some dynamic information to ReportPortal launch. _Build number_, for instance. 
 
