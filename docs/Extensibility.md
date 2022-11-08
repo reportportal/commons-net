@@ -11,7 +11,7 @@ To be able to observe events, next conditions should be met:
 `IReportEventsObserver` interface allows to observe such events as:
 
 - before/after starting/finishing launch
-- before/after starting/finising test item
+- before/after starting/finishing test item
 - before/after sending log items
 
 Please, have a look the interface for understanding what actions also can be observed.
