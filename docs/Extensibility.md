@@ -31,12 +31,9 @@ public class ReportPortalEventsObserver : IReportEventsObserver
     public void Initialize(IReportEventsSource reportEventsSource)
     {
         // we are interested in event when any test item starts to execute
-        reportEventsSource.OnBeforeTestStarting += ReportEventsSource_OnBeforeTestStarting;
-    }
-
-    private void ReportEventsSource_OnBeforeTestStarting(ITestReporter testReporter, BeforeTestStartingEventArgs args)
-    {
-        args.StartTestItemRequest.Name = args.StartTestItemRequest.Name.Replace('_', ' ');
+        reportEventsSource.OnBeforeTestStarting += (reporter, args) => {
+            args.StartTestItemRequest.Name = args.StartTestItemRequest.Name.Replace('_', ' ');
+        });
     }
 }
 ```
