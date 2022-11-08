@@ -30,7 +30,7 @@ public class ReportPortalEventsObserver : IReportEventsObserver
     // this method invoked once
     public void Initialize(IReportEventsSource reportEventsSource)
     {
-        // we are interested in event when any test item starts to execute
+        // we are interested in event when any test item starts to execute (including suites, tests, steps)
         reportEventsSource.OnBeforeTestStarting += (reporter, args) => {
             args.StartTestItemRequest.Name = args.StartTestItemRequest.Name.Replace('_', ' ');
         });
