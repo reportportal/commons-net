@@ -7,6 +7,15 @@ To be able to observe events, next conditions should be met:
 2. Name of an assembly with implementation from previous step should contain `ReportPortal` (e.g. `ReportPortal.MyExtension.dll`)
 3. The assembly should be in the same directory with `ReportPortal.Shared.dll`
 
+# What can be observed
+`IReportEventsObserver` interface allows to observe such events as:
+
+- before/after starting/finishing launch
+- before/after starting/finising test item
+- before/after sending log items
+
+Please, have a look the interface for understanding what actions also can be observed.
+
 # Examples
 
 ### 1. Test names updating
@@ -58,14 +67,3 @@ public class ReportPortalEventsObserver : IReportEventsObserver
     }
 }
 ```
-
-# What can be observed
-`IReportEventsObserver` interface allows to observe such events as:
-
-- before/after starting/finishing launch
-- before/after starting/finising test item
-- before/after sending log items
-
-Please, have a look the interface for understanding what actions also can be observed.
-
-
