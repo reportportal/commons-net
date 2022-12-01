@@ -10,6 +10,9 @@ namespace ReportPortal.Shared.Reporter.Statistics
         private TimeSpan _sum;
 
         /// <inheritdoc/>
+        public TimeSpan Last { get; private set; }
+
+        /// <inheritdoc/>
         public TimeSpan Min { get; private set; }
 
         /// <inheritdoc/>
@@ -43,6 +46,7 @@ namespace ReportPortal.Shared.Reporter.Statistics
                 {
                     Min = duration;
                     Max = duration;
+
                     _sum = duration;
                 }
                 else
@@ -59,6 +63,7 @@ namespace ReportPortal.Shared.Reporter.Statistics
                     _sum += duration;
                 }
 
+                Last = duration;
                 Count++;
             }
         }

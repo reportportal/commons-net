@@ -60,8 +60,10 @@ namespace ReportPortal.Shared.Tests.Internal.Delegating
             var action = new Mock<Func<Task<string>>>();
             action.Setup(a => a()).Throws(() => new ServiceException("", System.Net.HttpStatusCode.BadGateway, new Uri("https://example.com"), HttpMethod.Post, ""));
 
+            var counter = new StatisticsCounter();
+
             var executer = new LinearRetryRequestExecuter(3, 0, null, new System.Net.HttpStatusCode[] { System.Net.HttpStatusCode.BadGateway} );
-            await executer.Awaiting(e => e.ExecuteAsync(action.Object)).Should().ThrowAsync<ServiceException>();
+            await executer.Awaiting(e => e.ExecuteAsync(action.Object, statisticsCounter: counter)).Should().ThrowAsync<ServiceException>();
 
             action.Verify(a => a(), Times.Exactly(3));
         }

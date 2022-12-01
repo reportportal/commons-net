@@ -1,5 +1,7 @@
-﻿using ReportPortal.Shared.Reporter.Statistics;
+﻿using ReportPortal.Shared.Internal.Delegating.Exceptions;
+using ReportPortal.Shared.Reporter.Statistics;
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -65,6 +67,7 @@ namespace ReportPortal.Shared.Internal.Delegating
         public override async Task<T> ExecuteAsync<T>(Func<Task<T>> func, Action<Exception> beforeNextAttempt = null, IStatisticsCounter statisticsCounter = null)
         {
             T result = default;
+            List<Exception> exceptions = new List<Exception>();
 
             for (int i = 0; i < MaxRetryAttemps; i++)
             {
@@ -83,6 +86,8 @@ namespace ReportPortal.Shared.Internal.Delegating
                     exp is HttpRequestException ||
                     Array.IndexOf(HttpStatusCodes, (exp as Client.ServiceException)?.HttpStatusCode) > -1)
                 {
+                    exceptions.Add(new RetryHttpRequestException(i, statisticsCounter?.Last, exp));
+
                     if (i < MaxRetryAttemps - 1)
                     {
                         TraceLogger.Error($"Error while invoking '{func.Method.Name}' method. Current attempt: {i}. Waiting {Delay} milliseconds and retrying it.\n{exp}");
@@ -94,7 +99,7 @@ namespace ReportPortal.Shared.Internal.Delegating
                     else
                     {
                         TraceLogger.Error($"Error while invoking '{func.Method.Name}' method. Current attempt: {i}.\n{exp}");
-                        throw;
+                        throw new AggregateException(exceptions);
                     }
                 }
                 catch (Exception exp)

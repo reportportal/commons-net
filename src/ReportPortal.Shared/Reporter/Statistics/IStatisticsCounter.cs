@@ -23,6 +23,11 @@ namespace ReportPortal.Shared.Reporter.Statistics
         TimeSpan Avg { get; }
 
         /// <summary>
+        /// Duration of last measured request.
+        /// </summary>
+        TimeSpan Last { get; }
+
+        /// <summary>
         /// Total count of measured requests.
         /// </summary>
         long Count { get; }
