@@ -82,7 +82,7 @@ namespace ReportPortal.Shared.Tests.Internal.Delegating
                 .ThrowAsync<RetryExecutionException>()
                 .Where(ex => ex.InnerExceptions.Count == 2);
 
-            action.Verify(a => a(), Times.Exactly(5));
+            action.Verify(a => a(), Times.Exactly(2));
         }
 
         [Fact]
