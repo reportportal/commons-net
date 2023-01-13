@@ -87,13 +87,12 @@ namespace ReportPortal.Shared.Internal.Delegating
                     exp is HttpRequestException ||
                     Array.IndexOf(HttpStatusCodes, (exp as Client.ServiceException)?.HttpStatusCode) > -1)
                 {
-                    exceptions.Add(new RetryHttpRequestException(i, statisticsCounter?.Last, exp));
+                    var delay = (int)Math.Pow(BaseIndex, i + MaxRetryAttemps);
 
                     if (i < MaxRetryAttemps - 1)
                     {
-                        var delay = (int)Math.Pow(BaseIndex, i + MaxRetryAttemps);
-
                         TraceLogger.Error($"Error while invoking '{func.Method.Name}' method. Current attempt: {i}. Waiting {delay} seconds and retrying it.\n{exp}");
+                        exceptions.Add(new HttpRequestException($"Something unexpected happend. Next attempt in {delay} second(s).", exp));
 
                         await Task.Delay(delay * 1000).ConfigureAwait(false);
 
@@ -102,7 +101,9 @@ namespace ReportPortal.Shared.Internal.Delegating
                     else
                     {
                         TraceLogger.Error($"Error while invoking '{func.Method.Name}' method. Current attempt: {i}.\n{exp}");
-                        throw new AggregateException(exceptions);
+                        exceptions.Add(new HttpRequestException("Something unexpected happend. Limit of retries has been reached.", exp));
+
+                        throw new RetryExecutionException(exceptions);
                     }
                 }
                 catch (Exception exp)
