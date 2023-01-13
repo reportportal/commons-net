@@ -43,7 +43,6 @@ namespace ReportPortal.Shared.Reporter.Statistics
                 {
                     Min = duration;
                     Max = duration;
-
                     _sum = duration;
                 }
                 else
