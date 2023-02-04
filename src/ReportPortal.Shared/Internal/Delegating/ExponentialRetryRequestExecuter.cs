@@ -92,7 +92,7 @@ namespace ReportPortal.Shared.Internal.Delegating
                     if (i < MaxRetryAttemps - 1)
                     {
                         TraceLogger.Error($"Error while invoking '{func.Method.Name}' method. Current attempt: {i}. Waiting {delay} seconds and retrying it.\n{exp}");
-                        exceptions.Add(new HttpRequestException($"Something unexpected happened. Next attempt in {delay} second(s).", exp));
+                        exceptions.Add(new HttpRequestException($"'{func.Method.Name}' threw an exception. Next attempt in {delay} second(s).", exp));
 
                         await Task.Delay(delay * 1000).ConfigureAwait(false);
 
@@ -101,9 +101,9 @@ namespace ReportPortal.Shared.Internal.Delegating
                     else
                     {
                         TraceLogger.Error($"Error while invoking '{func.Method.Name}' method. Current attempt: {i}.\n{exp}");
-                        exceptions.Add(new HttpRequestException("Something unexpected happened. Limit of retries has been reached.", exp));
+                        exceptions.Add(new HttpRequestException($"'{func.Method.Name}' threw an exception. Limit of retries has been reached.", exp));
 
-                        throw new RetryExecutionException(exceptions);
+                        throw new RetryExecutionException(func.Method.Name, exceptions);
                     }
                 }
                 catch (Exception exp)

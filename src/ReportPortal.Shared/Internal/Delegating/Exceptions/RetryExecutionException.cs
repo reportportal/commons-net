@@ -15,21 +15,12 @@ namespace ReportPortal.Shared.Internal.Delegating.Exceptions
         /// <summary>
         /// Initializes a new instance of <see cref="RetryExecutionException"/>
         /// </summary>
+        /// <param name="methodName">Name of the method.</param>
         /// <param name="innerExceptions">Inner exceptions.</param>
-        public RetryExecutionException(IEnumerable<Exception> innerExceptions)
-            : this("Request has not finished successfully", innerExceptions)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of <see cref="RetryExecutionException"/>
-        /// </summary>
-        /// <param name="message">The message that describes the error.</param>
-        /// <param name="innerExceptions">Inner exceptions.</param>
-        public RetryExecutionException(string message, IEnumerable<Exception> innerExceptions)
+        public RetryExecutionException(string methodName, IEnumerable<Exception> innerExceptions)
             : base(message: null, innerExceptions)
         {
-            _message = message;
+            _message = $"'Invokation of '{methodName}' has not been finished.";
         }
 
         /// <inheritdoc/>
