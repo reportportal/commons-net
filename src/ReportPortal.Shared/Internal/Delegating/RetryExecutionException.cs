@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 
-namespace ReportPortal.Shared.Internal.Delegating.Exceptions
+namespace ReportPortal.Shared.Internal.Delegating
 {
     /// <summary>
     /// Occurs when retry request execution is unsuccessful.
@@ -20,7 +20,7 @@ namespace ReportPortal.Shared.Internal.Delegating.Exceptions
         public RetryExecutionException(string methodName, IEnumerable<Exception> innerExceptions)
             : base(message: null, innerExceptions)
         {
-            _message = $"'Invokation of '{methodName}' has not been finished.";
+            _message = $"'Invocation of '{methodName}' has not been finished.";
         }
 
         /// <inheritdoc/>
@@ -43,7 +43,6 @@ namespace ReportPortal.Shared.Internal.Delegating.Exceptions
                 text.AppendLine();
             }
 
-            
             return text.ToString();
         }
     }

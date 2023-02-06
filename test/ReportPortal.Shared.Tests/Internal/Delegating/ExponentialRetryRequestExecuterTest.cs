@@ -2,7 +2,6 @@
 using Moq;
 using ReportPortal.Client;
 using ReportPortal.Shared.Internal.Delegating;
-using ReportPortal.Shared.Internal.Delegating.Exceptions;
 using ReportPortal.Shared.Reporter.Statistics;
 using System;
 using System.Net;

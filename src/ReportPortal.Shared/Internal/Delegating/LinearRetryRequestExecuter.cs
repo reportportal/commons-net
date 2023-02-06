@@ -1,5 +1,4 @@
-﻿using ReportPortal.Shared.Internal.Delegating.Exceptions;
-using ReportPortal.Shared.Reporter.Statistics;
+﻿using ReportPortal.Shared.Reporter.Statistics;
 using System;
 using System.Collections.Generic;
 using System.Net;
