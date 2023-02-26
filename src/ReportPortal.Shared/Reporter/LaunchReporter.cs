@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using ReportPortal.Client.Abstractions;
 using ReportPortal.Client.Abstractions.Requests;
 using ReportPortal.Shared.Configuration;
+using ReportPortal.Shared.Converters;
 using ReportPortal.Shared.Extensibility;
 using ReportPortal.Shared.Extensibility.ReportEvents.EventArgs;
 using ReportPortal.Shared.Internal.Delegating;
@@ -87,7 +88,7 @@ namespace ReportPortal.Shared.Reporter
 
         public void Start(StartLaunchRequest request)
         {
-            if (request == null) throw new ArgumentNullException(nameof(request));
+            RequestPreprocessor.Preprocess(request);
 
             TraceLogger.Verbose($"Scheduling request to start new '{request.Name}' launch in {GetHashCode()} proxy instance");
 
