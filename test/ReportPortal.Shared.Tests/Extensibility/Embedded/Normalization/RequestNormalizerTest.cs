@@ -13,11 +13,19 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Normalization
 {
     public class RequestNormalizerTest
     {
+        private IExtensionManager _extensionManager;
+
+        public RequestNormalizerTest()
+        {
+            _extensionManager = new Shared.Extensibility.ExtensionManager();
+            _extensionManager.ReportEventObservers.Add(new RequestNormalizer());
+        }
+
         [Fact]
         public void ShouldTrimLaunchNameDuringStarting()
         {
             var reporter = new LaunchReporter(
-                new MockServiceBuilder().Build().Object, null, null, new Mock<IExtensionManager>().Object);
+                new MockServiceBuilder().Build().Object, null, null, _extensionManager);
 
             var request = new StartLaunchRequest { Name = new string('a', 257) };
 
@@ -29,7 +37,7 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Normalization
         public void ShouldTrimLaunchAttributesDuringStarting()
         {
             var reporter = new LaunchReporter(
-                new MockServiceBuilder().Build().Object, null, null, new Mock<IExtensionManager>().Object);
+                new MockServiceBuilder().Build().Object, null, null, _extensionManager);
 
             var request = new StartLaunchRequest
             {
@@ -53,10 +61,9 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Normalization
         public void ShouldTrimTestItemNameDuringStarting()
         {
             var service = new MockServiceBuilder().Build().Object;
-            var extensionManager = new Mock<IExtensionManager>().Object;
 
-            var launchReporter = new LaunchReporter(service, null, null, extensionManager);
-            var testReporter = new TestReporter(service, null, launchReporter, null, null, extensionManager, new Mock<ReportEventsSource>().Object);
+            var launchReporter = new LaunchReporter(service, null, null, _extensionManager);
+            var testReporter = new TestReporter(service, null, launchReporter, null, null, _extensionManager, new Mock<ReportEventsSource>().Object);
 
             var request = new StartTestItemRequest { Name = new string('a', 1025) };
 
@@ -70,10 +77,9 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Normalization
         public void ShouldTrimTestItemAttributesDuringStarting()
         {
             var service = new MockServiceBuilder().Build().Object;
-            var extensionManager = new Mock<IExtensionManager>().Object;
 
-            var launchReporter = new LaunchReporter(service, null, null, extensionManager);
-            var testReporter = new TestReporter(service, null, launchReporter, null, null, extensionManager, null);
+            var launchReporter = new LaunchReporter(service, null, null, _extensionManager);
+            var testReporter = new TestReporter(service, null, launchReporter, null, null, _extensionManager, null);
 
             var request = new StartTestItemRequest
             {
@@ -98,10 +104,9 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Normalization
         public void ShouldTrimTestItemAttributesDuringFinishing()
         {
             var service = new MockServiceBuilder().Build().Object;
-            var extensionManager = new Mock<IExtensionManager>().Object;
 
-            var launchReporter = new LaunchReporter(service, null, null, extensionManager);
-            var testReporter = new TestReporter(service, null, launchReporter, null, null, extensionManager, null);
+            var launchReporter = new LaunchReporter(service, null, null, _extensionManager);
+            var testReporter = new TestReporter(service, null, launchReporter, null, null, _extensionManager, null);
 
             var request = new FinishTestItemRequest
             {
@@ -131,10 +136,7 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Normalization
 
             var service = new MockServiceBuilder().Build();
 
-            var extensionManager = new Shared.Extensibility.ExtensionManager();
-            extensionManager.ReportEventObservers.Add(new RequestNormalizer());
-
-            var launch = new LaunchReporter(service.Object, null, null, extensionManager);
+            var launch = new LaunchReporter(service.Object, null, null, _extensionManager);
             launch.Start(new StartLaunchRequest() { StartTime = launchStartTime });
             launch.Finish(new FinishLaunchRequest() { EndTime = launchStartTime.AddDays(-1) });
             launch.Sync();
