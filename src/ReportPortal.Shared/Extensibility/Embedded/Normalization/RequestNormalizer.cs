@@ -8,10 +8,14 @@ using System.Collections.Generic;
 namespace ReportPortal.Shared.Extensibility.Embedded.Normalization
 {
     /// <summary>
-    /// Request normalizer.
+    /// Report events observer which makes basic validation and normalization before sending http requests to server.
+    /// Examples:
+    /// - Care about self/parent start/finish time
+    /// - Limit long strings (name, attributes)
     /// </summary>
     public class RequestNormalizer : IReportEventsObserver
     {
+        // TODO: make it configurable
         internal const int MAX_LAUNCH_NAME_LENGTH = 256;
         internal const int MAX_TEST_ITEM_NAME_LENGTH = 1024;
 
