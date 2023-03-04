@@ -227,18 +227,13 @@ namespace ReportPortal.Shared.Reporter
                         }
                     }
 
-                    if (request.EndTime < _launchInfo.StartTime)
-                    {
-                        request.EndTime = _launchInfo.StartTime;
-                        _launchInfo.FinishTime = request.EndTime;
-                    }
-
                     if (!_isExternalLaunchId)
                     {
                         NotifyFinishing(request);
 
                         var launchFinishedResponse = await _requestExecuter.ExecuteAsync(() => _service.Launch.FinishAsync(Info.Uuid, request), null, null).ConfigureAwait(false);
 
+                        _launchInfo.FinishTime = request.EndTime;
                         _launchInfo.Url = launchFinishedResponse.Link;
 
                         NotifyFinished();

@@ -530,21 +530,6 @@ namespace ReportPortal.Shared.Tests.Reporter
         }
 
         [Fact]
-        public void LaunchShouldCareOfFinishTime()
-        {
-            var launchStartTime = DateTime.UtcNow;
-
-            var service = new MockServiceBuilder().Build();
-
-            var launch = new LaunchReporter(service.Object, null, null, new ExtensionManager());
-            launch.Start(new StartLaunchRequest() { StartTime = launchStartTime });
-            launch.Finish(new FinishLaunchRequest() { EndTime = launchStartTime.AddDays(-1) });
-            launch.Sync();
-
-            launch.Info.FinishTime.Should().Be(launch.Info.StartTime);
-        }
-
-        [Fact]
         public void ShouldBeAbleToLogIntoLaunch()
         {
             var service = new MockServiceBuilder().Build();

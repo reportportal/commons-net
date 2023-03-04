@@ -6,6 +6,7 @@ using ReportPortal.Shared.Extensibility;
 using ReportPortal.Shared.Extensibility.Embedded.Normalization;
 using ReportPortal.Shared.Reporter;
 using ReportPortal.Shared.Tests.Helpers;
+using System;
 using Xunit;
 
 namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Normalization
@@ -121,6 +122,24 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Normalization
                 attribute.Key.Should().HaveLength(RequestNormalizer.MAX_ATTRIBUTE_KEY_LENGTH);
                 attribute.Value.Should().HaveLength(RequestNormalizer.MAX_ATTRIBUTE_VALUE_LENGTH);
             });
+        }
+
+        [Fact]
+        public void LaunchShouldCareOfFinishTime()
+        {
+            var launchStartTime = DateTime.UtcNow;
+
+            var service = new MockServiceBuilder().Build();
+
+            var extensionManager = new Shared.Extensibility.ExtensionManager();
+            extensionManager.ReportEventObservers.Add(new RequestNormalizer());
+
+            var launch = new LaunchReporter(service.Object, null, null, extensionManager);
+            launch.Start(new StartLaunchRequest() { StartTime = launchStartTime });
+            launch.Finish(new FinishLaunchRequest() { EndTime = launchStartTime.AddDays(-1) });
+            launch.Sync();
+
+            launch.Info.FinishTime.Should().Be(launch.Info.StartTime);
         }
     }
 }

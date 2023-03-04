@@ -82,6 +82,7 @@ namespace ReportPortal.Shared.Reporter
                 }
 
                 startTestItemRequest.LaunchUuid = LaunchReporter.Info.Uuid;
+
                 if (ParentTestReporter == null)
                 {
                     NotifyStarting(startTestItemRequest);
@@ -204,12 +205,12 @@ namespace ReportPortal.Shared.Reporter
                         }
                     }
 
-                    _testInfo.FinishTime = request.EndTime;
-                    _testInfo.Status = request.Status;
-
                     NotifyFinishing(request);
 
                     await _requestExecuter.ExecuteAsync(() => _service.TestItem.FinishAsync(Info.Uuid, request), null, LaunchReporter.StatisticsCounter.FinishTestItemStatisticsCounter).ConfigureAwait(false);
+
+                    _testInfo.FinishTime = request.EndTime;
+                    _testInfo.Status = request.Status;
 
                     NotifyFinished();
                 }
