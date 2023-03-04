@@ -4,6 +4,7 @@ using ReportPortal.Client.Abstractions.Models;
 using ReportPortal.Client.Abstractions.Requests;
 using ReportPortal.Client.Abstractions.Responses;
 using ReportPortal.Shared.Extensibility;
+using ReportPortal.Shared.Observers;
 using ReportPortal.Shared.Reporter;
 using ReportPortal.Shared.Tests.Helpers;
 using System;
@@ -692,8 +693,8 @@ namespace ReportPortal.Shared.Tests.Reporter
 
             request.Attributes.Should().AllSatisfy(attribute =>
             {
-                attribute.Key.Should().HaveLength(RequestPreprocessor.MAX_ATTRIBUTE_KEY_LENGTH);
-                attribute.Value.Should().HaveLength(RequestPreprocessor.MAX_ATTRIBUTE_VALUE_LENGTH);
+                attribute.Key.Should().HaveLength(DefaultReportEventsObserver.MAX_ATTRIBUTE_KEY_LENGTH);
+                attribute.Value.Should().HaveLength(DefaultReportEventsObserver.MAX_ATTRIBUTE_VALUE_LENGTH);
             });
         }
 
@@ -711,7 +712,7 @@ namespace ReportPortal.Shared.Tests.Reporter
             launchReporter.Start(new StartLaunchRequest());
             testReporter.Start(request);
 
-            request.Name.Should().HaveLength(RequestPreprocessor.MAX_TEST_ITEM_NAME_LENGTH);
+            request.Name.Should().HaveLength(DefaultReportEventsObserver.MAX_TEST_ITEM_NAME_LENGTH);
         }
 
         [Fact]
@@ -737,8 +738,8 @@ namespace ReportPortal.Shared.Tests.Reporter
 
             request.Attributes.Should().AllSatisfy(attribute =>
             {
-                attribute.Key.Should().HaveLength(RequestPreprocessor.MAX_ATTRIBUTE_KEY_LENGTH);
-                attribute.Value.Should().HaveLength(RequestPreprocessor.MAX_ATTRIBUTE_VALUE_LENGTH);
+                attribute.Key.Should().HaveLength(DefaultReportEventsObserver.MAX_ATTRIBUTE_KEY_LENGTH);
+                attribute.Value.Should().HaveLength(DefaultReportEventsObserver.MAX_ATTRIBUTE_VALUE_LENGTH);
             });
         }
 
@@ -767,8 +768,8 @@ namespace ReportPortal.Shared.Tests.Reporter
 
             request.Attributes.Should().AllSatisfy(attribute =>
             {
-                attribute.Key.Should().HaveLength(RequestPreprocessor.MAX_ATTRIBUTE_KEY_LENGTH);
-                attribute.Value.Should().HaveLength(RequestPreprocessor.MAX_ATTRIBUTE_VALUE_LENGTH);
+                attribute.Key.Should().HaveLength(DefaultReportEventsObserver.MAX_ATTRIBUTE_KEY_LENGTH);
+                attribute.Value.Should().HaveLength(DefaultReportEventsObserver.MAX_ATTRIBUTE_VALUE_LENGTH);
             });
         }
     }

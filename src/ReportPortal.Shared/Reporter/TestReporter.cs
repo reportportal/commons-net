@@ -52,7 +52,10 @@ namespace ReportPortal.Shared.Reporter
 
         public void Start(StartTestItemRequest request)
         {
-            RequestPreprocessor.Preprocess(request);
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
 
             if (StartTask != null)
             {
@@ -128,7 +131,10 @@ namespace ReportPortal.Shared.Reporter
 
         public void Finish(FinishTestItemRequest request)
         {
-            RequestPreprocessor.Preprocess(request);
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
 
             TraceLogger.Verbose($"Scheduling request to finish test item in {GetHashCode()} proxy instance");
 
