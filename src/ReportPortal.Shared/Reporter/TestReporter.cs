@@ -50,11 +50,11 @@ namespace ReportPortal.Shared.Reporter
 
         public Task StartTask { get; private set; }
 
-        public void Start(StartTestItemRequest request)
+        public void Start(StartTestItemRequest startTestItemRequest)
         {
-            if (request == null)
+            if (startTestItemRequest == null)
             {
-                throw new ArgumentNullException(nameof(request));
+                throw new ArgumentNullException(nameof(startTestItemRequest));
             }
 
             if (StartTask != null)
@@ -81,49 +81,39 @@ namespace ReportPortal.Shared.Reporter
                     throw exp;
                 }
 
-                request.LaunchUuid = LaunchReporter.Info.Uuid;
+                startTestItemRequest.LaunchUuid = LaunchReporter.Info.Uuid;
                 if (ParentTestReporter == null)
                 {
-                    if (request.StartTime < LaunchReporter.Info.StartTime)
-                    {
-                        request.StartTime = LaunchReporter.Info.StartTime;
-                    }
+                    NotifyStarting(startTestItemRequest);
 
-                    NotifyStarting(request);
-
-                    var testModel = await _requestExecuter.ExecuteAsync(() => _service.TestItem.StartAsync(request), null, LaunchReporter.StatisticsCounter.StartTestItemStatisticsCounter).ConfigureAwait(false);
+                    var testModel = await _requestExecuter.ExecuteAsync(() => _service.TestItem.StartAsync(startTestItemRequest), null, LaunchReporter.StatisticsCounter.StartTestItemStatisticsCounter).ConfigureAwait(false);
 
                     _testInfo = new TestInfo
                     {
                         Uuid = testModel.Uuid,
-                        Name = request.Name,
-                        StartTime = request.StartTime
+                        Name = startTestItemRequest.Name,
+                        StartTime = startTestItemRequest.StartTime
                     };
 
                     NotifyStarted();
                 }
                 else
                 {
-                    if (request.StartTime < ParentTestReporter.Info.StartTime)
-                    {
-                        request.StartTime = ParentTestReporter.Info.StartTime;
-                    }
+                    NotifyStarting(startTestItemRequest);
 
-                    NotifyStarting(request);
-
-                    var testModel = await _requestExecuter.ExecuteAsync(() => _service.TestItem.StartAsync(ParentTestReporter.Info.Uuid, request), null, LaunchReporter.StatisticsCounter.StartTestItemStatisticsCounter).ConfigureAwait(false);
+                    var testModel = await _requestExecuter.ExecuteAsync(() => _service.TestItem.StartAsync(ParentTestReporter.Info.Uuid, startTestItemRequest), null, LaunchReporter.StatisticsCounter.StartTestItemStatisticsCounter).ConfigureAwait(false);
 
                     _testInfo = new TestInfo
                     {
                         Uuid = testModel.Uuid,
-                        Name = request.Name,
-                        StartTime = request.StartTime
+                        Name = startTestItemRequest.Name,
+                        StartTime = startTestItemRequest.StartTime
                     };
 
                     NotifyStarted();
                 }
 
-                _testInfo.StartTime = request.StartTime;
+                _testInfo.StartTime = startTestItemRequest.StartTime;
             }, TaskContinuationOptions.PreferFairness).Unwrap();
         }
 
@@ -217,11 +207,6 @@ namespace ReportPortal.Shared.Reporter
                     _testInfo.FinishTime = request.EndTime;
                     _testInfo.Status = request.Status;
 
-                    if (request.EndTime < Info.StartTime)
-                    {
-                        request.EndTime = Info.StartTime;
-                    }
-
                     NotifyFinishing(request);
 
                     await _requestExecuter.ExecuteAsync(() => _service.TestItem.FinishAsync(Info.Uuid, request), null, LaunchReporter.StatisticsCounter.FinishTestItemStatisticsCounter).ConfigureAwait(false);
@@ -258,6 +243,7 @@ namespace ReportPortal.Shared.Reporter
                         ChildTestReporters = new List<ITestReporter>();
                     }
                 }
+
                 ChildTestReporters.Add(newTestNode);
             }
 

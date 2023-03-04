@@ -8,8 +8,8 @@ namespace ReportPortal.Shared.Reporter
 
         string Name { get; }
 
-        DateTime StartTime { get; }
+        DateTime StartTime { get; internal set; }
 
-        DateTime? FinishTime { get; }
+        DateTime? FinishTime { get; internal set; }
     }
 }
