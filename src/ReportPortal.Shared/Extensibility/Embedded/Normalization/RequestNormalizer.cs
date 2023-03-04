@@ -30,7 +30,7 @@ namespace ReportPortal.Shared.Extensibility.Embedded.Normalization
         private void ReportEventsSource_OnBeforeLaunchStarting(ILaunchReporter launchReporter, BeforeLaunchStartingEventArgs args)
         {
             args.StartLaunchRequest.Name = StringTrimmer.Trim(args.StartLaunchRequest.Name, MAX_LAUNCH_NAME_LENGTH);
-            NormilizeAttributes(args.StartLaunchRequest.Attributes);
+            NormфlizeAttributes(args.StartLaunchRequest.Attributes);
         }
 
         private void ReportEventsSource_OnBeforeLaunchFinishing(ILaunchReporter launchReporter, BeforeLaunchFinishingEventArgs args)
@@ -52,7 +52,7 @@ namespace ReportPortal.Shared.Extensibility.Embedded.Normalization
 
             args.StartTestItemRequest.Name = StringTrimmer.Trim(args.StartTestItemRequest.Name, MAX_TEST_ITEM_NAME_LENGTH);
 
-            NormilizeAttributes(args.StartTestItemRequest.Attributes);
+            NormфlizeAttributes(args.StartTestItemRequest.Attributes);
         }
 
         private void ReportEventsSource_OnBeforeTestFinishing(ITestReporter testReporter, BeforeTestFinishingEventArgs args)
@@ -62,10 +62,10 @@ namespace ReportPortal.Shared.Extensibility.Embedded.Normalization
                 args.FinishTestItemRequest.EndTime = testReporter.Info.StartTime;
             }
 
-            NormilizeAttributes(args.FinishTestItemRequest.Attributes);
+            NormфlizeAttributes(args.FinishTestItemRequest.Attributes);
         }
 
-        private static void NormilizeAttributes(IEnumerable<ItemAttribute> attributes)
+        private static void NormфlizeAttributes(IEnumerable<ItemAttribute> attributes)
         {
             if (attributes != null)
             {
