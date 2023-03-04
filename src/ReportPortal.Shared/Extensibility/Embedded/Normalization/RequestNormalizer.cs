@@ -22,18 +22,8 @@ namespace ReportPortal.Shared.Extensibility.Embedded.Normalization
         public void Initialize(IReportEventsSource reportEventsSource)
         {
             reportEventsSource.OnBeforeLaunchStarting += ReportEventsSource_OnBeforeLaunchStarting;
-            reportEventsSource.OnBeforeTestStarting += ReportEventsSource_OnBeforeTestStarting;
+            reportEventsSource.OnBeforeTestStarting += ReportEventsSource_OnBeforeTestStarting; 
             reportEventsSource.OnBeforeTestFinishing += ReportEventsSource_OnBeforeTestFinishing;
-            reportEventsSource.OnBeforeLaunchFinishing += ReportEventsSource_OnBeforeLaunchFinishing;
-        }
-
-        private void ReportEventsSource_OnBeforeLaunchFinishing(ILaunchReporter launchReporter, BeforeLaunchFinishingEventArgs args)
-        {
-            if (args.FinishLaunchRequest.EndTime < launchReporter.Info.StartTime)
-            {
-                args.FinishLaunchRequest.EndTime = launchReporter.Info.StartTime;
-                launchReporter.Info.FinishTime = args.FinishLaunchRequest.EndTime;
-            }
         }
 
         private void ReportEventsSource_OnBeforeTestFinishing(ITestReporter testReporter, BeforeTestFinishingEventArgs args)
