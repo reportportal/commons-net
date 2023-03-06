@@ -139,7 +139,7 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Normalization
         }
 
         [Fact]
-        public void LaunchShouldCareOfFinishTime()
+        public void LaunchShouldCareOfLaunchFinishTime()
         {
             var launchStartTime = DateTime.UtcNow;
 
@@ -151,6 +151,47 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Normalization
             launchReporter.Sync();
 
             launchReporter.Info.FinishTime.Should().Be(launchReporter.Info.StartTime);
+        }
+
+        [Fact]
+        public void LaunchShouldCareOfSuiteStartTime()
+        {
+            var launchStartTime = DateTime.UtcNow;
+
+            var service = new MockServiceBuilder().Build();
+
+            var launchReporter = new LaunchReporter(service.Object, null, null, _extensionManager);
+
+            launchReporter.Start(new StartLaunchRequest() { StartTime = launchStartTime });
+
+            var request = new StartTestItemRequest() { StartTime = launchStartTime.AddDays(-1) };
+
+            var testReporter = launchReporter.StartChildTestReporter(request);
+
+            testReporter.Sync();
+
+            request.StartTime.Should().Be(launchStartTime);
+        }
+
+        [Fact]
+        public void LaunchShouldCareOfSuiteFinishTime()
+        {
+            var launchStartTime = DateTime.UtcNow;
+
+            var service = new MockServiceBuilder().Build();
+
+            var launchReporter = new LaunchReporter(service.Object, null, null, _extensionManager);
+
+            launchReporter.Start(new StartLaunchRequest() { StartTime = launchStartTime });
+
+            var request = new FinishTestItemRequest() { EndTime = launchStartTime.AddDays(-50) };
+
+            var testReporter = launchReporter.StartChildTestReporter(new StartTestItemRequest());
+            testReporter.Finish(request);
+
+            testReporter.Sync();
+
+            request.EndTime.Should().Be(launchStartTime);
         }
     }
 }
