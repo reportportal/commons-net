@@ -13,7 +13,7 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Normalization
 {
     public class RequestNormalizerTest
     {
-        private IExtensionManager _extensionManager;
+        private readonly IExtensionManager _extensionManager;
 
         public RequestNormalizerTest()
         {
@@ -30,6 +30,9 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Normalization
             var request = new StartLaunchRequest { Name = new string('a', 257) };
 
             reporter.Start(request);
+
+            reporter.Sync();
+
             request.Name.Should().HaveLength(256);
         }
 
@@ -50,6 +53,8 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Normalization
 
             reporter.Start(request);
 
+            reporter.Sync();
+
             request.Attributes.Should().AllSatisfy(attribute =>
             {
                 attribute.Key.Should().HaveLength(RequestNormalizer.MAX_ATTRIBUTE_KEY_LENGTH);
@@ -69,6 +74,8 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Normalization
 
             launchReporter.Start(new StartLaunchRequest());
             testReporter.Start(request);
+
+            launchReporter.Sync();
 
             request.Name.Should().HaveLength(RequestNormalizer.MAX_TEST_ITEM_NAME_LENGTH);
         }
@@ -92,6 +99,8 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Normalization
 
             launchReporter.Start(new StartLaunchRequest());
             testReporter.Start(request);
+
+            launchReporter.Sync();
 
             request.Attributes.Should().AllSatisfy(attribute =>
             {
@@ -121,6 +130,8 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Normalization
 
             testReporter.Start(new StartTestItemRequest());
             testReporter.Finish(request);
+
+            launchReporter.Sync();
 
             request.Attributes.Should().AllSatisfy(attribute =>
             {
