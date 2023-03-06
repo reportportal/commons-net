@@ -24,14 +24,14 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Normalization
         [Fact]
         public void ShouldTrimLaunchNameDuringStarting()
         {
-            var reporter = new LaunchReporter(
+            var launchReporter = new LaunchReporter(
                 new MockServiceBuilder().Build().Object, null, null, _extensionManager);
 
             var request = new StartLaunchRequest { Name = new string('a', 257) };
 
-            reporter.Start(request);
+            launchReporter.Start(request);
 
-            reporter.Sync();
+            launchReporter.Sync();
 
             request.Name.Should().HaveLength(256);
         }
@@ -39,7 +39,7 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Normalization
         [Fact]
         public void ShouldTrimLaunchAttributesDuringStarting()
         {
-            var reporter = new LaunchReporter(
+            var launchReporter = new LaunchReporter(
                 new MockServiceBuilder().Build().Object, null, null, _extensionManager);
 
             var request = new StartLaunchRequest
@@ -51,9 +51,9 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Normalization
                 }
             };
 
-            reporter.Start(request);
+            launchReporter.Start(request);
 
-            reporter.Sync();
+            launchReporter.Sync();
 
             request.Attributes.Should().AllSatisfy(attribute =>
             {
@@ -68,14 +68,13 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Normalization
             var service = new MockServiceBuilder().Build().Object;
 
             var launchReporter = new LaunchReporter(service, null, null, _extensionManager);
-            var testReporter = new TestReporter(service, null, launchReporter, null, null, _extensionManager, new Mock<ReportEventsSource>().Object);
+            launchReporter.Start(new StartLaunchRequest());
 
             var request = new StartTestItemRequest { Name = new string('a', 1025) };
 
-            launchReporter.Start(new StartLaunchRequest());
-            testReporter.Start(request);
+            var testReporter = launchReporter.StartChildTestReporter(request);
 
-            launchReporter.Sync();
+            testReporter.Sync();
 
             request.Name.Should().HaveLength(RequestNormalizer.MAX_TEST_ITEM_NAME_LENGTH);
         }
@@ -86,7 +85,8 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Normalization
             var service = new MockServiceBuilder().Build().Object;
 
             var launchReporter = new LaunchReporter(service, null, null, _extensionManager);
-            var testReporter = new TestReporter(service, null, launchReporter, null, null, _extensionManager, null);
+
+            launchReporter.Start(new StartLaunchRequest());
 
             var request = new StartTestItemRequest
             {
@@ -97,10 +97,9 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Normalization
                 }
             };
 
-            launchReporter.Start(new StartLaunchRequest());
-            testReporter.Start(request);
+            var testReporter = launchReporter.StartChildTestReporter(request);
 
-            launchReporter.Sync();
+            testReporter.Sync();
 
             request.Attributes.Should().AllSatisfy(attribute =>
             {
@@ -115,7 +114,9 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Normalization
             var service = new MockServiceBuilder().Build().Object;
 
             var launchReporter = new LaunchReporter(service, null, null, _extensionManager);
-            var testReporter = new TestReporter(service, null, launchReporter, null, null, _extensionManager, null);
+            launchReporter.Start(new StartLaunchRequest());
+
+            var testReporter = launchReporter.StartChildTestReporter(new StartTestItemRequest { });
 
             var request = new FinishTestItemRequest
             {
@@ -126,12 +127,9 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Normalization
                 }
             };
 
-            launchReporter.Start(new StartLaunchRequest());
-
-            testReporter.Start(new StartTestItemRequest());
             testReporter.Finish(request);
 
-            launchReporter.Sync();
+            testReporter.Sync();
 
             request.Attributes.Should().AllSatisfy(attribute =>
             {
@@ -147,12 +145,12 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Normalization
 
             var service = new MockServiceBuilder().Build();
 
-            var launch = new LaunchReporter(service.Object, null, null, _extensionManager);
-            launch.Start(new StartLaunchRequest() { StartTime = launchStartTime });
-            launch.Finish(new FinishLaunchRequest() { EndTime = launchStartTime.AddDays(-1) });
-            launch.Sync();
+            var launchReporter = new LaunchReporter(service.Object, null, null, _extensionManager);
+            launchReporter.Start(new StartLaunchRequest() { StartTime = launchStartTime });
+            launchReporter.Finish(new FinishLaunchRequest() { EndTime = launchStartTime.AddDays(-1) });
+            launchReporter.Sync();
 
-            launch.Info.FinishTime.Should().Be(launch.Info.StartTime);
+            launchReporter.Info.FinishTime.Should().Be(launchReporter.Info.StartTime);
         }
     }
 }
