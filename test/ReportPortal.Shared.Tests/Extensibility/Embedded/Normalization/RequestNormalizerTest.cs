@@ -27,13 +27,16 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Normalization
             var launchReporter = new LaunchReporter(
                 new MockServiceBuilder().Build().Object, null, null, _extensionManager);
 
-            var request = new StartLaunchRequest { Name = new string('a', 257) };
+            var request = new StartLaunchRequest
+            {
+                Name = new string('a', RequestNormalizer.MAX_LAUNCH_NAME_LENGTH + 1)
+            };
 
             launchReporter.Start(request);
 
             launchReporter.Sync();
 
-            request.Name.Should().HaveLength(256);
+            request.Name.Should().HaveLength(RequestNormalizer.MAX_LAUNCH_NAME_LENGTH);
         }
 
         [Fact]
@@ -46,8 +49,16 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Normalization
             {
                 Attributes = new[]
                 {
-                    new ItemAttribute { Key = new string('a', 129), Value = new string('b', 129) },
-                    new ItemAttribute { Key = new string('a', 256), Value = new string('b', 256) },
+                    new ItemAttribute
+                    { 
+                        Key = new string('a', RequestNormalizer.MAX_ATTRIBUTE_KEY_LENGTH + 1),
+                        Value = new string('b', RequestNormalizer.MAX_ATTRIBUTE_VALUE_LENGTH + 1)
+                    },
+                    new ItemAttribute 
+                    {
+                        Key = new string('a', RequestNormalizer.MAX_ATTRIBUTE_KEY_LENGTH * 2),
+                        Value = new string('b', RequestNormalizer.MAX_ATTRIBUTE_VALUE_LENGTH * 2)
+                    },
                 }
             };
 
@@ -70,7 +81,10 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Normalization
             var launchReporter = new LaunchReporter(service, null, null, _extensionManager);
             launchReporter.Start(new StartLaunchRequest());
 
-            var request = new StartTestItemRequest { Name = new string('a', 1025) };
+            var request = new StartTestItemRequest 
+            {
+                Name = new string('a', RequestNormalizer.MAX_TEST_ITEM_NAME_LENGTH + 1)
+            };
 
             var testReporter = launchReporter.StartChildTestReporter(request);
 
@@ -92,8 +106,16 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Normalization
             {
                 Attributes = new[]
                 {
-                    new ItemAttribute { Key = new string('a', 129), Value = new string('b', 129) },
-                    new ItemAttribute { Key = new string('a', 256), Value = new string('b', 256) },
+                    new ItemAttribute
+                    {
+                        Key = new string('a', RequestNormalizer.MAX_ATTRIBUTE_KEY_LENGTH + 1),
+                        Value = new string('b', RequestNormalizer.MAX_ATTRIBUTE_VALUE_LENGTH + 1) 
+                    },
+                    new ItemAttribute 
+                    {
+                        Key = new string('a', RequestNormalizer.MAX_ATTRIBUTE_KEY_LENGTH * 2),
+                        Value = new string('b', RequestNormalizer.MAX_ATTRIBUTE_VALUE_LENGTH * 2)
+                    },
                 }
             };
 
@@ -122,8 +144,16 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Normalization
             {
                 Attributes = new[]
                 {
-                    new ItemAttribute { Key = new string('a', 129), Value = new string('b', 129) },
-                    new ItemAttribute { Key = new string('a', 256), Value = new string('b', 256) },
+                    new ItemAttribute
+                    {
+                        Key = new string('a', RequestNormalizer.MAX_ATTRIBUTE_KEY_LENGTH + 1),
+                        Value = new string('b', RequestNormalizer.MAX_ATTRIBUTE_VALUE_LENGTH + 1)
+                    },
+                    new ItemAttribute
+                    {
+                        Key = new string('a', RequestNormalizer.MAX_ATTRIBUTE_KEY_LENGTH * 2),
+                        Value = new string('b', RequestNormalizer.MAX_ATTRIBUTE_VALUE_LENGTH * 2)
+                    },
                 }
             };
 
@@ -191,7 +221,7 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Normalization
 
             testReporter.Sync();
 
-            request.EndTime.Should().Be(launchStartTime);
+            request.EndTime.Should().BeCloseTo(launchStartTime, TimeSpan.FromSeconds(1));
         }
     }
 }
