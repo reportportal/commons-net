@@ -207,7 +207,6 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Normalization
         public void LaunchShouldCareOfSuiteFinishTime()
         {
             var launchStartTime = DateTime.UtcNow;
-
             var service = new MockServiceBuilder().Build();
 
             var launchReporter = new LaunchReporter(service.Object, null, null, _extensionManager);
@@ -216,12 +215,13 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Normalization
 
             var request = new FinishTestItemRequest() { EndTime = launchStartTime.AddDays(-50) };
 
-            var testReporter = launchReporter.StartChildTestReporter(new StartTestItemRequest());
-            testReporter.Finish(request);
+            var testReporter = launchReporter.StartChildTestReporter(
+                new StartTestItemRequest { StartTime = launchStartTime.AddDays(-51) });
 
+            testReporter.Finish(request);
             testReporter.Sync();
 
-            request.EndTime.Should().BeCloseTo(launchStartTime, TimeSpan.FromSeconds(1));
+            request.EndTime.Should().Be(launchStartTime);
         }
     }
 }
