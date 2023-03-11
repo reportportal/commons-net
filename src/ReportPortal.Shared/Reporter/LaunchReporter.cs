@@ -9,6 +9,8 @@ using ReportPortal.Shared.Extensibility;
 using ReportPortal.Shared.Extensibility.ReportEvents.EventArgs;
 using ReportPortal.Shared.Internal.Delegating;
 using ReportPortal.Shared.Reporter.Statistics;
+using ReportPortal.Client.Abstractions.Responses;
+using System.Threading;
 
 namespace ReportPortal.Shared.Reporter
 {
@@ -116,7 +118,11 @@ namespace ReportPortal.Shared.Reporter
                 {
                     NotifyStarting(request);
 
-                    var launch = await _requestExecuter.ExecuteAsync(() => _service.Launch.StartAsync(request), null, null).ConfigureAwait(false);
+                    var launch = await _requestExecuter
+                        .ExecuteAsync(() => _configuration.GetValue(ConfigurationPath.ApiVersion, 1) == 2
+                                ? _service.AsyncLaunch.StartAsync(request)
+                                : _service.Launch.StartAsync(request), null, null)
+                        .ConfigureAwait(false);
 
                     _launchInfo = new LaunchInfo
                     {
@@ -231,7 +237,11 @@ namespace ReportPortal.Shared.Reporter
                     {
                         NotifyFinishing(request);
 
-                        var launchFinishedResponse = await _requestExecuter.ExecuteAsync(() => _service.Launch.FinishAsync(Info.Uuid, request), null, null).ConfigureAwait(false);
+                        var launchFinishedResponse = await _requestExecuter
+                            .ExecuteAsync(() => _configuration.GetValue(ConfigurationPath.ApiVersion, 1) == 2
+                                ? _service.AsyncLaunch.FinishAsync(Info.Uuid, request)
+                                : _service.Launch.FinishAsync(Info.Uuid, request), null, null)
+                            .ConfigureAwait(false);
 
                         _launchInfo.FinishTime = request.EndTime;
                         _launchInfo.Url = launchFinishedResponse.Link;
