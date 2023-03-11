@@ -23,6 +23,12 @@ namespace ReportPortal.Shared.Benchmark.Reporter
         public IUserFilterResource UserFilter => throw new NotImplementedException();
 
         public IProjectResource Project => throw new NotImplementedException();
+
+        public IAsyncLaunchResource AsyncLaunch => throw new NotImplementedException();
+
+        public IAsyncTestItemResource AsyncTestItem => throw new NotImplementedException();
+
+        public IAsyncLogItemResource AsyncLogItem => throw new NotImplementedException();
     }
 
     public class NopLaunchResource : ILaunchResource

@@ -294,7 +294,7 @@ namespace ReportPortal.Shared.Tests.Extensibility.ReportEvents
             CreateLogItemRequest[] sentClientLogs = null;
 
             var clientMock = new MockServiceBuilder().Build();
-            clientMock.Setup(c => c.LogItem.CreateAsync(It.IsAny<CreateLogItemRequest[]>())).Callback<CreateLogItemRequest[]>(lgs => sentClientLogs = lgs);
+            clientMock.Setup(c => c.LogItem.CreateAsync(It.IsAny<CreateLogItemRequest[]>(), default)).Callback<CreateLogItemRequest[]>(lgs => sentClientLogs = lgs);
             var client = clientMock.Object;
             var launch = new LaunchReporterBuilder(client).With(extManager).Build(1, 1, 3);
             launch.Sync();
