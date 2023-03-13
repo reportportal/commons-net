@@ -77,7 +77,7 @@ namespace ReportPortal.Shared.Tests.Helpers
                     });
 
                     for (int l = 0; l < logsPerTest; l++)
-                    {                      
+                    {
                         testNode.Log(new CreateLogItemRequest
                         {
                             Level = LogLevel.Info,

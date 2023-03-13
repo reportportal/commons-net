@@ -32,7 +32,6 @@ namespace ReportPortal.Shared.Tests.Reporter
             _testReporter.SetupGet(r => r.StartTask).Returns(() => Task.FromResult(0));
             _testReporter.SetupGet(r => r.Info).Returns(() => new TestInfo { });
 
-
             _configuration = new ConfigurationBuilder().Build();
             _configuration.Properties[ConfigurationPath.ApiVersion] = 2;
 
