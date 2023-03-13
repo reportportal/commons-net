@@ -38,7 +38,7 @@ namespace ReportPortal.Shared.Reporter
             _requestExecuter = requestExecuter;
             _extensionManager = extensionManager;
             _reportEventsSource = reportEventNotifier;
-            _asyncReporting = _configuration?.GetValue(ConfigurationPath.AsyncReporting, false) ?? false;
+            _asyncReporting = _configuration.GetValue(ConfigurationPath.AsyncReporting, false);
 
             LaunchReporter = launchReporter;
             ParentTestReporter = parentTestReporter;

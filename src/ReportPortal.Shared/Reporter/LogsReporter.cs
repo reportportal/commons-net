@@ -45,7 +45,7 @@ namespace ReportPortal.Shared.Reporter
             _requestExecuter = requestExecuter;
             _logRequestAmender = logRequestAmender;
             _reportEventsSource = reportEventsSource;
-            _asyncReporting = _configuration?.GetValue(ConfigurationPath.AsyncReporting, false) ?? false;
+            _asyncReporting = _configuration.GetValue(ConfigurationPath.AsyncReporting, false);
 
             if (batchCapacity < 1) throw new ArgumentException("Batch capacity for logs processing cannot be less than 1.", nameof(batchCapacity));
             BatchCapacity = batchCapacity;
