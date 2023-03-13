@@ -23,7 +23,7 @@ namespace ReportPortal.Shared.Tests.Reporter
         public AsyncReporterTest()
         {
             _configuration = new ConfigurationBuilder().Build();
-            _configuration.Properties[ConfigurationPath.ApiVersion] = 2;
+            _configuration.Properties[ConfigurationPath.AsyncReporting] = true;
         }
 
         [Theory]
@@ -453,7 +453,7 @@ namespace ReportPortal.Shared.Tests.Reporter
 
             var config = new ConfigurationBuilder().Build();
 
-            config.Properties[ConfigurationPath.ApiVersion] = 2;
+            config.Properties[ConfigurationPath.AsyncReporting] = true;
             config.Properties["Launch:Rerun"] = "true";
 
             var launch = new LaunchReporter(service.Object, config, null, new Mock<IExtensionManager>().Object);
@@ -481,7 +481,7 @@ namespace ReportPortal.Shared.Tests.Reporter
 
             var config = new ConfigurationBuilder().Build();
 
-            config.Properties[ConfigurationPath.ApiVersion] = 2;
+            config.Properties[ConfigurationPath.AsyncReporting] = true;
             config.Properties["Launch:Rerun"] = "true";
             config.Properties["Launch:RerunOf"] = "any_uuid_of_existing_launch";
 
@@ -509,8 +509,8 @@ namespace ReportPortal.Shared.Tests.Reporter
                 .Callback<StartLaunchRequest, CancellationToken>((r, t) => startLaunchRequest = r);
 
             var config = new ConfigurationBuilder().Build();
-
-            config.Properties[ConfigurationPath.ApiVersion] = 2;
+    
+            config.Properties[ConfigurationPath.AsyncReporting] = true;
             config.Properties["Launch:Rerun"] = "false";
             config.Properties["Launch:RerunOf"] = "any_uuid_of_existing_launch";
 
@@ -535,7 +535,7 @@ namespace ReportPortal.Shared.Tests.Reporter
                 .Returns(Task.FromResult(new LaunchResponse { Uuid = "123" }));
 
             var config = new ConfigurationBuilder().Build();
-            config.Properties[ConfigurationPath.ApiVersion] = 2;
+            config.Properties[ConfigurationPath.AsyncReporting] = true;
             config.Properties["Launch:Id"] = "any_uuid_of_existing_launch";
 
             var launch = new LaunchReporter(service.Object, config, null, new Mock<IExtensionManager>().Object);

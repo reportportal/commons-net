@@ -33,7 +33,7 @@ namespace ReportPortal.Shared.Tests.Reporter
             _testReporter.SetupGet(r => r.Info).Returns(() => new TestInfo { });
 
             _configuration = new ConfigurationBuilder().Build();
-            _configuration.Properties[ConfigurationPath.ApiVersion] = 2;
+            _configuration.Properties[ConfigurationPath.AsyncReporting] = true;
 
             _requestExecuter = new NoneRetryRequestExecuter(null);
             _reportEventsSource = new ReportEventsSource();

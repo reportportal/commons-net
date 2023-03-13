@@ -79,7 +79,7 @@ namespace ReportPortal.Shared.Reporter
                                 NotifySending(requests);
 
                                 await _requestExecuter
-                                    .ExecuteAsync(async () => _configuration.GetValue(ConfigurationPath.ApiVersion, 1) == 2
+                                    .ExecuteAsync(async () => _configuration.GetValue(ConfigurationPath.AsyncReporting, false)
                                         ? await _service.AsyncLogItem.CreateAsync(requests.ToArray())
                                         : await _service.LogItem.CreateAsync(requests.ToArray()), null, _reporter.StatisticsCounter.LogItemStatisticsCounter)
                                     .ConfigureAwait(false);

@@ -119,7 +119,7 @@ namespace ReportPortal.Shared.Reporter
                     NotifyStarting(request);
 
                     var launch = await _requestExecuter
-                        .ExecuteAsync(() => _configuration.GetValue(ConfigurationPath.ApiVersion, 1) == 2
+                        .ExecuteAsync(() => _configuration.GetValue(ConfigurationPath.AsyncReporting, false)
                                 ? _service.AsyncLaunch.StartAsync(request)
                                 : _service.Launch.StartAsync(request), null, null)
                         .ConfigureAwait(false);
@@ -238,7 +238,7 @@ namespace ReportPortal.Shared.Reporter
                         NotifyFinishing(request);
 
                         var launchFinishedResponse = await _requestExecuter
-                            .ExecuteAsync(() => _configuration.GetValue(ConfigurationPath.ApiVersion, 1) == 2
+                            .ExecuteAsync(() => _configuration.GetValue(ConfigurationPath.AsyncReporting, false)
                                 ? _service.AsyncLaunch.FinishAsync(Info.Uuid, request)
                                 : _service.Launch.FinishAsync(Info.Uuid, request), null, null)
                             .ConfigureAwait(false);

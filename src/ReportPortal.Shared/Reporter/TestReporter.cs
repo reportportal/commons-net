@@ -88,7 +88,7 @@ namespace ReportPortal.Shared.Reporter
                     NotifyStarting(startTestItemRequest);
 
                     var testModel = await _requestExecuter
-                        .ExecuteAsync(() => _configuration.GetValue(ConfigurationPath.ApiVersion, 1) == 2
+                        .ExecuteAsync(() => _configuration.GetValue(ConfigurationPath.AsyncReporting, false)
                             ? _service.AsyncTestItem.StartAsync(startTestItemRequest)
                             : _service.TestItem.StartAsync(startTestItemRequest), null, LaunchReporter.StatisticsCounter.StartTestItemStatisticsCounter)
                         .ConfigureAwait(false);
@@ -107,7 +107,7 @@ namespace ReportPortal.Shared.Reporter
                     NotifyStarting(startTestItemRequest);
 
                     var testModel = await _requestExecuter
-                        .ExecuteAsync(() => _configuration.GetValue(ConfigurationPath.ApiVersion, 1) == 2
+                        .ExecuteAsync(() => _configuration.GetValue(ConfigurationPath.AsyncReporting, false)
                             ? _service.AsyncTestItem.StartAsync(ParentTestReporter.Info.Uuid, startTestItemRequest)
                             : _service.TestItem.StartAsync(ParentTestReporter.Info.Uuid, startTestItemRequest), null, LaunchReporter.StatisticsCounter.StartTestItemStatisticsCounter)
                         .ConfigureAwait(false);
@@ -216,7 +216,7 @@ namespace ReportPortal.Shared.Reporter
                     NotifyFinishing(request);
 
                     await _requestExecuter
-                        .ExecuteAsync(() => _configuration.GetValue(ConfigurationPath.ApiVersion, 1) == 2
+                        .ExecuteAsync(() => _configuration.GetValue(ConfigurationPath.AsyncReporting, false)
                             ? _service.AsyncTestItem.FinishAsync(Info.Uuid, request)
                             : _service.TestItem.FinishAsync(Info.Uuid, request), null, LaunchReporter.StatisticsCounter.FinishTestItemStatisticsCounter)
                         .ConfigureAwait(false);

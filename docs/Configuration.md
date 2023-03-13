@@ -41,8 +41,8 @@ Sometimes it's useful to specify configuration properties via environment variab
 ## Timeout
 `Server:Timeout` - how many seconds to wait when awaiting response from server.
 
-## ApiVersion
-`Server:ApiVersion` - ReportPortal API version to use (default version is 1). Version 2 is available partially (please have a look, what endpoints are available [here](https://github.com/reportportal/client-net/tree/develop/src/ReportPortal.Client/Resources)).
+## AsyncReporting
+`Server:AsyncReporting` - statement of using async endpoints (default value is false).
 
 # HTTP requests retry
 During tests execution agent sends test results as http requests to server. In case of fast test execution, or parallel tests execution, agent produces many requests to server. These requests are being sent in background and in parallel. Some requests might be failed due any reason e.g. short-term service unavailability, or network bandwith. To negotiate this issue several methodics can be applied.
