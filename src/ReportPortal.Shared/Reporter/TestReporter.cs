@@ -302,6 +302,16 @@ namespace ReportPortal.Shared.Reporter
         {
             StartTask?.GetAwaiter().GetResult();
 
+            if (ChildTestReporters != null)
+            {
+                foreach (var testNode in ChildTestReporters)
+                {
+                    testNode.Sync();
+                }
+            }
+
+            _logsReporter?.Sync();
+
             FinishTask?.GetAwaiter().GetResult();
         }
 
