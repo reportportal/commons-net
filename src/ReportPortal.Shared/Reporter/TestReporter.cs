@@ -15,6 +15,7 @@ namespace ReportPortal.Shared.Reporter
 {
     public class TestReporter : ITestReporter
     {
+        private readonly bool _asyncReporting;
         private readonly IClientService _service;
         private readonly IConfiguration _configuration;
         private readonly IRequestExecuter _requestExecuter;
@@ -37,6 +38,8 @@ namespace ReportPortal.Shared.Reporter
             _requestExecuter = requestExecuter;
             _extensionManager = extensionManager;
             _reportEventsSource = reportEventNotifier;
+            _asyncReporting = _configuration?.GetValue(ConfigurationPath.AsyncReporting, false) ?? false;
+
             LaunchReporter = launchReporter;
             ParentTestReporter = parentTestReporter;
         }
@@ -88,7 +91,7 @@ namespace ReportPortal.Shared.Reporter
                     NotifyStarting(startTestItemRequest);
 
                     var testModel = await _requestExecuter
-                        .ExecuteAsync(() => _configuration.GetValue(ConfigurationPath.AsyncReporting, false)
+                        .ExecuteAsync(() => _asyncReporting
                             ? _service.AsyncTestItem.StartAsync(startTestItemRequest)
                             : _service.TestItem.StartAsync(startTestItemRequest), null, LaunchReporter.StatisticsCounter.StartTestItemStatisticsCounter)
                         .ConfigureAwait(false);
@@ -107,7 +110,7 @@ namespace ReportPortal.Shared.Reporter
                     NotifyStarting(startTestItemRequest);
 
                     var testModel = await _requestExecuter
-                        .ExecuteAsync(() => _configuration.GetValue(ConfigurationPath.AsyncReporting, false)
+                        .ExecuteAsync(() => _asyncReporting
                             ? _service.AsyncTestItem.StartAsync(ParentTestReporter.Info.Uuid, startTestItemRequest)
                             : _service.TestItem.StartAsync(ParentTestReporter.Info.Uuid, startTestItemRequest), null, LaunchReporter.StatisticsCounter.StartTestItemStatisticsCounter)
                         .ConfigureAwait(false);
@@ -216,7 +219,7 @@ namespace ReportPortal.Shared.Reporter
                     NotifyFinishing(request);
 
                     await _requestExecuter
-                        .ExecuteAsync(() => _configuration.GetValue(ConfigurationPath.AsyncReporting, false)
+                        .ExecuteAsync(() => _asyncReporting
                             ? _service.AsyncTestItem.FinishAsync(Info.Uuid, request)
                             : _service.TestItem.FinishAsync(Info.Uuid, request), null, LaunchReporter.StatisticsCounter.FinishTestItemStatisticsCounter)
                         .ConfigureAwait(false);

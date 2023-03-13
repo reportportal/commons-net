@@ -16,6 +16,8 @@ namespace ReportPortal.Shared.Reporter
         private static ITraceLogger TraceLogger { get; } = TraceLogManager.Instance.GetLogger<LogsReporter>();
 
         private readonly Queue<CreateLogItemRequest> _buffer = new Queue<CreateLogItemRequest>();
+
+        private readonly bool _asyncReporting;
         private readonly IReporter _reporter;
         private readonly IClientService _service;
         private readonly IConfiguration _configuration;
@@ -43,6 +45,7 @@ namespace ReportPortal.Shared.Reporter
             _requestExecuter = requestExecuter;
             _logRequestAmender = logRequestAmender;
             _reportEventsSource = reportEventsSource;
+            _asyncReporting = _configuration?.GetValue(ConfigurationPath.AsyncReporting, false) ?? false;
 
             if (batchCapacity < 1) throw new ArgumentException("Batch capacity for logs processing cannot be less than 1.", nameof(batchCapacity));
             BatchCapacity = batchCapacity;
@@ -79,7 +82,7 @@ namespace ReportPortal.Shared.Reporter
                                 NotifySending(requests);
 
                                 await _requestExecuter
-                                    .ExecuteAsync(async () => _configuration.GetValue(ConfigurationPath.AsyncReporting, false)
+                                    .ExecuteAsync(async () => _asyncReporting
                                         ? await _service.AsyncLogItem.CreateAsync(requests.ToArray())
                                         : await _service.LogItem.CreateAsync(requests.ToArray()), null, _reporter.StatisticsCounter.LogItemStatisticsCounter)
                                     .ConfigureAwait(false);
