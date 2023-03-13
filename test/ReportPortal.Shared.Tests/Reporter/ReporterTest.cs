@@ -338,8 +338,9 @@ namespace ReportPortal.Shared.Tests.Reporter
             var requests = new ConcurrentBag<CreateLogItemRequest[]>();
 
             var service = new MockServiceBuilder().Build();
-            service.Setup(s => s.LogItem.CreateAsync(It.IsAny<CreateLogItemRequest[]>(), default)).ReturnsAsync(new LogItemsCreatedResponse())
-                .Callback<CreateLogItemRequest[]>((arg) => requests.Add(arg));
+            service.Setup(s => s.LogItem.CreateAsync(It.IsAny<CreateLogItemRequest[]>(), default))
+                .ReturnsAsync(new LogItemsCreatedResponse())
+                .Callback<CreateLogItemRequest[], CancellationToken>((arg, t) => requests.Add(arg));
 
             var launchScheduler = new LaunchReporterBuilder(service.Object);
             var launchReporter = launchScheduler.Build(1, 30, 30);
@@ -433,7 +434,7 @@ namespace ReportPortal.Shared.Tests.Reporter
 
             service.Setup(s => s.Launch.StartAsync(It.IsAny<StartLaunchRequest>(), default))
                 .Returns(() => Task.FromResult(new LaunchCreatedResponse { Uuid = Guid.NewGuid().ToString() }))
-                .Callback<StartLaunchRequest>(r => startLaunchRequest = r);
+                .Callback<StartLaunchRequest, CancellationToken>((r, t) => startLaunchRequest = r);
 
             var config = new Shared.Configuration.ConfigurationBuilder().Build();
             config.Properties["Launch:Rerun"] = "true";
@@ -486,7 +487,7 @@ namespace ReportPortal.Shared.Tests.Reporter
 
             service.Setup(s => s.Launch.StartAsync(It.IsAny<StartLaunchRequest>(), default))
                 .Returns(() => Task.FromResult(new LaunchCreatedResponse { Uuid = Guid.NewGuid().ToString() }))
-                .Callback<StartLaunchRequest>(r => startLaunchRequest = r);
+                .Callback<StartLaunchRequest, CancellationToken>((r, t) => startLaunchRequest = r);
 
             var config = new Shared.Configuration.ConfigurationBuilder().Build();
             config.Properties["Launch:Rerun"] = "false";

@@ -9,6 +9,7 @@ using ReportPortal.Shared.Reporter.Statistics;
 using ReportPortal.Shared.Tests.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -166,7 +167,13 @@ namespace ReportPortal.Shared.Tests.Reporter
 
             var service = new MockServiceBuilder().Build();
             service.Setup(s => s.LogItem.CreateAsync(It.IsAny<CreateLogItemRequest[]>(), default))
-                .Callback<CreateLogItemRequest[]>(rqs => { foreach (var rq in rqs) logItemRequestTexts.Add(rq.Text); })
+                .Callback<CreateLogItemRequest[], CancellationToken>((rqs, t) =>
+                {
+                    foreach (var rq in rqs)
+                    {
+                        logItemRequestTexts.Add(rq.Text);
+                    }
+                })
                 .Returns(() => Task.FromResult(new Client.Abstractions.Responses.LogItemsCreatedResponse()));
 
             var logsReporter = new LogsReporter(_testReporter.Object, service.Object, _configuration, _extensionManager, _requestExecuter, _logRequestAmender.Object, _reportEventsSource, 20);
