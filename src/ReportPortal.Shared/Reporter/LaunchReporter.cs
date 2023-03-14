@@ -316,19 +316,24 @@ namespace ReportPortal.Shared.Reporter
 
         public void Sync()
         {
-            StartTask?.GetAwaiter().GetResult();
-
-            if (ChildTestReporters != null)
+            if (FinishTask != null)
             {
-                foreach (var testNode in ChildTestReporters)
-                {
-                    testNode.Sync();
-                }
+                FinishTask.GetAwaiter().GetResult();
             }
+            else
+            {
+                StartTask?.GetAwaiter().GetResult();
 
-            _logsReporter?.Sync();
+                if (ChildTestReporters != null)
+                {
+                    foreach (var testNode in ChildTestReporters)
+                    {
+                        testNode.Sync();
+                    }
+                }
 
-            FinishTask?.GetAwaiter().GetResult();
+                _logsReporter?.Sync();
+            }
         }
 
         private LaunchInitializingEventArgs NotifyInitializing()
