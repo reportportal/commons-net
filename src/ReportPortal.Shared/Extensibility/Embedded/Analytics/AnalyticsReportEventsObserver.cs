@@ -4,6 +4,7 @@ using System;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
+using ReportPortal.Shared.Configuration;
 
 namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
 {
@@ -26,13 +27,21 @@ namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
 
         private readonly HttpClient _httpClient;
 
-        public AnalyticsReportEventsObserver() : this(new HttpClientHandler
+        public AnalyticsReportEventsObserver(IConfiguration configuration) : this(CreateHttpMessageHandler(configuration))
         {
+        }
+
+        private static HttpMessageHandler CreateHttpMessageHandler(IConfiguration configuration) 
+        {
+            var handler = new HttpClientHandler();
+            
 #if !NET462
-            ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; }
+            if (configuration.GetValue("Server:IgnoreSslErrors", true)) 
+            {
+                handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
+            }
 #endif
-        })
-        {
+            return handler;
         }
 
         public AnalyticsReportEventsObserver(HttpMessageHandler httpHandler)

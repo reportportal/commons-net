@@ -36,10 +36,18 @@ namespace ReportPortal.Shared.Reporter.Http
 
             httpClientHandler.Proxy = GetProxy();
 
+            var ignoreSslErrors = Configuration.GetValue<bool>("Server:IgnoreSslErrors", true);
+            
 #if NETSTANDARD2_0
-            httpClientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
+            if (ignoreSslErrors)            
+            {
+                httpClientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
+            }
 #else
-            ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
+            if (ignoreSslErrors)
+            {
+                ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
+            }
             ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12;
 #endif
 
