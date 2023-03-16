@@ -92,26 +92,18 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Analytics
         public void ShouldThrowIfEventsSourceIsNull()
         {
             var configuration = new ConfigurationBuilder().Build();
-            var ga = new AnalyticsReportEventsObserver(configuration);
+            var ga = new AnalyticsReportEventsObserver();
 
             Action act = () => ga.Initialize(reportEventsSource: null);
 
             act.Should().Throw<ArgumentNullException>();
         }
-        
-        [Fact]
-        public void ShouldThrowIfConfigurationIsNull()
-        {
-            Action act = () => new AnalyticsReportEventsObserver(configuration: null);
 
-            act.Should().Throw<ArgumentNullException>();
-        }
 
         [Fact]
         public void ShouldBeSilentIfLaunchIsNotStartedButFinished()
         {
-            var configuration = new ConfigurationBuilder().Build();
-            var ga = new AnalyticsReportEventsObserver(configuration);
+            var ga = new AnalyticsReportEventsObserver();
 
             var launchReporter = new Mock<ILaunchReporter>();
 
@@ -125,8 +117,7 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Analytics
         [Fact]
         public void ShouldDispose()
         {
-            var configuration = new ConfigurationBuilder().Build();
-            var ga = new AnalyticsReportEventsObserver(configuration);
+            var ga = new AnalyticsReportEventsObserver();
 
             ga.Initialize(new ReportEventsSource());
 
