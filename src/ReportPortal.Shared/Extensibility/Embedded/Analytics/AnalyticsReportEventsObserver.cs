@@ -1,6 +1,7 @@
 ﻿using ReportPortal.Shared.Extensibility.ReportEvents;
 using ReportPortal.Shared.Internal.Logging;
 using System;
+using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -25,8 +26,8 @@ namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
 
         private readonly string _platformVersion;
 
-        private static HttpClient _httpClient;
-        private static object _httpClientLock;
+        private HttpClient _httpClient;
+        private readonly object _httpClientLock = new object();
 
         public AnalyticsReportEventsObserver()
         {
@@ -99,7 +100,7 @@ namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
 
         private Task _sendGaUsageTask;
 
-        static HttpClient GetHttpClient(IConfiguration configuration)
+        HttpClient GetHttpClient(IConfiguration configuration)
         {
             if (_httpClient != null) 
                 return _httpClient;
@@ -110,7 +111,12 @@ namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
                     return _httpClient;
                 
                 var handler = new HttpClientHandler();
-#if !NET462
+#if NET462
+                if (configuration.GetValue("Server:IgnoreSslErrors", true)) 
+                {
+                    ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
+                }
+#else
                 if (configuration.GetValue("Server:IgnoreSslErrors", true)) 
                 {
                     handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;

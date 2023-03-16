@@ -38,17 +38,17 @@ namespace ReportPortal.Shared.Reporter.Http
 
             var ignoreSslErrors = Configuration.GetValue<bool>("Server:IgnoreSslErrors", true);
             
-#if NETSTANDARD2_0
-            if (ignoreSslErrors)            
-            {
-                httpClientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
-            }
-#else
+#if NET462
             if (ignoreSslErrors)
             {
                 ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
             }
             ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12;
+#else
+            if (ignoreSslErrors)            
+            {
+                httpClientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
+            }
 #endif
 
             return httpClientHandler;
