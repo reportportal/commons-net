@@ -13,7 +13,6 @@ using System.Net;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Web;
-using ReportPortal.Shared.Configuration;
 using Xunit;
 
 namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Analytics
@@ -91,14 +90,12 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Analytics
         [Fact]
         public void ShouldThrowIfEventsSourceIsNull()
         {
-            var configuration = new ConfigurationBuilder().Build();
             var ga = new AnalyticsReportEventsObserver();
 
             Action act = () => ga.Initialize(reportEventsSource: null);
 
             act.Should().Throw<ArgumentNullException>();
         }
-
 
         [Fact]
         public void ShouldBeSilentIfLaunchIsNotStartedButFinished()
