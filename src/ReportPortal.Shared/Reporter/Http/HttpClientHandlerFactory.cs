@@ -36,7 +36,7 @@ namespace ReportPortal.Shared.Reporter.Http
 
             httpClientHandler.Proxy = GetProxy();
 
-            var ignoreSslErrors = Configuration.GetValue<bool>("Server:IgnoreSslErrors", true);
+            var ignoreSslErrors = Configuration.GetValue<bool>("Server:IgnoreSslErrors", false);
             
 #if NET462
             if (ignoreSslErrors)

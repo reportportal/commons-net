@@ -41,7 +41,7 @@ Sometimes it's useful to specify configuration properties via environment variab
 
 `Server:Url` - url to your ReportPortal server, including protocol and ports, e.g. `https://reportportal.example.com` or `https://reportportal.example.com:8080`.
 `Server:Authentication:Uuid` - access token to submit results to ReportPortal. You can find this in your user profile.
-`Server:IgnoreSslErrors` - ignores SSL / TLS errors. Defaults to `true` for backwards compatibility. This can be helpful when using self-signed certificates, however it is recommended to set this to `false`.
+`Server:IgnoreSslErrors` - ignores SSL / TLS errors. Defaults to `false`. This can be helpful when using self-signed certificates, however this can make the connection susceptible to [man-in-the-middle](https://en.wikipedia.org/wiki/Man-in-the-middle_attack) attacks.
 
 ## Proxy
 `Server:Proxy:Url` - url to proxy server to be used for http requests like `http://myproxy.corp:8080`.

@@ -111,13 +111,15 @@ namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
                     return _httpClient;
                 
                 var handler = new HttpClientHandler();
+                var ignoreSslErrors = configuration.GetValue<bool>("Server:IgnoreSslErrors", false);
+
 #if NET462
-                if (configuration.GetValue("Server:IgnoreSslErrors", true)) 
+                if (ignoreSslErrors)
                 {
                     ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
                 }
 #else
-                if (configuration.GetValue("Server:IgnoreSslErrors", true)) 
+                if (ignoreSslErrors) 
                 {
                     handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
                 }
