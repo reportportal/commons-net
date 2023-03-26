@@ -123,7 +123,7 @@ namespace ReportPortal.Shared.Reporter
                     var launch = await _requestExecuter
                         .ExecuteAsync(() => _asyncReporting
                             ? _service.AsyncLaunch.StartAsync(request)
-                            : _service.Launch.StartAsync(request), null, null)
+                            : _service.Launch.StartAsync(request), null, null, $"Starting new '{request.Name}' launch...")
                         .ConfigureAwait(false);
 
                     _launchInfo = new LaunchInfo
@@ -141,7 +141,7 @@ namespace ReportPortal.Shared.Reporter
                 // get launch info
                 StartTask = Task.Run(async () =>
                 {
-                    var launch = await _requestExecuter.ExecuteAsync(() => _service.Launch.GetAsync(Info.Uuid), null, null).ConfigureAwait(false);
+                    var launch = await _requestExecuter.ExecuteAsync(() => _service.Launch.GetAsync(Info.Uuid), null, null, $"Getting existing launch by '{Info.Uuid}' uuid...").ConfigureAwait(false);
 
                     _launchInfo = new LaunchInfo
                     {
@@ -242,7 +242,7 @@ namespace ReportPortal.Shared.Reporter
                         var launchFinishedResponse = await _requestExecuter
                             .ExecuteAsync(() => _asyncReporting
                                 ? _service.AsyncLaunch.FinishAsync(Info.Uuid, request)
-                                : _service.Launch.FinishAsync(Info.Uuid, request), null, null)
+                                : _service.Launch.FinishAsync(Info.Uuid, request), null, null, $"Finishing '{Info.Name}' launch...")
                             .ConfigureAwait(false);
 
                         _launchInfo.FinishTime = request.EndTime;

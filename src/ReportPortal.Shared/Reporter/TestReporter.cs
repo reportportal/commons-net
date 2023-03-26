@@ -93,7 +93,10 @@ namespace ReportPortal.Shared.Reporter
                     var testModel = await _requestExecuter
                         .ExecuteAsync(() => _asyncReporting
                             ? _service.AsyncTestItem.StartAsync(startTestItemRequest)
-                            : _service.TestItem.StartAsync(startTestItemRequest), null, LaunchReporter.StatisticsCounter.StartTestItemStatisticsCounter)
+                            : _service.TestItem.StartAsync(startTestItemRequest),
+                            null,
+                            LaunchReporter.StatisticsCounter.StartTestItemStatisticsCounter,
+                            $"Starting new '{startTestItemRequest.Name}' test item...")
                         .ConfigureAwait(false);
 
                     _testInfo = new TestInfo
@@ -112,7 +115,10 @@ namespace ReportPortal.Shared.Reporter
                     var testModel = await _requestExecuter
                         .ExecuteAsync(() => _asyncReporting
                             ? _service.AsyncTestItem.StartAsync(ParentTestReporter.Info.Uuid, startTestItemRequest)
-                            : _service.TestItem.StartAsync(ParentTestReporter.Info.Uuid, startTestItemRequest), null, LaunchReporter.StatisticsCounter.StartTestItemStatisticsCounter)
+                            : _service.TestItem.StartAsync(ParentTestReporter.Info.Uuid, startTestItemRequest),
+                            null,
+                            LaunchReporter.StatisticsCounter.StartTestItemStatisticsCounter,
+                            $"Starting new '{startTestItemRequest.Name}' test item...")
                         .ConfigureAwait(false);
 
                     _testInfo = new TestInfo
@@ -221,7 +227,10 @@ namespace ReportPortal.Shared.Reporter
                     await _requestExecuter
                         .ExecuteAsync(() => _asyncReporting
                             ? _service.AsyncTestItem.FinishAsync(Info.Uuid, request)
-                            : _service.TestItem.FinishAsync(Info.Uuid, request), null, LaunchReporter.StatisticsCounter.FinishTestItemStatisticsCounter)
+                            : _service.TestItem.FinishAsync(Info.Uuid, request),
+                            null,
+                            LaunchReporter.StatisticsCounter.FinishTestItemStatisticsCounter,
+                            $"Finishing '{Info.Name}' test item with '{request.Status}' status")
                         .ConfigureAwait(false);
 
                     _testInfo.FinishTime = request.EndTime;
