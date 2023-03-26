@@ -37,11 +37,11 @@ namespace ReportPortal.Shared.Internal.Delegating
         {
             Interlocked.Increment(ref _waitingThreads);
 
-            TraceLogger.Verbose($"Awaiting free executor. Currently available: {_concurrentAwaiter.CurrentCount}, demand: {_waitingThreads}");
+            TraceLogger.Verbose($"Awaiting free executor. Available: {_concurrentAwaiter.CurrentCount}, demand: {_waitingThreads}");
 
             await _concurrentAwaiter.WaitAsync().ConfigureAwait(false);
 
-            TraceLogger.Verbose($"Executor is reserved. Currently available: {_concurrentAwaiter.CurrentCount}");
+            TraceLogger.Verbose($"Executor is reserved. Available: {_concurrentAwaiter.CurrentCount}");
         }
 
         /// <inheritdoc/>
@@ -51,7 +51,7 @@ namespace ReportPortal.Shared.Internal.Delegating
 
             Interlocked.Decrement(ref _waitingThreads);
 
-            TraceLogger.Verbose($"Executor is released. Currently available: {previousCount + 1}, demand: {_waitingThreads}");
+            TraceLogger.Verbose($"Executor is released. Available: {previousCount + 1}, demand: {_waitingThreads}");
         }
 
         /// <summary>
