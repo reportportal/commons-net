@@ -11,6 +11,8 @@ namespace ReportPortal.Shared.Internal.Delegating
 
         private readonly SemaphoreSlim _concurrentAwaiter;
 
+        private int _waitingThreads = 0;
+
         /// <summary>
         /// Initializes new instance of <see cref="RequestExecutionThrottler"/>
         /// </summary>
@@ -33,7 +35,9 @@ namespace ReportPortal.Shared.Internal.Delegating
         /// <inheritdoc/>
         public async Task ReserveAsync()
         {
-            TraceLogger.Verbose($"Awaiting free executor. Currently available: {_concurrentAwaiter.CurrentCount}");
+            Interlocked.Increment(ref _waitingThreads);
+
+            TraceLogger.Verbose($"Awaiting free executor. Currently available: {_concurrentAwaiter.CurrentCount}, demand: {_waitingThreads}");
 
             await _concurrentAwaiter.WaitAsync().ConfigureAwait(false);
 
@@ -45,7 +49,9 @@ namespace ReportPortal.Shared.Internal.Delegating
         {
             var previousCount = _concurrentAwaiter.Release();
 
-            TraceLogger.Verbose($"Executor is released. Currently available: {previousCount + 1}");
+            Interlocked.Decrement(ref _waitingThreads);
+
+            TraceLogger.Verbose($"Executor is released. Currently available: {previousCount + 1}, demand: {_waitingThreads}");
         }
 
         /// <summary>
