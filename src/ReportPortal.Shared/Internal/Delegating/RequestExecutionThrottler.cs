@@ -35,9 +35,9 @@ namespace ReportPortal.Shared.Internal.Delegating
         /// <inheritdoc/>
         public async Task ReserveAsync()
         {
-            Interlocked.Increment(ref _waitingThreads);
-
             TraceLogger.Verbose($"Awaiting free executor. Available: {_concurrentAwaiter.CurrentCount}, demand: {_waitingThreads}");
+
+            Interlocked.Increment(ref _waitingThreads);
 
             await _concurrentAwaiter.WaitAsync().ConfigureAwait(false);
 
