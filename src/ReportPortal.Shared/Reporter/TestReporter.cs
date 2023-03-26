@@ -230,7 +230,7 @@ namespace ReportPortal.Shared.Reporter
                             : _service.TestItem.FinishAsync(Info.Uuid, request),
                             null,
                             LaunchReporter.StatisticsCounter.FinishTestItemStatisticsCounter,
-                            $"Finishing '{Info.Name}' test item with '{request.Status}' status")
+                            $"Finishing '{Info.Name}' test item with '{request.Status}' status...")
                         .ConfigureAwait(false);
 
                     _testInfo.FinishTime = request.EndTime;
