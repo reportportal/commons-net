@@ -67,6 +67,8 @@ namespace ReportPortal.Shared.Reporter
                 throw exp;
             }
 
+            TraceLogger.Verbose($"Scheduling request to start test item in {GetHashCode()} proxy instance");
+
             var parentStartTask = ParentTestReporter?.StartTask ?? LaunchReporter.StartTask;
 
             StartTask = parentStartTask.ContinueWith(async pt =>

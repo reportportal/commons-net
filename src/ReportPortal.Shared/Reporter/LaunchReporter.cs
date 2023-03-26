@@ -9,8 +9,6 @@ using ReportPortal.Shared.Extensibility;
 using ReportPortal.Shared.Extensibility.ReportEvents.EventArgs;
 using ReportPortal.Shared.Internal.Delegating;
 using ReportPortal.Shared.Reporter.Statistics;
-using ReportPortal.Client.Abstractions.Responses;
-using System.Threading;
 
 namespace ReportPortal.Shared.Reporter
 {
