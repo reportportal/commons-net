@@ -15,6 +15,9 @@ namespace ReportPortal.Shared.Benchmark.Reporter
         [Params(1, 100000)]
         public int SuitesCount { get; set; }
 
+        [Params(0, 100)]
+        public int LogsCount { get; set; }
+
         [Benchmark]
         public void LaunchReporter()
         {
@@ -41,6 +44,53 @@ namespace ReportPortal.Shared.Benchmark.Reporter
                     StartTime = launchDateTime.AddMilliseconds(-1),
                     Type = TestItemType.Suite
                 });
+
+                suiteNode.Finish(new FinishTestItemRequest
+                {
+                    EndTime = launchDateTime,
+                    Status = Status.Passed
+                });
+            }
+
+            launchReporter.Finish(new FinishLaunchRequest
+            {
+                EndTime = launchDateTime
+            });
+
+            launchReporter.Sync();
+        }
+
+        [Benchmark]
+        public void LaunchReporterWithLogs()
+        {
+            var configuration = new Configuration.ConfigurationBuilder().Build();
+            configuration.Properties[ConfigurationPath.AsyncReporting] = true;
+
+            var nopService = new NopService();
+            var launchReporter = new LaunchReporter(nopService, configuration, null, new ExtensionManager());
+
+            var launchDateTime = DateTime.UtcNow;
+
+            launchReporter.Start(new StartLaunchRequest
+            {
+                Name = "ReportPortal Benchmark",
+                StartTime = launchDateTime,
+                Mode = LaunchMode.Debug
+            });
+
+            for (int i = 0; i < SuitesCount; i++)
+            {
+                var suiteNode = launchReporter.StartChildTestReporter(new StartTestItemRequest
+                {
+                    Name = $"Suite {i}",
+                    StartTime = launchDateTime.AddMilliseconds(-1),
+                    Type = TestItemType.Suite
+                });
+
+                for (int j = 0; j < 500; j++)
+                {
+                    suiteNode.Log(new CreateLogItemRequest { Text = "abc" });
+                }
 
                 suiteNode.Finish(new FinishTestItemRequest
                 {
