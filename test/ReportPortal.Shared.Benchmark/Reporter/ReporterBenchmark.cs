@@ -21,8 +21,7 @@ namespace ReportPortal.Shared.Benchmark.Reporter
         [Benchmark]
         public void LaunchReporter()
         {
-            var configuration = new Configuration.ConfigurationBuilder().Build();
-            configuration.Properties[ConfigurationPath.AsyncReporting] = true;
+            var configuration = new ConfigurationBuilder().Build();
 
             var nopService = new NopService();
             var launchReporter = new LaunchReporter(nopService, configuration, null, new ExtensionManager());
@@ -63,8 +62,7 @@ namespace ReportPortal.Shared.Benchmark.Reporter
         [Benchmark]
         public void LaunchReporterWithLogs()
         {
-            var configuration = new Configuration.ConfigurationBuilder().Build();
-            configuration.Properties[ConfigurationPath.AsyncReporting] = true;
+            var configuration = new ConfigurationBuilder().Build();
 
             var nopService = new NopService();
             var launchReporter = new LaunchReporter(nopService, configuration, null, new ExtensionManager());
@@ -87,7 +85,7 @@ namespace ReportPortal.Shared.Benchmark.Reporter
                     Type = TestItemType.Suite
                 });
 
-                for (int j = 0; j < 500; j++)
+                for (int j = 0; j < LogsCount; j++)
                 {
                     suiteNode.Log(new CreateLogItemRequest { Text = "abc" });
                 }

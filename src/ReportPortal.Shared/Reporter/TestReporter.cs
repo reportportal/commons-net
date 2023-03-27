@@ -161,6 +161,7 @@ namespace ReportPortal.Shared.Reporter
 
             if (_logsReporter != null)
             {
+                _logsReporter.Finish();
                 dependentTasks.Add(_logsReporter.ProcessingTask);
             }
 
