@@ -44,47 +44,6 @@ namespace ReportPortal.Shared.Benchmark.Reporter
                     Type = TestItemType.Suite
                 });
 
-                suiteNode.Finish(new FinishTestItemRequest
-                {
-                    EndTime = launchDateTime,
-                    Status = Status.Passed
-                });
-            }
-
-            launchReporter.Finish(new FinishLaunchRequest
-            {
-                EndTime = launchDateTime
-            });
-
-            launchReporter.Sync();
-        }
-
-        [Benchmark]
-        public void LaunchReporterWithLogs()
-        {
-            var configuration = new ConfigurationBuilder().Build();
-
-            var nopService = new NopService();
-            var launchReporter = new LaunchReporter(nopService, configuration, null, new ExtensionManager());
-
-            var launchDateTime = DateTime.UtcNow;
-
-            launchReporter.Start(new StartLaunchRequest
-            {
-                Name = "ReportPortal Benchmark",
-                StartTime = launchDateTime,
-                Mode = LaunchMode.Debug
-            });
-
-            for (int i = 0; i < SuitesCount; i++)
-            {
-                var suiteNode = launchReporter.StartChildTestReporter(new StartTestItemRequest
-                {
-                    Name = $"Suite {i}",
-                    StartTime = launchDateTime.AddMilliseconds(-1),
-                    Type = TestItemType.Suite
-                });
-
                 for (int j = 0; j < LogsCount; j++)
                 {
                     suiteNode.Log(new CreateLogItemRequest { Text = "abc" });
