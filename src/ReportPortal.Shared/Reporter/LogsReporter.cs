@@ -1,4 +1,4 @@
-﻿using ReportPortal.Client.Abstractions;
+using ReportPortal.Client.Abstractions;
 using ReportPortal.Client.Abstractions.Requests;
 using ReportPortal.Shared.Configuration;
 using ReportPortal.Shared.Extensibility;
