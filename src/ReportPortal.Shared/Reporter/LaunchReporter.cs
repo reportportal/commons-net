@@ -317,6 +317,8 @@ namespace ReportPortal.Shared.Reporter
 
         public void Sync()
         {
+            _logsReporter?.Sync();
+
             if (FinishTask != null)
             {
                 FinishTask.GetAwaiter().GetResult();
@@ -324,16 +326,14 @@ namespace ReportPortal.Shared.Reporter
             else
             {
                 StartTask?.GetAwaiter().GetResult();
+            }
 
-                if (ChildTestReporters != null)
+            if (ChildTestReporters != null)
+            {
+                foreach (var testNode in ChildTestReporters)
                 {
-                    foreach (var testNode in ChildTestReporters)
-                    {
-                        testNode.Sync();
-                    }
+                    testNode.Sync();
                 }
-
-                _logsReporter?.Sync();
             }
         }
 

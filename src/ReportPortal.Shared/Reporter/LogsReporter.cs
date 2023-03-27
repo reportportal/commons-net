@@ -56,7 +56,7 @@ namespace ReportPortal.Shared.Reporter
             ProcessingTask = _reporter.StartTask.ContinueWith(async consumer =>
             {
                 await ConsumeLogRequests();
-            });
+            }).Unwrap();
         }
 
         public int BatchCapacity { get; }
@@ -98,9 +98,9 @@ namespace ReportPortal.Shared.Reporter
                     else
                     {
                         var buffer = new List<CreateLogItemRequest>
-                    {
-                        logRequest
-                    };
+                            {
+                                logRequest
+                            };
 
                         for (int i = 0; i < BatchCapacity - 1; i++)
                         {
