@@ -18,8 +18,6 @@ namespace ReportPortal.Shared.Reporter
 
         private readonly BlockingCollection<CreateLogItemRequest> _queue = new BlockingCollection<CreateLogItemRequest>();
 
-        private readonly Queue<CreateLogItemRequest> _buffer = new Queue<CreateLogItemRequest>();
-
         private readonly bool _asyncReporting;
         private readonly IReporter _reporter;
         private readonly IClientService _service;
