@@ -6,6 +6,10 @@ using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 using ReportPortal.Shared.Configuration;
+using System.Text;
+using System.Collections.Generic;
+using System.Text.Json;
+using System.Net.Mime;
 
 namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
 {
@@ -14,9 +18,10 @@ namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
     /// </summary>
     public class AnalyticsReportEventsObserver : IReportEventsObserver, IDisposable
     {
-        private const string MEASUREMENT_ID = "UA-173456809-1";
+        private const string CLIENT_INFO = "Ry1XUDU3UlNHOFhMOkVGaGFqc2J3U3RTbmEtc0NydGN6RHc=";
         private const string BASE_URI = "https://www.google-analytics.com";
         private const string CLIENT_NAME = "commons-dotnet";
+        private const string EVENT_NAME = "start_launch";
 
         private static ITraceLogger TraceLogger => TraceLogManager.Instance.GetLogger<AnalyticsReportEventsObserver>();
 
@@ -25,6 +30,9 @@ namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
         private readonly string _clientVersion;
 
         private readonly string _platformVersion;
+
+        private readonly string _measurementId;
+        private readonly string _apiKey;
 
         private HttpClient _httpClient;
         private readonly object _httpClientLock = new object();
@@ -41,6 +49,9 @@ namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
 #else
             _platformVersion = AppDomain.CurrentDomain.SetupInformation.TargetFrameworkName;
 #endif
+            var clientInfo = Encoding.UTF8.GetString(Convert.FromBase64String(CLIENT_INFO)).Split(":");
+            _measurementId = clientInfo[0];
+            _apiKey = clientInfo[1];
         }
 
         public AnalyticsReportEventsObserver(HttpMessageHandler httpHandler) : this()
@@ -147,19 +158,37 @@ namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
         {
             if (args.Configuration.GetValue("Analytics:Enabled", true))
             {
-                var category = $"Client name \"{CLIENT_NAME}\", version \"{_clientVersion}\", interpreter \"{_platformVersion}\"";
-                var label = $"Agent name \"{AgentName}\", version \"{AgentVersion}\"";
+                var requestParams = new Dictionary<string, string>() {
+                    { "client_name", CLIENT_NAME },
+                    { "client_version", _clientVersion },
+                    { "interpreter", _platformVersion },
+                    { "agent_name", AgentName },
+                    { "agent_version", AgentVersion }
+                };
 
-                var requestData = $"/collect?v=1&tid={MEASUREMENT_ID}&cid={_clientId}&t=event&ec={category}&ea=Start launch&el={label}";
+                var eventData = new Dictionary<string, object>()
+                {
+                    { "name", EVENT_NAME },
+                    { "params", requestParams }
+                };
+
+                var payload = new Dictionary<string, object>()
+                {
+                    { "client_id", _clientId },
+                    { "events", new List<object> { eventData } }
+                };
+
+                var requestUri = $"/mp/collect?measurement_id={_measurementId}&api_secret={_apiKey}";
 
                 var httpClient = GetHttpClient(args.Configuration);
+                var stringContent = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, MediaTypeNames.Application.Json);
 
                 // schedule tracking request
                 _sendGaUsageTask = Task.Run(async () =>
                 {
                     try
                     {
-                        using (var response = await httpClient.PostAsync(requestData, null))
+                        using (var response = await httpClient.PostAsync(requestUri, stringContent))
                         {
                             response.EnsureSuccessStatusCode();
                         }
