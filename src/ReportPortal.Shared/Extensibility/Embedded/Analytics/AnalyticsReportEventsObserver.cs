@@ -37,6 +37,9 @@ namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
         private HttpClient _httpClient;
         private readonly object _httpClientLock = new object();
 
+        /// <summary>
+        /// Create an instance of AnalyticsReportEventsObserver object, construct own HttpClient if neccessary.
+        /// </summary>
         public AnalyticsReportEventsObserver()
         {
             _clientId = Guid.NewGuid().ToString();
@@ -49,11 +52,15 @@ namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
 #else
             _platformVersion = AppDomain.CurrentDomain.SetupInformation.TargetFrameworkName;
 #endif
-            var clientInfo = Encoding.UTF8.GetString(Convert.FromBase64String(CLIENT_INFO)).Split(":");
+            var clientInfo = Encoding.UTF8.GetString(Convert.FromBase64String(CLIENT_INFO)).Split(':');
             _measurementId = clientInfo[0];
             _apiKey = clientInfo[1];
         }
 
+        /// <summary>
+        /// Create an instance of AnalyticsReportEventsObserver object, use provided HttpMessageHandler to construct an HttpClient.
+        /// </summary>
+        /// <param name="httpHandler">Http handler to construc a client</param>
         public AnalyticsReportEventsObserver(HttpMessageHandler httpHandler) : this()
         {
             _httpClient = new HttpClient(httpHandler)
@@ -92,9 +99,15 @@ namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
             }
         }
 
+        /// <summary>
+        /// Set the name of the Agent or use default name "Anonymous".
+        /// </summary>
         public static string AgentName { get; private set; } = "Anonymous";
 
         private static string _agentVersion;
+        /// <summary>
+        /// Return the version of the Agent retrieved from Assembly.
+        /// </summary>
         public static string AgentVersion
         {
             get
@@ -181,7 +194,7 @@ namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
                 var requestUri = $"/mp/collect?measurement_id={_measurementId}&api_secret={_apiKey}";
 
                 var httpClient = GetHttpClient(args.Configuration);
-                var stringContent = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, MediaTypeNames.Application.Json);
+                var stringContent = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
 
                 // schedule tracking request
                 _sendGaUsageTask = Task.Run(async () =>
