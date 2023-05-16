@@ -12,6 +12,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Web;
 using Xunit;
 
@@ -19,22 +20,28 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Analytics
 {
     public class AnalyticsReportEventsObserverTest
     {
-        private const string CATEGORY_VALIDATION_PATTERN = "Client name \"[^\"]+\", version \"[^\"]+\", interpreter \".NET[^\"]+\"";
-
         [Fact]
         public void ShouldHaveCorrectCategoryFormat()
         {
             var mockHttpHandler = new MockHttpMessageHandler();
-            mockHttpHandler.Expect(HttpMethod.Post, "https://www.google-analytics.com/collect").With(new CustomMatcher(m =>
+            mockHttpHandler.Expect(HttpMethod.Post, "https://www.google-analytics.com/mp/collect").With(new CustomMatcher(m =>
             {
-                var content = m.RequestUri.Query.TrimStart('?').Split('&')
+                var queryParams = m.RequestUri.Query.TrimStart('?').Split('&')
                 .Select(pair => pair.Split(new char[] { '=' }, 2))
                 .ToDictionary(pair => HttpUtility.UrlDecode(pair[0]), pair => pair.Length == 2 ? HttpUtility.UrlDecode(pair[1]) : "");
-                if (content.Count() == 0)
+                if (queryParams.Count() == 0)
                 {
                     return false;
                 }
-                return Regex.IsMatch(content["ec"], CATEGORY_VALIDATION_PATTERN);
+                var isOk = queryParams.ContainsKey("measurement_id") && queryParams["measurement_id"].StartsWith("G-");
+                isOk = isOk && queryParams.ContainsKey("api_secret") && queryParams["api_secret"].Length > 0;
+                isOk = isOk && m.Content.Headers.ContentType.ToString().StartsWith("application/json");
+                var task = Task.Run(async () => await m.Content.ReadAsStringAsync());
+                var content = task.Result;
+                isOk = isOk && content.Contains("\"client_id\":\"");
+                isOk = isOk && content.Contains("\"events\":[{\"");
+                isOk = isOk && content.Contains("\"params\":{\"");
+                return isOk;
             })).Respond(HttpStatusCode.OK);
 
             var analyticsObserver = new AnalyticsReportEventsObserver(mockHttpHandler);
@@ -51,7 +58,7 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Analytics
         public void ShouldNotThrow()
         {
             var mockHttpHandler = new MockHttpMessageHandler();
-            mockHttpHandler.Expect(HttpMethod.Post, "https://www.google-analytics.com/collect").Respond(HttpStatusCode.InternalServerError);
+            mockHttpHandler.Expect(HttpMethod.Post, "https://www.google-analytics.com/mp/collect").Respond(HttpStatusCode.InternalServerError);
 
             var analyticsObserver = new AnalyticsReportEventsObserver(mockHttpHandler);
             var extManager = new Shared.Extensibility.ExtensionManager();
@@ -67,7 +74,7 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Analytics
         public void ShouldDefineConsumer()
         {
             var mockHttpHandler = new MockHttpMessageHandler();
-            mockHttpHandler.Expect(HttpMethod.Post, "https://www.google-analytics.com/collect").Respond(HttpStatusCode.InternalServerError);
+            mockHttpHandler.Expect(HttpMethod.Post, "https://www.google-analytics.com/mp/collect").Respond(HttpStatusCode.InternalServerError);
 
             AnalyticsReportEventsObserver.DefineConsumer("agent1", "5.0");
 
@@ -79,7 +86,7 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Analytics
         public void ShouldDefineConsumerWithEmptyAgentName()
         {
             var mockHttpHandler = new MockHttpMessageHandler();
-            mockHttpHandler.Expect(HttpMethod.Post, "https://www.google-analytics.com/collect").Respond(HttpStatusCode.InternalServerError);
+            mockHttpHandler.Expect(HttpMethod.Post, "https://www.google-analytics.com/mp/collect").Respond(HttpStatusCode.InternalServerError);
 
             AnalyticsReportEventsObserver.DefineConsumer(null);
 
