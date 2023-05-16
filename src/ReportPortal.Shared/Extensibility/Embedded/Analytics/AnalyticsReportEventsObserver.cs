@@ -10,6 +10,7 @@ using System.Text;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Net.Mime;
+using ReportPortal.Shared.Internal;
 
 namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
 {
@@ -24,8 +25,6 @@ namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
         private const string EVENT_NAME = "start_launch";
 
         private static ITraceLogger TraceLogger => TraceLogManager.Instance.GetLogger<AnalyticsReportEventsObserver>();
-
-        private readonly string _clientId;
 
         private readonly string _clientVersion;
 
@@ -42,8 +41,6 @@ namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
         /// </summary>
         public AnalyticsReportEventsObserver()
         {
-            _clientId = Guid.NewGuid().ToString();
-
             // Client is this assembly
             _clientVersion = typeof(AnalyticsReportEventsObserver).Assembly.GetName().Version.ToString(3);
 
@@ -102,12 +99,14 @@ namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
         /// <summary>
         /// Set the name of the Agent or use default name "Anonymous".
         /// </summary>
+        /// <returns>The Agent name.</returns>
         public static string AgentName { get; private set; } = "Anonymous";
 
         private static string _agentVersion;
         /// <summary>
         /// Return the version of the Agent retrieved from Assembly.
         /// </summary>
+        /// <returns>The Agent version.</returns>
         public static string AgentVersion
         {
             get
@@ -167,7 +166,7 @@ namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
             return _httpClient;
         }
 
-        private void ReportEventsSource_OnBeforeLaunchStarting(Reporter.ILaunchReporter launchReporter, ReportEvents.EventArgs.BeforeLaunchStartingEventArgs args)
+        private async void ReportEventsSource_OnBeforeLaunchStarting(Reporter.ILaunchReporter launchReporter, ReportEvents.EventArgs.BeforeLaunchStartingEventArgs args)
         {
             if (args.Configuration.GetValue("Analytics:Enabled", true))
             {
@@ -187,7 +186,7 @@ namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
 
                 var payload = new Dictionary<string, object>()
                 {
-                    { "client_id", _clientId },
+                    { "client_id", await ClientIdProvider.GetClientIdAsync() },
                     { "events", new List<object> { eventData } }
                 };
 

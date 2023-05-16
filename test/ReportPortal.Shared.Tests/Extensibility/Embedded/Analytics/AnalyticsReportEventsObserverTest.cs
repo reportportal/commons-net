@@ -21,7 +21,7 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Analytics
     public class AnalyticsReportEventsObserverTest
     {
         [Fact]
-        public void ShouldHaveCorrectCategoryFormat()
+        public void ShouldHaveCorrectFormat()
         {
             var mockHttpHandler = new MockHttpMessageHandler();
             mockHttpHandler.Expect(HttpMethod.Post, "https://www.google-analytics.com/mp/collect").With(new CustomMatcher(m =>
@@ -34,10 +34,10 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Analytics
                     return false;
                 }
                 var isOk = queryParams.ContainsKey("measurement_id") && queryParams["measurement_id"].StartsWith("G-");
-                isOk = isOk && queryParams.ContainsKey("api_secret") && queryParams["api_secret"].Length > 0;
+                isOk = isOk && queryParams.ContainsKey("api_secret") && !string.IsNullOrEmpty(queryParams["api_secret"]);
                 isOk = isOk && m.Content.Headers.ContentType.ToString().StartsWith("application/json");
                 var task = Task.Run(async () => await m.Content.ReadAsStringAsync());
-                var content = task.Result;
+                var content = task.GetAwaiter().GetResult();
                 isOk = isOk && content.Contains("\"client_id\":\"");
                 isOk = isOk && content.Contains("\"events\":[{\"");
                 isOk = isOk && content.Contains("\"params\":{\"");
