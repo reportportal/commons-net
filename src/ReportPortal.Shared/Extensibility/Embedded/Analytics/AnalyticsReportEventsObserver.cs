@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Net.Mime;
 using ReportPortal.Shared.Internal;
+using System.IO;
 
 namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
 {
@@ -166,7 +167,7 @@ namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
             return _httpClient;
         }
 
-        private async void ReportEventsSource_OnBeforeLaunchStarting(Reporter.ILaunchReporter launchReporter, ReportEvents.EventArgs.BeforeLaunchStartingEventArgs args)
+        private void ReportEventsSource_OnBeforeLaunchStarting(Reporter.ILaunchReporter launchReporter, ReportEvents.EventArgs.BeforeLaunchStartingEventArgs args)
         {
             if (args.Configuration.GetValue("Analytics:Enabled", true))
             {
@@ -184,20 +185,30 @@ namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
                     { "params", requestParams }
                 };
 
-                var payload = new Dictionary<string, object>()
-                {
-                    { "client_id", await ClientIdProvider.GetClientIdAsync() },
-                    { "events", new List<object> { eventData } }
-                };
-
                 var requestUri = $"/mp/collect?measurement_id={_measurementId}&api_secret={_apiKey}";
 
                 var httpClient = GetHttpClient(args.Configuration);
-                var stringContent = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
 
                 // schedule tracking request
                 _sendGaUsageTask = Task.Run(async () =>
                 {
+                    var payload = new Dictionary<string, object>()
+                    {
+                        { "client_id", await ClientIdProvider.GetClientIdAsync() },
+                        { "events", new List<object> { eventData } }
+                    };
+                    string content;
+                    using (var stream = new MemoryStream())
+                    {
+                        await JsonSerializer.SerializeAsync(stream, payload, payload.GetType());
+                        stream.Position = 0;
+                        using (var reader = new StreamReader(stream))
+                        {
+                            content = await reader.ReadToEndAsync();
+                        }
+                    }
+
+                    var stringContent = new StringContent(content, Encoding.UTF8, "application/json");
                     try
                     {
                         using (var response = await httpClient.PostAsync(requestUri, stringContent))
