@@ -1,16 +1,15 @@
-﻿using ReportPortal.Shared.Extensibility.ReportEvents;
+﻿using ReportPortal.Shared.Configuration;
+using ReportPortal.Shared.Extensibility.ReportEvents;
 using ReportPortal.Shared.Internal.Logging;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
-using System.Threading.Tasks;
-using ReportPortal.Shared.Configuration;
 using System.Text;
-using System.Collections.Generic;
 using System.Text.Json;
-using System.Net.Mime;
-using System.IO;
+using System.Threading.Tasks;
 
 namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
 {
