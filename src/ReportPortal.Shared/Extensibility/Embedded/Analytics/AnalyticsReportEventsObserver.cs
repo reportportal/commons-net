@@ -169,33 +169,35 @@ namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
         {
             if (args.Configuration.GetValue("Analytics:Enabled", true))
             {
-                var requestParams = new Dictionary<string, string>() {
-                    { "client_name", CLIENT_NAME },
-                    { "client_version", _clientVersion },
-                    { "interpreter", _platformVersion },
-                    { "agent_name", AgentName },
-                    { "agent_version", AgentVersion }
-                };
-
-                var eventData = new Dictionary<string, object>()
-                {
-                    { "name", EVENT_NAME },
-                    { "params", requestParams }
-                };
-
-                var requestUri = $"/mp/collect?measurement_id={_measurementId}&api_secret={_apiKey}";
-
-                var httpClient = GetHttpClient(args.Configuration);
-
                 // schedule tracking request
                 _sendGaUsageTask = Task.Run(async () =>
                 {
+                    var requestParams = new Dictionary<string, string>() {
+                        { "client_name", CLIENT_NAME },
+                        { "client_version", _clientVersion },
+                        { "interpreter", _platformVersion },
+                        { "agent_name", AgentName },
+                        { "agent_version", AgentVersion }
+                    };
+
+                    var eventData = new Dictionary<string, object>()
+                    {
+                        { "name", EVENT_NAME },
+                        { "params", requestParams }
+                    };
+
+                    var requestUri = $"/mp/collect?measurement_id={_measurementId}&api_secret={_apiKey}";
+
+                    var httpClient = GetHttpClient(args.Configuration);
+
                     var payload = new Dictionary<string, object>()
                     {
                         { "client_id", await ClientIdProvider.GetClientIdAsync() },
                         { "events", new List<object> { eventData } }
                     };
+
                     string content;
+
                     using (var stream = new MemoryStream())
                     {
                         await JsonSerializer.SerializeAsync(stream, payload, payload.GetType());
@@ -207,6 +209,7 @@ namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
                     }
 
                     var stringContent = new StringContent(content, Encoding.UTF8, "application/json");
+                    
                     try
                     {
                         using (var response = await httpClient.PostAsync(requestUri, stringContent))
