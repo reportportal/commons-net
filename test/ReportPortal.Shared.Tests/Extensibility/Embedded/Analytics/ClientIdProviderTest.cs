@@ -1,10 +1,10 @@
-﻿using System;
-using Xunit;
-using FluentAssertions;
+﻿using FluentAssertions;
+using System;
 using System.IO;
+using Xunit;
 using static ReportPortal.Shared.Extensibility.Embedded.Analytics.ClientIdProvider;
 
-namespace ReportPortal.Shared.Tests.Internal
+namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Analytics
 {
     public class ClientIdProviderTest
     {
