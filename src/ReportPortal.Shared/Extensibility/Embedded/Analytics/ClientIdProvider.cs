@@ -4,9 +4,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace ReportPortal.Shared.Internal
+namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
 {
-    public static class ClientIdProvider
+    internal static class ClientIdProvider
     {
         public static readonly string FILE_PATH = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".rp", "rp.properties");
         private const string CLIENT_ID_KEY = "client.id";

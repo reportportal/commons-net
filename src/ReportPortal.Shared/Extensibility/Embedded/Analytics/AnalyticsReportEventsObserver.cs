@@ -10,7 +10,6 @@ using System.Text;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Net.Mime;
-using ReportPortal.Shared.Internal;
 using System.IO;
 
 namespace ReportPortal.Shared.Extensibility.Embedded.Analytics

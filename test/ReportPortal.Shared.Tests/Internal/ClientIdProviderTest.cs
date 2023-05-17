@@ -2,7 +2,7 @@
 using Xunit;
 using FluentAssertions;
 using System.IO;
-using static ReportPortal.Shared.Internal.ClientIdProvider;
+using static ReportPortal.Shared.Extensibility.Embedded.Analytics.ClientIdProvider;
 
 namespace ReportPortal.Shared.Tests.Internal
 {
