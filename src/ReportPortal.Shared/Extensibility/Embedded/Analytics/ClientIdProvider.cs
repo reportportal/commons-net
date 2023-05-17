@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
 {
+    // TODO: Makethis class testable, or even create GlobalConfiguration
     internal static class ClientIdProvider
     {
         public static readonly string FILE_PATH = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".rp", "rp.properties");
