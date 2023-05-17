@@ -36,8 +36,7 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Analytics
                 var isOk = queryParams.ContainsKey("measurement_id") && queryParams["measurement_id"].StartsWith("G-");
                 isOk = isOk && queryParams.ContainsKey("api_secret") && !string.IsNullOrEmpty(queryParams["api_secret"]);
                 isOk = isOk && m.Content.Headers.ContentType.ToString().StartsWith("application/json");
-                var task = Task.Run(async () => await m.Content.ReadAsStringAsync());
-                var content = task.GetAwaiter().GetResult();
+                var content = m.Content.ReadAsStringAsync().GetAwaiter().GetResult();
                 isOk = isOk && content.Contains("\"client_id\":\"");
                 isOk = isOk && content.Contains("\"events\":[{\"");
                 isOk = isOk && content.Contains("\"params\":{\"");

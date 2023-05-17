@@ -8,7 +8,7 @@ namespace ReportPortal.Shared.Internal
 {
     public static class ClientIdProvider
     {
-        private static readonly string FILE_PATH = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".rp", "rp.properties");
+        public static readonly string FILE_PATH = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".rp", "rp.properties");
         private const string CLIENT_ID_KEY = "client.id";
 
         /// <summary>
