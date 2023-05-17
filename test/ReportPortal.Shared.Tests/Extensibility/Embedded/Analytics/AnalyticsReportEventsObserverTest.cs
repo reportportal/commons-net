@@ -24,7 +24,7 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Analytics
         public void ShouldHaveCorrectFormat()
         {
             var mockHttpHandler = new MockHttpMessageHandler();
-            mockHttpHandler.Expect(HttpMethod.Post, "https://www.google-analytics.com/mp/collect").With(new CustomMatcher(m =>
+            mockHttpHandler.Expect(HttpMethod.Post, "https://www.google-analytics.com/mp/collect").With(m =>
             {
                 var queryParams = m.RequestUri.Query.TrimStart('?').Split('&')
                 .Select(pair => pair.Split(new char[] { '=' }, 2))
@@ -41,7 +41,7 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Analytics
                 isOk = isOk && content.Contains("\"events\":[{\"");
                 isOk = isOk && content.Contains("\"params\":{\"");
                 return isOk;
-            })).Respond(HttpStatusCode.OK);
+            }).Respond(HttpStatusCode.OK);
 
             var analyticsObserver = new AnalyticsReportEventsObserver(mockHttpHandler);
             var extManager = new Shared.Extensibility.ExtensionManager();
