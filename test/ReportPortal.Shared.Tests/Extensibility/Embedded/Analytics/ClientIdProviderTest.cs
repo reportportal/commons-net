@@ -6,6 +6,7 @@ using static ReportPortal.Shared.Extensibility.Embedded.Analytics.ClientIdProvid
 
 namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Analytics
 {
+    [Collection("Static")]
     public class ClientIdProviderTest
     {
         private const string TEST_PROPERTY = "test.property=555\n";
@@ -39,7 +40,7 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Analytics
         [Fact]
         public async void GetClientIdShouldSaveIdToPropertyFile()
         {
-            File.Delete(FILE_PATH);
+            if (File.Exists(FILE_PATH)) { File.Delete(FILE_PATH); }
             string clientId = await GetClientIdAsync();
             string content;
             using (var reader = new StreamReader(FILE_PATH))
@@ -52,7 +53,7 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Analytics
         [Fact]
         public async void GetClientIdShouldReadIdFromPropertyFile()
         {
-            File.Delete(FILE_PATH);
+            if (File.Exists(FILE_PATH)) { File.Delete(FILE_PATH); }
             string clientId = Guid.NewGuid().ToString();
             using (var writer = new StreamWriter(FILE_PATH))
             {
@@ -65,7 +66,7 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Analytics
         [Fact]
         public async void GetClientIdShouldReadIdFromPropertyFileIfNotEmptyAndIdIsTheFirstLine()
         {
-            File.Delete(FILE_PATH);
+            if (File.Exists(FILE_PATH)) { File.Delete(FILE_PATH); }
             string clientId = Guid.NewGuid().ToString();
             using (var writer = new StreamWriter(FILE_PATH))
             {
@@ -78,7 +79,7 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Analytics
         [Fact]
         public async void GetClientIdShouldReadIdFromPropertyFileIfNotEmptyAndIdIsNotTheFirstLine()
         {
-            File.Delete(FILE_PATH);
+            if (File.Exists(FILE_PATH)) { File.Delete(FILE_PATH); }
             string clientId = Guid.NewGuid().ToString();
             using (var writer = new StreamWriter(FILE_PATH))
             {
@@ -91,7 +92,7 @@ namespace ReportPortal.Shared.Tests.Extensibility.Embedded.Analytics
         [Fact]
         public async void GetClientIdShouldWriteIdToPropertyFileIfNotEmpty()
         {
-            File.Delete(FILE_PATH);
+            if (File.Exists(FILE_PATH)) { File.Delete(FILE_PATH); }
             using (var writer = new StreamWriter(FILE_PATH))
             {
                 await writer.WriteAsync(TEST_PROPERTY);
