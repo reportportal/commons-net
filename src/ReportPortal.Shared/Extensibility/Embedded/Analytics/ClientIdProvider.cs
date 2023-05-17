@@ -33,21 +33,14 @@ namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
         {
             if (File.Exists(FILE_PATH))
             {
-                try
+                using (var reader = new StreamReader(FILE_PATH))
                 {
-                    using (var reader = new StreamReader(FILE_PATH))
+                    var contents = await reader.ReadToEndAsync();
+                    var matches = new Regex($@"{CLIENT_ID_KEY}\s*=\s*(\S*)").Matches(contents);
+                    if (matches.Count > 0)
                     {
-                        var contents = await reader.ReadToEndAsync();
-                        var matches = new Regex($@"{CLIENT_ID_KEY}\s*=\s*(\S*)").Matches(contents);
-                        if (matches.Count > 0)
-                        {
-                            return matches[0].Groups[1].Value.Trim();
-                        }
+                        return matches[0].Groups[1].Value.Trim();
                     }
-                }
-                catch
-                {
-                    // Ignore any exceptions when reading the file
                 }
             }
 
@@ -56,31 +49,24 @@ namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
 
         private static async Task SaveClientIdAsync(string clientId)
         {
-            try
+            StringBuilder contents = new StringBuilder();
+            if (File.Exists(FILE_PATH))
             {
-                StringBuilder contents = new StringBuilder();
-                if (File.Exists(FILE_PATH))
+                using (var reader = new StreamReader(FILE_PATH))
                 {
-                    using (var reader = new StreamReader(FILE_PATH))
+                    contents.Append(await reader.ReadToEndAsync());
+                    if (contents.Length > 0 && !contents.ToString().EndsWith("\n"))
                     {
-                        contents.Append(await reader.ReadToEndAsync());
-                        if (contents.Length > 0 && !contents.ToString().EndsWith("\n"))
-                        {
-                            contents.Append("\n");
-                        }
+                        contents.Append("\n");
                     }
                 }
-                contents.Append($"{CLIENT_ID_KEY} = {clientId}\n");
-
-                Directory.CreateDirectory(Path.GetDirectoryName(FILE_PATH)); // Ensure the directory exists
-                using (var writer = new StreamWriter(FILE_PATH))
-                {
-                    await writer.WriteAsync(contents.ToString());
-                }
             }
-            catch
+            contents.Append($"{CLIENT_ID_KEY} = {clientId}\n");
+
+            Directory.CreateDirectory(Path.GetDirectoryName(FILE_PATH)); // Ensure the directory exists
+            using (var writer = new StreamWriter(FILE_PATH))
             {
-                // Ignore any exceptions when writing to the file
+                await writer.WriteAsync(contents.ToString());
             }
         }
     }
