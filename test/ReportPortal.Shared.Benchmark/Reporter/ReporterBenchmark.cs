@@ -1,6 +1,7 @@
 ﻿using BenchmarkDotNet.Attributes;
 using ReportPortal.Client.Abstractions.Models;
 using ReportPortal.Client.Abstractions.Requests;
+using ReportPortal.Shared.Configuration;
 using ReportPortal.Shared.Extensibility;
 using ReportPortal.Shared.Reporter;
 using System;
@@ -14,10 +15,13 @@ namespace ReportPortal.Shared.Benchmark.Reporter
         [Params(1, 100000)]
         public int SuitesCount { get; set; }
 
+        [Params(0, 100)]
+        public int LogsCount { get; set; }
+
         [Benchmark]
         public void LaunchReporter()
         {
-            var configuration = new Configuration.ConfigurationBuilder().Build();
+            var configuration = new ConfigurationBuilder().Build();
 
             var nopService = new NopService();
             var launchReporter = new LaunchReporter(nopService, configuration, null, new ExtensionManager());
@@ -39,6 +43,11 @@ namespace ReportPortal.Shared.Benchmark.Reporter
                     StartTime = launchDateTime.AddMilliseconds(-1),
                     Type = TestItemType.Suite
                 });
+
+                for (int j = 0; j < LogsCount; j++)
+                {
+                    suiteNode.Log(new CreateLogItemRequest { Text = "abc" });
+                }
 
                 suiteNode.Finish(new FinishTestItemRequest
                 {

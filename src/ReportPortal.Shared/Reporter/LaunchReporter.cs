@@ -16,6 +16,7 @@ namespace ReportPortal.Shared.Reporter
     {
         private Internal.Logging.ITraceLogger TraceLogger { get; } = Internal.Logging.TraceLogManager.Instance.GetLogger<LaunchReporter>();
 
+        private readonly bool _asyncReporting;
         private readonly IConfiguration _configuration;
         private readonly IClientService _service;
         private readonly IRequestExecuter _requestExecuter;
@@ -41,11 +42,13 @@ namespace ReportPortal.Shared.Reporter
                 _configuration = new ConfigurationBuilder().AddDefaults(configurationDirectory).Build();
             }
 
+            _asyncReporting = _configuration.GetValue(ConfigurationPath.AsyncReporting, false);
             _requestExecuter = requestExecuter ?? new RequestExecuterFactory(_configuration).Create();
 
             _extensionManager = extensionManager ?? throw new ArgumentNullException(nameof(extensionManager));
 
             _reportEventsSource = new ReportEventsSource();
+
             if (extensionManager.ReportEventObservers != null)
             {
                 foreach (var reportEventObserver in extensionManager.ReportEventObservers)
@@ -87,7 +90,10 @@ namespace ReportPortal.Shared.Reporter
 
         public void Start(StartLaunchRequest request)
         {
-            if (request == null) throw new ArgumentNullException(nameof(request));
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
 
             TraceLogger.Verbose($"Scheduling request to start new '{request.Name}' launch in {GetHashCode()} proxy instance");
 
@@ -112,7 +118,11 @@ namespace ReportPortal.Shared.Reporter
                 {
                     NotifyStarting(request);
 
-                    var launch = await _requestExecuter.ExecuteAsync(() => _service.Launch.StartAsync(request), null, null).ConfigureAwait(false);
+                    var launch = await _requestExecuter
+                        .ExecuteAsync(() => _asyncReporting
+                            ? _service.AsyncLaunch.StartAsync(request)
+                            : _service.Launch.StartAsync(request), null, null, $"Starting new '{request.Name}' launch...")
+                        .ConfigureAwait(false);
 
                     _launchInfo = new LaunchInfo
                     {
@@ -129,7 +139,7 @@ namespace ReportPortal.Shared.Reporter
                 // get launch info
                 StartTask = Task.Run(async () =>
                 {
-                    var launch = await _requestExecuter.ExecuteAsync(() => _service.Launch.GetAsync(Info.Uuid), null, null).ConfigureAwait(false);
+                    var launch = await _requestExecuter.ExecuteAsync(() => _service.Launch.GetAsync(Info.Uuid), null, null, $"Getting existing launch by '{Info.Uuid}' uuid...").ConfigureAwait(false);
 
                     _launchInfo = new LaunchInfo
                     {
@@ -169,6 +179,7 @@ namespace ReportPortal.Shared.Reporter
 
             if (_logsReporter != null)
             {
+                _logsReporter.Finish();
                 dependentTasks.Add(_logsReporter.ProcessingTask);
             }
 
@@ -223,18 +234,17 @@ namespace ReportPortal.Shared.Reporter
                         }
                     }
 
-                    if (request.EndTime < _launchInfo.StartTime)
-                    {
-                        request.EndTime = _launchInfo.StartTime;
-                        _launchInfo.FinishTime = request.EndTime;
-                    }
-
                     if (!_isExternalLaunchId)
                     {
                         NotifyFinishing(request);
 
-                        var launchFinishedResponse = await _requestExecuter.ExecuteAsync(() => _service.Launch.FinishAsync(Info.Uuid, request), null, null).ConfigureAwait(false);
+                        var launchFinishedResponse = await _requestExecuter
+                            .ExecuteAsync(() => _asyncReporting
+                                ? _service.AsyncLaunch.FinishAsync(Info.Uuid, request)
+                                : _service.Launch.FinishAsync(Info.Uuid, request), null, null, $"Finishing '{Info.Name}' launch...")
+                            .ConfigureAwait(false);
 
+                        _launchInfo.FinishTime = request.EndTime;
                         _launchInfo.Url = launchFinishedResponse.Link;
 
                         NotifyFinished();
@@ -264,6 +274,7 @@ namespace ReportPortal.Shared.Reporter
                         ChildTestReporters = new List<ITestReporter>();
                     }
                 }
+
                 ChildTestReporters.Add(newTestNode);
             }
 
@@ -304,9 +315,24 @@ namespace ReportPortal.Shared.Reporter
 
         public void Sync()
         {
-            StartTask?.GetAwaiter().GetResult();
+            _logsReporter?.Sync();
 
-            FinishTask?.GetAwaiter().GetResult();
+            if (FinishTask != null)
+            {
+                FinishTask.GetAwaiter().GetResult();
+            }
+            else
+            {
+                StartTask?.GetAwaiter().GetResult();
+            }
+
+            if (ChildTestReporters != null)
+            {
+                foreach (var testNode in ChildTestReporters)
+                {
+                    testNode.Sync();
+                }
+            }
         }
 
         private LaunchInitializingEventArgs NotifyInitializing()

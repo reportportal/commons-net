@@ -1,8 +1,14 @@
-﻿using ReportPortal.Shared.Extensibility.ReportEvents;
+﻿using ReportPortal.Shared.Configuration;
+using ReportPortal.Shared.Extensibility.ReportEvents;
 using ReportPortal.Shared.Internal.Logging;
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Reflection;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
@@ -12,33 +18,28 @@ namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
     /// </summary>
     public class AnalyticsReportEventsObserver : IReportEventsObserver, IDisposable
     {
-        private const string MEASUREMENT_ID = "UA-173456809-1";
+        private const string CLIENT_INFO = "Ry1XUDU3UlNHOFhMOkVGaGFqc2J3U3RTbmEtc0NydGN6RHc=";
         private const string BASE_URI = "https://www.google-analytics.com";
         private const string CLIENT_NAME = "commons-dotnet";
+        private const string EVENT_NAME = "start_launch";
 
         private static ITraceLogger TraceLogger => TraceLogManager.Instance.GetLogger<AnalyticsReportEventsObserver>();
-
-        private readonly string _clientId;
 
         private readonly string _clientVersion;
 
         private readonly string _platformVersion;
 
-        private readonly HttpClient _httpClient;
+        private readonly string _measurementId;
+        private readonly string _apiKey;
 
-        public AnalyticsReportEventsObserver() : this(new HttpClientHandler
-        {
-#if !NET462
-            ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; }
-#endif
-        })
-        {
-        }
+        private HttpClient _httpClient;
+        private readonly object _httpClientLock = new object();
 
-        public AnalyticsReportEventsObserver(HttpMessageHandler httpHandler)
+        /// <summary>
+        /// Create an instance of AnalyticsReportEventsObserver object, construct own HttpClient if neccessary.
+        /// </summary>
+        public AnalyticsReportEventsObserver()
         {
-            _clientId = Guid.NewGuid().ToString();
-
             // Client is this assembly
             _clientVersion = typeof(AnalyticsReportEventsObserver).Assembly.GetName().Version.ToString(3);
 
@@ -47,7 +48,17 @@ namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
 #else
             _platformVersion = AppDomain.CurrentDomain.SetupInformation.TargetFrameworkName;
 #endif
+            var clientInfo = Encoding.UTF8.GetString(Convert.FromBase64String(CLIENT_INFO)).Split(':');
+            _measurementId = clientInfo[0];
+            _apiKey = clientInfo[1];
+        }
 
+        /// <summary>
+        /// Create an instance of AnalyticsReportEventsObserver object, use provided HttpMessageHandler to construct an HttpClient.
+        /// </summary>
+        /// <param name="httpHandler">Http handler to construc a client</param>
+        public AnalyticsReportEventsObserver(HttpMessageHandler httpHandler) : this()
+        {
             _httpClient = new HttpClient(httpHandler)
             {
                 BaseAddress = new Uri(BASE_URI)
@@ -61,22 +72,40 @@ namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
         /// <param name="agentVersion">Automatically identified as calling assembly version if null.</param>
         public static void DefineConsumer(string agentName, string agentVersion = null)
         {
-            if (string.IsNullOrEmpty(agentName) || string.IsNullOrEmpty(agentVersion))
+            // determine agent name
+            if (string.IsNullOrEmpty(agentName))
             {
                 var agentAssemblyName = Assembly.GetCallingAssembly().GetName();
                 AgentName = agentAssemblyName.Name;
-                _agentVersion = agentAssemblyName.Version.ToString(3);
             }
             else
             {
                 AgentName = agentName;
+            }
+
+            // determine agent version
+            if (string.IsNullOrEmpty(agentVersion))
+            {
+                var agentAssemblyName = Assembly.GetCallingAssembly().GetName();
+                _agentVersion = agentAssemblyName.Version.ToString(3);
+            }
+            else
+            {
                 _agentVersion = agentVersion;
             }
         }
 
+        /// <summary>
+        /// Set the name of the Agent or use default name "Anonymous".
+        /// </summary>
+        /// <returns>The Agent name.</returns>
         public static string AgentName { get; private set; } = "Anonymous";
 
         private static string _agentVersion;
+        /// <summary>
+        /// Return the version of the Agent retrieved from Assembly.
+        /// </summary>
+        /// <returns>The Agent version.</returns>
         public static string AgentVersion
         {
             get
@@ -103,21 +132,87 @@ namespace ReportPortal.Shared.Extensibility.Embedded.Analytics
 
         private Task _sendGaUsageTask;
 
+        HttpClient GetHttpClient(IConfiguration configuration)
+        {
+            if (_httpClient != null)
+                return _httpClient;
+
+            lock (_httpClientLock)
+            {
+                if (_httpClient != null)
+                    return _httpClient;
+
+                var handler = new HttpClientHandler();
+                var ignoreSslErrors = configuration.GetValue<bool>("Server:IgnoreSslErrors", false);
+
+#if NET462
+                if (ignoreSslErrors)
+                {
+                    ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
+                }
+#else
+                if (ignoreSslErrors)
+                {
+                    handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
+                }
+#endif
+                _httpClient = new HttpClient(handler)
+                {
+                    BaseAddress = new Uri(BASE_URI)
+                };
+            }
+
+            return _httpClient;
+        }
+
         private void ReportEventsSource_OnBeforeLaunchStarting(Reporter.ILaunchReporter launchReporter, ReportEvents.EventArgs.BeforeLaunchStartingEventArgs args)
         {
             if (args.Configuration.GetValue("Analytics:Enabled", true))
             {
-                var category = $"Client name \"{CLIENT_NAME}\", version \"{_clientVersion}\", interpreter \"{_platformVersion}\"";
-                var label = $"Agent name \"{AgentName}\", version \"{AgentVersion}\"";
-
-                var requestData = $"/collect?v=1&tid={MEASUREMENT_ID}&cid={_clientId}&t=event&ec={category}&ea=Start launch&el={label}";
-
                 // schedule tracking request
                 _sendGaUsageTask = Task.Run(async () =>
                 {
+                    var requestParams = new Dictionary<string, string>() {
+                        { "client_name", CLIENT_NAME },
+                        { "client_version", _clientVersion },
+                        { "interpreter", _platformVersion },
+                        { "agent_name", AgentName },
+                        { "agent_version", AgentVersion }
+                    };
+
+                    var eventData = new Dictionary<string, object>()
+                    {
+                        { "name", EVENT_NAME },
+                        { "params", requestParams }
+                    };
+
+                    var requestUri = $"/mp/collect?measurement_id={_measurementId}&api_secret={_apiKey}";
+
+                    var httpClient = GetHttpClient(args.Configuration);
+
+                    var payload = new Dictionary<string, object>()
+                    {
+                        { "client_id", await ClientIdProvider.GetClientIdAsync() },
+                        { "events", new List<object> { eventData } }
+                    };
+
+                    string content;
+
+                    using (var stream = new MemoryStream())
+                    {
+                        await JsonSerializer.SerializeAsync(stream, payload, payload.GetType());
+                        stream.Position = 0;
+                        using (var reader = new StreamReader(stream))
+                        {
+                            content = await reader.ReadToEndAsync();
+                        }
+                    }
+
+                    var stringContent = new StringContent(content, Encoding.UTF8, "application/json");
+                    
                     try
                     {
-                        using (var response = await _httpClient.PostAsync(requestData, null))
+                        using (var response = await httpClient.PostAsync(requestUri, stringContent))
                         {
                             response.EnsureSuccessStatusCode();
                         }
